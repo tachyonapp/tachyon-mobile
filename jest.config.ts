@@ -5,7 +5,7 @@ const config: Config = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   testMatch: ["**/__tests__/**/*.{ts,tsx}", "**/*.{spec,test}.{ts,tsx}"],
   transformIgnorePatterns: [
-    "node_modules/(?!(jest-expo|expo|@expo|react-native|@react-native|@apollo|react-native-auth0)/)",
+    "node_modules/(?!(jest-expo|expo-modules-core|expo|@expo|react-native|@react-native|@apollo|react-native-auth0)/)",
   ],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
