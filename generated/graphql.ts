@@ -1,0 +1,1773 @@
+/* eslint-disable */
+import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
+export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]: Maybe<T[SubKey]>;
+};
+export type MakeEmpty<
+  T extends { [key: string]: unknown },
+  K extends keyof T,
+> = { [_ in K]?: never };
+export type Incremental<T> =
+  | T
+  | {
+      [P in keyof T]?: P extends " $fragmentName" | "__typename" ? T[P] : never;
+    };
+/** All built-in and custom scalars, mapped to their actual values */
+export type Scalars = {
+  ID: { input: string; output: string };
+  String: { input: string; output: string };
+  Boolean: { input: boolean; output: boolean };
+  Int: { input: number; output: number };
+  Float: { input: number; output: number };
+  DateTime: { input: any; output: any };
+  Decimal: { input: any; output: any };
+};
+
+/** A user broker connection */
+export type Account = {
+  __typename?: "Account";
+  createdAt?: Maybe<Scalars["DateTime"]["output"]>;
+  id?: Maybe<Scalars["ID"]["output"]>;
+  providerName?: Maybe<Scalars["String"]["output"]>;
+  status?: Maybe<BrokerConnStatus>;
+  updatedAt?: Maybe<Scalars["DateTime"]["output"]>;
+};
+
+export type ApproveProposalResult = AuthError | NotFoundError | Proposal;
+
+export type AuthError = BaseError & {
+  __typename?: "AuthError";
+  message?: Maybe<Scalars["String"]["output"]>;
+};
+
+/** Computed balance summary for the authenticated user */
+export type Balance = {
+  __typename?: "Balance";
+  cashBalance?: Maybe<Scalars["Decimal"]["output"]>;
+  dayPnl?: Maybe<Scalars["Decimal"]["output"]>;
+  dayPnlPercent?: Maybe<Scalars["Decimal"]["output"]>;
+  investedValue?: Maybe<Scalars["Decimal"]["output"]>;
+  totalValue?: Maybe<Scalars["Decimal"]["output"]>;
+};
+
+export type BaseError = {
+  message?: Maybe<Scalars["String"]["output"]>;
+};
+
+/** A user-configured AI trading bot */
+export type Bot = {
+  __typename?: "Bot";
+  activePosition?: Maybe<Position>;
+  allocationPct?: Maybe<Scalars["Decimal"]["output"]>;
+  combatPatience?: Maybe<CombatPatience>;
+  createdAt?: Maybe<Scalars["DateTime"]["output"]>;
+  dailyMaxGain?: Maybe<Scalars["Decimal"]["output"]>;
+  dailyMaxLoss?: Maybe<Scalars["Decimal"]["output"]>;
+  frame?: Maybe<BotFrame>;
+  id?: Maybe<Scalars["ID"]["output"]>;
+  name?: Maybe<Scalars["String"]["output"]>;
+  owner?: Maybe<User>;
+  proposals?: Maybe<Array<Proposal>>;
+  riskAttitude?: Maybe<RiskAttitude>;
+  status?: Maybe<BotStatus>;
+  tradeTempo?: Maybe<TradeTempo>;
+  updatedAt?: Maybe<Scalars["DateTime"]["output"]>;
+};
+
+/** A user-configured AI trading bot */
+export type BotProposalsArgs = {
+  status?: InputMaybe<ProposalStatus>;
+};
+
+export enum BotFrame {
+  Berserker = "BERSERKER",
+  Brawler = "BRAWLER",
+  Bruiser = "BRUISER",
+  Guardian = "GUARDIAN",
+  Scout = "SCOUT",
+  Sniper = "SNIPER",
+}
+
+export type BotResult = Bot | NotFoundError | ValidationError;
+
+export enum BotStatus {
+  Active = "ACTIVE",
+  Archived = "ARCHIVED",
+  Draft = "DRAFT",
+  Paused = "PAUSED",
+}
+
+export enum BrokerConnStatus {
+  Active = "ACTIVE",
+  Error = "ERROR",
+  Revoked = "REVOKED",
+}
+
+export enum CombatPatience {
+  Calculated = "CALCULATED",
+  Impulsive = "IMPULSIVE",
+  Patient = "PATIENT",
+  Strategic = "STRATEGIC",
+}
+
+export type ConnectBrokerResult = Account | ValidationError;
+
+export type CreateBotInput = {
+  allocationPct: Scalars["Decimal"]["input"];
+  combatPatience: CombatPatience;
+  dailyMaxGain: Scalars["Decimal"]["input"];
+  dailyMaxLoss: Scalars["Decimal"]["input"];
+  frameName: BotFrame;
+  name: Scalars["String"]["input"];
+  riskAttitude: RiskAttitude;
+  tradeTempo: TradeTempo;
+};
+
+export type CreateBotResult = Bot | ValidationError;
+
+export type Mutation = {
+  __typename?: "Mutation";
+  activateBot?: Maybe<BotResult>;
+  approveProposal?: Maybe<ApproveProposalResult>;
+  connectBroker?: Maybe<ConnectBrokerResult>;
+  createBot?: Maybe<CreateBotResult>;
+  deleteBot?: Maybe<BotResult>;
+  pauseBot?: Maybe<BotResult>;
+  skipProposal?: Maybe<SkipProposalResult>;
+  updateBot?: Maybe<UpdateBotResult>;
+};
+
+export type MutationActivateBotArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type MutationApproveProposalArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type MutationConnectBrokerArgs = {
+  brokerName: Scalars["String"]["input"];
+  credentials: Scalars["String"]["input"];
+};
+
+export type MutationCreateBotArgs = {
+  input: CreateBotInput;
+};
+
+export type MutationDeleteBotArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type MutationPauseBotArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type MutationSkipProposalArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type MutationUpdateBotArgs = {
+  id: Scalars["ID"]["input"];
+  input: UpdateBotInput;
+};
+
+export type NotFoundError = BaseError & {
+  __typename?: "NotFoundError";
+  message?: Maybe<Scalars["String"]["output"]>;
+};
+
+export enum OrderEntryType {
+  Limit = "LIMIT",
+  Market = "MARKET",
+}
+
+/** An open or closed trading position held by a bot */
+export type Position = {
+  __typename?: "Position";
+  avgEntryPrice?: Maybe<Scalars["Decimal"]["output"]>;
+  bot?: Maybe<Bot>;
+  closedAt?: Maybe<Scalars["DateTime"]["output"]>;
+  id?: Maybe<Scalars["ID"]["output"]>;
+  minHoldUntil?: Maybe<Scalars["DateTime"]["output"]>;
+  openedAt?: Maybe<Scalars["DateTime"]["output"]>;
+  qty?: Maybe<Scalars["Decimal"]["output"]>;
+  status?: Maybe<PositionStatus>;
+  symbol?: Maybe<Scalars["String"]["output"]>;
+};
+
+export enum PositionStatus {
+  Closed = "CLOSED",
+  Open = "OPEN",
+}
+
+/** A trade proposal generated by a bot, pending user approval */
+export type Proposal = {
+  __typename?: "Proposal";
+  bot?: Maybe<Bot>;
+  confidence?: Maybe<Scalars["Decimal"]["output"]>;
+  createdAt?: Maybe<Scalars["DateTime"]["output"]>;
+  entryType?: Maybe<OrderEntryType>;
+  expiresAt?: Maybe<Scalars["DateTime"]["output"]>;
+  id?: Maybe<Scalars["ID"]["output"]>;
+  limitPrice?: Maybe<Scalars["Decimal"]["output"]>;
+  minHoldUntil?: Maybe<Scalars["DateTime"]["output"]>;
+  qty?: Maybe<Scalars["Decimal"]["output"]>;
+  rationaleText?: Maybe<Scalars["String"]["output"]>;
+  side?: Maybe<ProposalSide>;
+  status?: Maybe<ProposalStatus>;
+  stopPrice?: Maybe<Scalars["Decimal"]["output"]>;
+  symbol?: Maybe<Scalars["String"]["output"]>;
+  targetPrice?: Maybe<Scalars["Decimal"]["output"]>;
+};
+
+export enum ProposalSide {
+  Buy = "BUY",
+  Sell = "SELL",
+}
+
+export enum ProposalStatus {
+  Approved = "APPROVED",
+  Cancelled = "CANCELLED",
+  Expired = "EXPIRED",
+  Pending = "PENDING",
+  Skipped = "SKIPPED",
+}
+
+export type Query = {
+  __typename?: "Query";
+  account?: Maybe<Account>;
+  balance?: Maybe<Balance>;
+  bot?: Maybe<Bot>;
+  bots?: Maybe<Array<Bot>>;
+  me?: Maybe<User>;
+  positions?: Maybe<Array<Position>>;
+  proposals?: Maybe<Array<Proposal>>;
+};
+
+export type QueryBotArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryProposalsArgs = {
+  status?: InputMaybe<ProposalStatus>;
+};
+
+export enum RiskAttitude {
+  Aggressive = "AGGRESSIVE",
+  Balanced = "BALANCED",
+  Cautious = "CAUTIOUS",
+}
+
+export type SkipProposalResult = AuthError | NotFoundError | Proposal;
+
+export type Subscription = {
+  __typename?: "Subscription";
+  orderUpdated?: Maybe<Position>;
+  proposalCreated?: Maybe<Proposal>;
+};
+
+export type SubscriptionOrderUpdatedArgs = {
+  botId: Scalars["ID"]["input"];
+};
+
+export type SubscriptionProposalCreatedArgs = {
+  botId: Scalars["ID"]["input"];
+};
+
+export enum TradeTempo {
+  Active = "ACTIVE",
+  Opportunistic = "OPPORTUNISTIC",
+  Relentless = "RELENTLESS",
+}
+
+export type UpdateBotInput = {
+  allocationPct?: InputMaybe<Scalars["Decimal"]["input"]>;
+  combatPatience?: InputMaybe<CombatPatience>;
+  dailyMaxGain?: InputMaybe<Scalars["Decimal"]["input"]>;
+  dailyMaxLoss?: InputMaybe<Scalars["Decimal"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  riskAttitude?: InputMaybe<RiskAttitude>;
+  tradeTempo?: InputMaybe<TradeTempo>;
+};
+
+export type UpdateBotResult = Bot | NotFoundError | ValidationError;
+
+/** An authenticated Tachyon user */
+export type User = {
+  __typename?: "User";
+  auth0Id?: Maybe<Scalars["String"]["output"]>;
+  createdAt?: Maybe<Scalars["DateTime"]["output"]>;
+  email?: Maybe<Scalars["String"]["output"]>;
+  id?: Maybe<Scalars["ID"]["output"]>;
+};
+
+export type ValidationError = BaseError & {
+  __typename?: "ValidationError";
+  code?: Maybe<Scalars["String"]["output"]>;
+  field?: Maybe<Scalars["String"]["output"]>;
+  message?: Maybe<Scalars["String"]["output"]>;
+};
+
+export type ActivateBotMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ActivateBotMutation = {
+  __typename?: "Mutation";
+  activateBot?:
+    | { __typename?: "Bot"; id?: string | null; status?: BotStatus | null }
+    | { __typename?: "NotFoundError"; message?: string | null }
+    | { __typename?: "ValidationError" }
+    | null;
+};
+
+export type ApproveProposalMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ApproveProposalMutation = {
+  __typename?: "Mutation";
+  approveProposal?:
+    | { __typename?: "AuthError"; message?: string | null }
+    | { __typename?: "NotFoundError"; message?: string | null }
+    | {
+        __typename?: "Proposal";
+        id?: string | null;
+        status?: ProposalStatus | null;
+      }
+    | null;
+};
+
+export type ConnectBrokerMutationVariables = Exact<{
+  brokerName: Scalars["String"]["input"];
+  credentials: Scalars["String"]["input"];
+}>;
+
+export type ConnectBrokerMutation = {
+  __typename?: "Mutation";
+  connectBroker?:
+    | {
+        __typename?: "Account";
+        id?: string | null;
+        status?: BrokerConnStatus | null;
+        providerName?: string | null;
+      }
+    | {
+        __typename?: "ValidationError";
+        message?: string | null;
+        field?: string | null;
+        code?: string | null;
+      }
+    | null;
+};
+
+export type CreateBotMutationVariables = Exact<{
+  input: CreateBotInput;
+}>;
+
+export type CreateBotMutation = {
+  __typename?: "Mutation";
+  createBot?:
+    | {
+        __typename?: "Bot";
+        id?: string | null;
+        name?: string | null;
+        frame?: BotFrame | null;
+        status?: BotStatus | null;
+        allocationPct?: any | null;
+      }
+    | {
+        __typename?: "ValidationError";
+        message?: string | null;
+        field?: string | null;
+        code?: string | null;
+      }
+    | null;
+};
+
+export type DeleteBotMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type DeleteBotMutation = {
+  __typename?: "Mutation";
+  deleteBot?:
+    | { __typename?: "Bot"; id?: string | null; status?: BotStatus | null }
+    | { __typename?: "NotFoundError"; message?: string | null }
+    | { __typename?: "ValidationError" }
+    | null;
+};
+
+export type PauseBotMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type PauseBotMutation = {
+  __typename?: "Mutation";
+  pauseBot?:
+    | { __typename?: "Bot"; id?: string | null; status?: BotStatus | null }
+    | { __typename?: "NotFoundError"; message?: string | null }
+    | { __typename?: "ValidationError" }
+    | null;
+};
+
+export type SkipProposalMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type SkipProposalMutation = {
+  __typename?: "Mutation";
+  skipProposal?:
+    | { __typename?: "AuthError"; message?: string | null }
+    | { __typename?: "NotFoundError"; message?: string | null }
+    | {
+        __typename?: "Proposal";
+        id?: string | null;
+        status?: ProposalStatus | null;
+      }
+    | null;
+};
+
+export type UpdateBotMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: UpdateBotInput;
+}>;
+
+export type UpdateBotMutation = {
+  __typename?: "Mutation";
+  updateBot?:
+    | {
+        __typename?: "Bot";
+        id?: string | null;
+        name?: string | null;
+        allocationPct?: any | null;
+        dailyMaxLoss?: any | null;
+        dailyMaxGain?: any | null;
+        updatedAt?: any | null;
+      }
+    | { __typename?: "NotFoundError"; message?: string | null }
+    | {
+        __typename?: "ValidationError";
+        message?: string | null;
+        field?: string | null;
+        code?: string | null;
+      }
+    | null;
+};
+
+export type AccountQueryVariables = Exact<{ [key: string]: never }>;
+
+export type AccountQuery = {
+  __typename?: "Query";
+  account?: {
+    __typename?: "Account";
+    id?: string | null;
+    status?: BrokerConnStatus | null;
+    providerName?: string | null;
+  } | null;
+};
+
+export type BalanceQueryVariables = Exact<{ [key: string]: never }>;
+
+export type BalanceQuery = {
+  __typename?: "Query";
+  balance?: {
+    __typename?: "Balance";
+    totalValue?: any | null;
+    cashBalance?: any | null;
+    investedValue?: any | null;
+    dayPnl?: any | null;
+    dayPnlPercent?: any | null;
+  } | null;
+};
+
+export type BotQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type BotQuery = {
+  __typename?: "Query";
+  bot?: {
+    __typename?: "Bot";
+    id?: string | null;
+    name?: string | null;
+    frame?: BotFrame | null;
+    status?: BotStatus | null;
+    allocationPct?: any | null;
+    dailyMaxLoss?: any | null;
+    dailyMaxGain?: any | null;
+    riskAttitude?: RiskAttitude | null;
+    tradeTempo?: TradeTempo | null;
+    combatPatience?: CombatPatience | null;
+    createdAt?: any | null;
+    updatedAt?: any | null;
+    activePosition?: {
+      __typename?: "Position";
+      id?: string | null;
+      symbol?: string | null;
+      qty?: any | null;
+      avgEntryPrice?: any | null;
+      status?: PositionStatus | null;
+      openedAt?: any | null;
+    } | null;
+    proposals?: Array<{
+      __typename?: "Proposal";
+      id?: string | null;
+      symbol?: string | null;
+      side?: ProposalSide | null;
+      qty?: any | null;
+      limitPrice?: any | null;
+      rationaleText?: string | null;
+      status?: ProposalStatus | null;
+      expiresAt?: any | null;
+      createdAt?: any | null;
+    }> | null;
+  } | null;
+};
+
+export type BotsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type BotsQuery = {
+  __typename?: "Query";
+  bots?: Array<{
+    __typename?: "Bot";
+    id?: string | null;
+    name?: string | null;
+    frame?: BotFrame | null;
+    status?: BotStatus | null;
+    allocationPct?: any | null;
+    dailyMaxLoss?: any | null;
+    dailyMaxGain?: any | null;
+    riskAttitude?: RiskAttitude | null;
+    tradeTempo?: TradeTempo | null;
+    combatPatience?: CombatPatience | null;
+    createdAt?: any | null;
+    updatedAt?: any | null;
+  }> | null;
+};
+
+export type MeQueryVariables = Exact<{ [key: string]: never }>;
+
+export type MeQuery = {
+  __typename?: "Query";
+  me?: {
+    __typename?: "User";
+    id?: string | null;
+    email?: string | null;
+    auth0Id?: string | null;
+    createdAt?: any | null;
+  } | null;
+};
+
+export type PositionsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type PositionsQuery = {
+  __typename?: "Query";
+  positions?: Array<{
+    __typename?: "Position";
+    id?: string | null;
+    symbol?: string | null;
+    qty?: any | null;
+    avgEntryPrice?: any | null;
+    status?: PositionStatus | null;
+    openedAt?: any | null;
+    closedAt?: any | null;
+    bot?: {
+      __typename?: "Bot";
+      id?: string | null;
+      name?: string | null;
+    } | null;
+  }> | null;
+};
+
+export type ProposalsQueryVariables = Exact<{
+  status?: InputMaybe<ProposalStatus>;
+}>;
+
+export type ProposalsQuery = {
+  __typename?: "Query";
+  proposals?: Array<{
+    __typename?: "Proposal";
+    id?: string | null;
+    symbol?: string | null;
+    side?: ProposalSide | null;
+    qty?: any | null;
+    limitPrice?: any | null;
+    rationaleText?: string | null;
+    status?: ProposalStatus | null;
+    expiresAt?: any | null;
+    createdAt?: any | null;
+    bot?: {
+      __typename?: "Bot";
+      id?: string | null;
+      name?: string | null;
+    } | null;
+  }> | null;
+};
+
+export const ActivateBotDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "ActivateBot" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "activateBot" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "id" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "Bot" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "NotFoundError" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "message" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ActivateBotMutation, ActivateBotMutationVariables>;
+export const ApproveProposalDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "ApproveProposal" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "approveProposal" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "id" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "Proposal" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "NotFoundError" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "message" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "AuthError" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "message" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ApproveProposalMutation,
+  ApproveProposalMutationVariables
+>;
+export const ConnectBrokerDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "ConnectBroker" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "brokerName" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "String" },
+            },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "credentials" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "String" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "connectBroker" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "brokerName" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "brokerName" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "credentials" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "credentials" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "Account" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "providerName" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ValidationError" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "message" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "field" } },
+                      { kind: "Field", name: { kind: "Name", value: "code" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ConnectBrokerMutation,
+  ConnectBrokerMutationVariables
+>;
+export const CreateBotDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "CreateBot" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "CreateBotInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "createBot" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "Bot" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "frame" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "allocationPct" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ValidationError" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "message" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "field" } },
+                      { kind: "Field", name: { kind: "Name", value: "code" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<CreateBotMutation, CreateBotMutationVariables>;
+export const DeleteBotDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "DeleteBot" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "deleteBot" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "id" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "Bot" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "NotFoundError" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "message" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<DeleteBotMutation, DeleteBotMutationVariables>;
+export const PauseBotDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "PauseBot" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "pauseBot" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "id" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "Bot" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "NotFoundError" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "message" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<PauseBotMutation, PauseBotMutationVariables>;
+export const SkipProposalDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "SkipProposal" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "skipProposal" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "id" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "Proposal" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "NotFoundError" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "message" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "AuthError" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "message" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  SkipProposalMutation,
+  SkipProposalMutationVariables
+>;
+export const UpdateBotDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "UpdateBot" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "UpdateBotInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "updateBot" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "id" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "Bot" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "allocationPct" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "dailyMaxLoss" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "dailyMaxGain" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "updatedAt" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ValidationError" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "message" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "field" } },
+                      { kind: "Field", name: { kind: "Name", value: "code" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "NotFoundError" },
+                  },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "message" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<UpdateBotMutation, UpdateBotMutationVariables>;
+export const AccountDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "Account" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "account" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "status" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "providerName" },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AccountQuery, AccountQueryVariables>;
+export const BalanceDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "Balance" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "balance" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "totalValue" } },
+                { kind: "Field", name: { kind: "Name", value: "cashBalance" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "investedValue" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "dayPnl" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "dayPnlPercent" },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<BalanceQuery, BalanceQueryVariables>;
+export const BotDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "Bot" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "bot" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "id" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "frame" } },
+                { kind: "Field", name: { kind: "Name", value: "status" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "allocationPct" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "dailyMaxLoss" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "dailyMaxGain" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "riskAttitude" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "tradeTempo" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "combatPatience" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "activePosition" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "symbol" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "qty" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "avgEntryPrice" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "openedAt" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "proposals" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "status" },
+                      value: { kind: "EnumValue", value: "PENDING" },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "symbol" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "side" } },
+                      { kind: "Field", name: { kind: "Name", value: "qty" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "limitPrice" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "rationaleText" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "expiresAt" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "createdAt" },
+                      },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                { kind: "Field", name: { kind: "Name", value: "updatedAt" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<BotQuery, BotQueryVariables>;
+export const BotsDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "Bots" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "bots" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "frame" } },
+                { kind: "Field", name: { kind: "Name", value: "status" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "allocationPct" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "dailyMaxLoss" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "dailyMaxGain" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "riskAttitude" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "tradeTempo" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "combatPatience" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                { kind: "Field", name: { kind: "Name", value: "updatedAt" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<BotsQuery, BotsQueryVariables>;
+export const MeDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "Me" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "me" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "email" } },
+                { kind: "Field", name: { kind: "Name", value: "auth0Id" } },
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<MeQuery, MeQueryVariables>;
+export const PositionsDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "Positions" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "positions" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "symbol" } },
+                { kind: "Field", name: { kind: "Name", value: "qty" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "avgEntryPrice" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "status" } },
+                { kind: "Field", name: { kind: "Name", value: "openedAt" } },
+                { kind: "Field", name: { kind: "Name", value: "closedAt" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "bot" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<PositionsQuery, PositionsQueryVariables>;
+export const ProposalsDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "Proposals" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "status" },
+          },
+          type: {
+            kind: "NamedType",
+            name: { kind: "Name", value: "ProposalStatus" },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "proposals" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "status" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "status" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "symbol" } },
+                { kind: "Field", name: { kind: "Name", value: "side" } },
+                { kind: "Field", name: { kind: "Name", value: "qty" } },
+                { kind: "Field", name: { kind: "Name", value: "limitPrice" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "rationaleText" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "status" } },
+                { kind: "Field", name: { kind: "Name", value: "expiresAt" } },
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "bot" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ProposalsQuery, ProposalsQueryVariables>;

@@ -9,7 +9,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --watchAll=false",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "codegen": "graphql-codegen --config graphql/codegen.ts",
+    "codegen:watch": "graphql-codegen --config graphql/codegen.ts --watch"
   },
   "dependencies": {
     "@apollo/client": "^4.1.6",
