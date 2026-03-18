@@ -28,5 +28,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       apiUrl: envConfig.apiUrl,
       environment,
     },
+    plugins: ["react-native-auth0"],
   };
 };

@@ -1,0 +1,9 @@
+# fetchPolicy: cache-first (identity changes rarely)
+query Me {
+  me {
+    id
+    email
+    auth0Id
+    createdAt
+  }
+}

@@ -1,0 +1,11 @@
+mutation ActivateBot($id: ID!) {
+  activateBot(id: $id) {
+    ... on Bot {
+      id
+      status
+    }
+    ... on NotFoundError {
+      message
+    }
+  }
+}

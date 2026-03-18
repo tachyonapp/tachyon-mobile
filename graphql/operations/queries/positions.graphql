@@ -1,0 +1,16 @@
+# fetchPolicy: network-only (real-time financial data)
+query Positions {
+  positions {
+    id
+    symbol
+    qty
+    avgEntryPrice
+    status
+    openedAt
+    closedAt
+    bot {
+      id
+      name
+    }
+  }
+}

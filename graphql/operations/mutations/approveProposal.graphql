@@ -1,0 +1,14 @@
+mutation ApproveProposal($id: ID!) {
+  approveProposal(id: $id) {
+    ... on Proposal {
+      id
+      status
+    }
+    ... on NotFoundError {
+      message
+    }
+    ... on AuthError {
+      message
+    }
+  }
+}

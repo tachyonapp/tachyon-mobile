@@ -1,0 +1,17 @@
+# fetchPolicy: cache-and-network
+query Bots {
+  bots {
+    id
+    name
+    frame
+    status
+    allocationPct
+    dailyMaxLoss
+    dailyMaxGain
+    riskAttitude
+    tradeTempo
+    combatPatience
+    createdAt
+    updatedAt
+  }
+}

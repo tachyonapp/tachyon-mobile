@@ -1,0 +1,10 @@
+# fetchPolicy: network-only (financial data — never serve from cache)
+query Balance {
+  balance {
+    totalValue
+    cashBalance
+    investedValue
+    dayPnl
+    dayPnlPercent
+  }
+}
