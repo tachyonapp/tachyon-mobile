@@ -1,0 +1,14 @@
+mutation ConnectBroker($brokerName: String!, $credentials: String!) {
+  connectBroker(brokerName: $brokerName, credentials: $credentials) {
+    ... on Account {
+      id
+      brokerConnected
+      brokerName
+    }
+    ... on ValidationError {
+      message
+      field
+      code
+    }
+  }
+}

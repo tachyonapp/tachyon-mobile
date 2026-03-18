@@ -1,0 +1,16 @@
+mutation CreateBot($input: CreateBotInput!) {
+  createBot(input: $input) {
+    ... on Bot {
+      id
+      name
+      frame
+      status
+      capitalAllocation
+    }
+    ... on ValidationError {
+      message
+      field
+      code
+    }
+  }
+}

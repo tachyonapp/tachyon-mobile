@@ -1,0 +1,11 @@
+mutation PauseBot($id: ID!) {
+  pauseBot(id: $id) {
+    ... on Bot {
+      id
+      status
+    }
+    ... on NotFoundError {
+      message
+    }
+  }
+}

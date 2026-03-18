@@ -1,0 +1,8 @@
+# fetchPolicy: cache-and-network
+query Account {
+  account {
+    id
+    brokerConnected
+    brokerName
+  }
+}

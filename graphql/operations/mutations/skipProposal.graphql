@@ -1,0 +1,15 @@
+# Used with optimistic update
+mutation SkipProposal($id: ID!) {
+  skipProposal(id: $id) {
+    ... on Proposal {
+      id
+      status
+    }
+    ... on NotFoundError {
+      message
+    }
+    ... on AuthError {
+      message
+    }
+  }
+}

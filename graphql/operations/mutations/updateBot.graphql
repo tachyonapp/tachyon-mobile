@@ -1,0 +1,21 @@
+mutation UpdateBot($id: ID!, $input: UpdateBotInput!) {
+  updateBot(id: $id, input: $input) {
+    ... on Bot {
+      id
+      name
+      capitalAllocation
+      maxDailyLoss
+      maxDailyGain
+      maxPositions
+      updatedAt
+    }
+    ... on ValidationError {
+      message
+      field
+      code
+    }
+    ... on NotFoundError {
+      message
+    }
+  }
+}

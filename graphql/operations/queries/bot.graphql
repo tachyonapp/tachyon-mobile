@@ -1,0 +1,36 @@
+# fetchPolicy: cache-and-network
+query Bot($id: ID!) {
+  bot(id: $id) {
+    id
+    name
+    frame
+    status
+    capitalAllocation
+    maxDailyLoss
+    maxDailyGain
+    maxPositions
+    activePosition {
+      id
+      ticker
+      quantity
+      entryPrice
+      currentPrice
+      unrealizedPnl
+      status
+      openedAt
+    }
+    proposals(status: PENDING) {
+      id
+      ticker
+      direction
+      quantity
+      proposedPrice
+      rationale
+      status
+      expiresAt
+      createdAt
+    }
+    createdAt
+    updatedAt
+  }
+}

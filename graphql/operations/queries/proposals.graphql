@@ -1,0 +1,18 @@
+# fetchPolicy: network-only (real-time — never serve stale proposals)
+query Proposals($status: ProposalStatus) {
+  proposals(status: $status) {
+    id
+    ticker
+    direction
+    quantity
+    proposedPrice
+    rationale
+    status
+    expiresAt
+    createdAt
+    bot {
+      id
+      name
+    }
+  }
+}
