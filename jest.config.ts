@@ -8,7 +8,7 @@ const config: Config = {
     "node_modules/(?!(jest-expo|expo|@expo|react-native|@react-native|@apollo|react-native-auth0)/)",
   ],
   moduleNameMapper: {
-    "^@/(.*)$": ["<rootDir>/src/$1", "<rootDir>/$1"],
+    "^@/(.*)$": "<rootDir>/$1",
   },
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",
