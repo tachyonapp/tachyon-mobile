@@ -5,27 +5,27 @@ query Bot($id: ID!) {
     name
     frame
     status
-    capitalAllocation
-    maxDailyLoss
-    maxDailyGain
-    maxPositions
+    allocationPct
+    dailyMaxLoss
+    dailyMaxGain
+    riskAttitude
+    tradeTempo
+    combatPatience
     activePosition {
       id
-      ticker
-      quantity
-      entryPrice
-      currentPrice
-      unrealizedPnl
+      symbol
+      qty
+      avgEntryPrice
       status
       openedAt
     }
     proposals(status: PENDING) {
       id
-      ticker
-      direction
-      quantity
-      proposedPrice
-      rationale
+      symbol
+      side
+      qty
+      limitPrice
+      rationaleText
       status
       expiresAt
       createdAt

@@ -3,10 +3,9 @@ mutation UpdateBot($id: ID!, $input: UpdateBotInput!) {
     ... on Bot {
       id
       name
-      capitalAllocation
-      maxDailyLoss
-      maxDailyGain
-      maxPositions
+      allocationPct
+      dailyMaxLoss
+      dailyMaxGain
       updatedAt
     }
     ... on ValidationError {

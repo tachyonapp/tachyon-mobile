@@ -2,8 +2,8 @@ mutation ConnectBroker($brokerName: String!, $credentials: String!) {
   connectBroker(brokerName: $brokerName, credentials: $credentials) {
     ... on Account {
       id
-      brokerConnected
-      brokerName
+      status
+      providerName
     }
     ... on ValidationError {
       message

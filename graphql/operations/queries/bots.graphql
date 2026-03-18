@@ -5,10 +5,12 @@ query Bots {
     name
     frame
     status
-    capitalAllocation
-    maxDailyLoss
-    maxDailyGain
-    maxPositions
+    allocationPct
+    dailyMaxLoss
+    dailyMaxGain
+    riskAttitude
+    tradeTempo
+    combatPatience
     createdAt
     updatedAt
   }

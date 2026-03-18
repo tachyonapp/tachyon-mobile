@@ -2,11 +2,11 @@
 query Proposals($status: ProposalStatus) {
   proposals(status: $status) {
     id
-    ticker
-    direction
-    quantity
-    proposedPrice
-    rationale
+    symbol
+    side
+    qty
+    limitPrice
+    rationaleText
     status
     expiresAt
     createdAt

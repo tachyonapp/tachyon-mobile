@@ -5,7 +5,7 @@ mutation CreateBot($input: CreateBotInput!) {
       name
       frame
       status
-      capitalAllocation
+      allocationPct
     }
     ... on ValidationError {
       message

@@ -2,7 +2,7 @@
 query Account {
   account {
     id
-    brokerConnected
-    brokerName
+    status
+    providerName
   }
 }

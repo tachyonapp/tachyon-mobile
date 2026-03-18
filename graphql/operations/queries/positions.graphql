@@ -2,11 +2,9 @@
 query Positions {
   positions {
     id
-    ticker
-    quantity
-    entryPrice
-    currentPrice
-    unrealizedPnl
+    symbol
+    qty
+    avgEntryPrice
     status
     openedAt
     closedAt
