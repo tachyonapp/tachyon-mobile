@@ -1,30 +1,21 @@
-import { ApolloLink } from '@apollo/client';
-import { Observable } from 'rxjs';
-import Auth0 from 'react-native-auth0';
+import { SetContextLink } from '@apollo/client/link/context'
 
-// Apollo v4: Observable is from rxjs — not from @apollo/client
-const auth0 = new Auth0({
-  domain: process.env.EXPO_PUBLIC_AUTH0_DOMAIN!,
-  clientId: process.env.EXPO_PUBLIC_AUTH0_CLIENT_ID!,
-});
+// Module-level ref populated by ClerkTokenBridge (auth/clerk-token-bridge.tsx).
+// ClerkTokenBridge calls setClerkGetToken() once on mount, wiring Clerk's
+// getToken() into the link chain without needing a React hook here.
+let clerkGetToken: (() => Promise<string | null>) | null = null
 
-// Attaches Bearer token to every outgoing request
-// Reads from platform secure storage via credentialsManager (iOS Keychain / Android Keystore)
-export const authLink = new ApolloLink((operation, forward) => {
-  return new Observable((subscriber) => {
-    auth0.credentialsManager
-      .getCredentials()
-      .then((credentials) => {
-        if (credentials?.accessToken) {
-          operation.setContext({
-            headers: { authorization: `Bearer ${credentials.accessToken}` },
-          });
-        }
-        forward(operation).subscribe(subscriber);
-      })
-      .catch(() => {
-        // No credentials — proceed unauthenticated
-        forward(operation).subscribe(subscriber);
-      });
-  });
-});
+export function setClerkGetToken(fn: () => Promise<string | null>) {
+  clerkGetToken = fn
+}
+
+export const authLink = new SetContextLink(async (prevContext) => {
+  const token = clerkGetToken ? await clerkGetToken() : null
+  const { headers } = prevContext
+  return {
+    headers: {
+      ...headers,
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+    },
+  }
+})

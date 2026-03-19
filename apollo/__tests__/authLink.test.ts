@@ -1,7 +1,6 @@
+import { authLink, setClerkGetToken } from "@/apollo/links/authLink";
 import { ApolloClient, ApolloLink, InMemoryCache, gql } from "@apollo/client";
-import Auth0 from "react-native-auth0";
 import { of } from "rxjs";
-import { authLink } from "@/apollo/links/authLink";
 
 const ME_QUERY = gql`
   query Me {
@@ -12,17 +11,22 @@ const ME_QUERY = gql`
   }
 `;
 
-// auth0 is instantiated at module scope in authLink.ts when the module is first imported.
-// Capture the mock instance so we can control getCredentials per test.
-const mockGetCredentials = (Auth0 as jest.Mock).mock.results[0].value
-  .credentialsManager.getCredentials as jest.Mock;
-
 beforeEach(() => {
-  mockGetCredentials.mockReset();
+  // Reset to null before each test so tests are isolated
+  setClerkGetToken(async () => null);
 });
 
+// auth0 is instantiated at module scope in authLink.ts when the module is first imported.
+// Capture the mock instance so we can control getCredentials per test.
+// const mockGetCredentials = (Auth0 as jest.Mock).mock.results[0].value
+//   .credentialsManager.getCredentials as jest.Mock;
+
+// beforeEach(() => {
+//   mockGetCredentials.mockReset();
+// });
+
 it("attaches Authorization header with Bearer token", async () => {
-  mockGetCredentials.mockResolvedValue({ accessToken: "test-token-abc" });
+  setClerkGetToken(async () => "test-token-abc");
 
   let capturedHeaders: Record<string, string> = {};
 
@@ -41,7 +45,7 @@ it("attaches Authorization header with Bearer token", async () => {
 });
 
 it("proceeds unauthenticated when no credentials are available", async () => {
-  mockGetCredentials.mockRejectedValue(new Error("No credentials stored"));
+  setClerkGetToken(async () => null);
 
   let capturedHeaders: Record<string, string> | undefined;
 

@@ -1,4 +1,9 @@
+import { apolloClient } from "@/apollo/client";
+import { AuthProvider } from "@/auth/AuthProvider";
+import { tokenCache } from "@/auth/token-cache";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { ApolloProvider } from "@apollo/client/react";
+import { ClerkProvider } from "@clerk/clerk-expo";
 import {
   DarkTheme,
   DefaultTheme,
@@ -8,36 +13,39 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
-import { apolloClient } from "@/apollo/client";
-import { Auth0Provider } from "@/auth/Auth0Provider";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
 export const unstable_settings = {
   anchor: "(tabs)",
 };
 
-// Auth0Provider must be outermost — Apollo link chain reads credentials via
-// react-native-auth0 directly (not via context), so ordering here is for
-// future hooks/components that consume both providers.
+// ClerkProvider must be outermost — all Clerk hooks require it in the tree.
+// ClerkTokenBridge wires Clerk's getToken() into the Apollo auth link.
+// AuthProvider (our custom context) sits inside ClerkProvider so it can use Clerk hooks.
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <Auth0Provider>
-      <ApolloProvider client={apolloClient}>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="modal"
-              options={{ presentation: "modal", title: "Modal" }}
-            />
-          </Stack>
-          <StatusBar style="auto" />
-        </ThemeProvider>
-      </ApolloProvider>
-    </Auth0Provider>
+    <ClerkProvider
+      publishableKey={CLERK_PUBLISHABLE_KEY}
+      tokenCache={tokenCache}
+    >
+      <AuthProvider>
+        <ApolloProvider client={apolloClient}>
+          <ThemeProvider
+            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+          >
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="modal"
+                options={{ presentation: "modal", title: "Modal" }}
+              />
+            </Stack>
+            <StatusBar style="auto" />
+          </ThemeProvider>
+        </ApolloProvider>
+      </AuthProvider>
+    </ClerkProvider>
   );
 }
