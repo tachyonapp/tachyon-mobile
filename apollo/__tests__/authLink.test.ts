@@ -16,15 +16,6 @@ beforeEach(() => {
   setClerkGetToken(async () => null);
 });
 
-// auth0 is instantiated at module scope in authLink.ts when the module is first imported.
-// Capture the mock instance so we can control getCredentials per test.
-// const mockGetCredentials = (Auth0 as jest.Mock).mock.results[0].value
-//   .credentialsManager.getCredentials as jest.Mock;
-
-// beforeEach(() => {
-//   mockGetCredentials.mockReset();
-// });
-
 it("attaches Authorization header with Bearer token", async () => {
   setClerkGetToken(async () => "test-token-abc");
 
