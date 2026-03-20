@@ -1,5 +1,5 @@
 import { apolloClient } from "@/apollo/client";
-import { AuthProvider } from "@/auth/AuthProvider";
+import { AuthProvider, useAuth } from "@/auth/AuthProvider";
 import { ClerkTokenBridge } from "@/auth/clerk-token-bridge";
 import { tokenCache } from "@/auth/token-cache";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -10,15 +10,54 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { Stack } from "expo-router";
+import { Redirect, Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import "react-native-reanimated";
+import { AuthLoadingState } from "../components/auth/auth-loading-state";
+
+// Hold the native splash screen until auth check resolves.
+SplashScreen.preventAutoHideAsync();
 
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
-export const unstable_settings = {
-  anchor: "(tabs)",
-};
+/**
+ * Inner layout reads auth state and handles routing.
+ * Must be inside ClerkProvider + AuthProvider to access useAuth().
+ */
+function RootNavigator() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading) {
+      // Auth check resolved — hide native splash screen
+      SplashScreen.hideAsync();
+    }
+  }, [isLoading]);
+
+  if (isLoading) {
+    return <AuthLoadingState message="Loading…" />;
+  }
+
+  return (
+    <>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="modal"
+          options={{ presentation: "modal", title: "Modal" }}
+        />
+      </Stack>
+
+      {/* Navigation guard: redirect unauthenticated users to login */}
+      {!isAuthenticated && <Redirect href="/(auth)/login" />}
+
+      <StatusBar style="auto" />
+    </>
+  );
+}
 
 // ClerkProvider must be outermost — all Clerk hooks require it in the tree.
 // ClerkTokenBridge wires Clerk's getToken() into the Apollo auth link.
@@ -38,14 +77,7 @@ export default function RootLayout() {
           <ThemeProvider
             value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
           >
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen
-                name="modal"
-                options={{ presentation: "modal", title: "Modal" }}
-              />
-            </Stack>
-            <StatusBar style="auto" />
+            <RootNavigator />
           </ThemeProvider>
         </ApolloProvider>
       </AuthProvider>
