@@ -1,5 +1,6 @@
 import { apolloClient } from "@/apollo/client";
 import { AuthProvider } from "@/auth/AuthProvider";
+import { ClerkTokenBridge } from "@/auth/clerk-token-bridge";
 import { tokenCache } from "@/auth/token-cache";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { ApolloProvider } from "@apollo/client/react";
@@ -30,6 +31,8 @@ export default function RootLayout() {
       publishableKey={CLERK_PUBLISHABLE_KEY}
       tokenCache={tokenCache}
     >
+      {/* ClerkTokenBridge calls `useAuth` from `@clerk/clerk-expo`, which requires being inside `ClerkProvider` */}
+      <ClerkTokenBridge />
       <AuthProvider>
         <ApolloProvider client={apolloClient}>
           <ThemeProvider
