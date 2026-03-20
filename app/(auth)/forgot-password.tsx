@@ -14,11 +14,11 @@ import {
   View,
 } from "react-native";
 
-export default function ForgotPasswordScreen() {
+const ForgotPasswordScreen = () => {
   const { forgotPassword, error } = useAuth();
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "dark"];
+  const theme = Colors[colorScheme];
 
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -128,7 +128,7 @@ export default function ForgotPasswordScreen() {
       </Pressable>
     </AuthScreen>
   );
-}
+};
 
 const styles = StyleSheet.create({
   title: {
@@ -199,3 +199,5 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 });
+
+export default ForgotPasswordScreen;

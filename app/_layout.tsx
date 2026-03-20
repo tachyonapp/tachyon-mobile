@@ -11,7 +11,7 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { Redirect, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
@@ -27,7 +27,7 @@ const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
  * Must be inside ClerkProvider + AuthProvider to access useAuth().
  */
 function RootNavigator() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isLoading } = useAuth();
 
   useEffect(() => {
     if (!isLoading) {
@@ -50,9 +50,6 @@ function RootNavigator() {
           options={{ presentation: "modal", title: "Modal" }}
         />
       </Stack>
-
-      {/* Navigation guard: redirect unauthenticated users to login */}
-      {!isAuthenticated && <Redirect href="/(auth)/login" />}
 
       <StatusBar style="auto" />
     </>

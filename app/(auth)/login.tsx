@@ -18,7 +18,7 @@ export default function LoginScreen() {
   const { login, isLoading, error } = useAuth();
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "dark"];
+  const theme = Colors[colorScheme];
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

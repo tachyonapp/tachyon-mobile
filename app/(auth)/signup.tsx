@@ -49,7 +49,7 @@ function getPasswordStrength(password: string): number {
 export default function SignupScreen() {
   const { signup, isLoading, error } = useAuth();
   const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "dark"];
+  const theme = Colors[colorScheme];
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

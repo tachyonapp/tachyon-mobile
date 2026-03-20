@@ -22,7 +22,7 @@ interface AuthScreenProps {
 
 export function AuthScreen({ children }: AuthScreenProps) {
   const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "dark"];
+  const theme = Colors[colorScheme];
 
   const opacity = useSharedValue(0.3);
 

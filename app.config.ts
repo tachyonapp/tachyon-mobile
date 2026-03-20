@@ -30,6 +30,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     ios: {
       bundleIdentifier: "com.marczenn.tachyon",
+      userInterfaceStyle: "automatic",
     },
     android: {
       package: "com.marczenn.tachyon",
