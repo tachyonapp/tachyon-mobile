@@ -1,5 +1,9 @@
+import {
+  clearSessionExpiredHandler,
+  setSessionExpiredHandler,
+} from "@/auth/authEventEmitter";
 import { useClerk, useSignIn, useSignUp, useUser } from "@clerk/clerk-expo";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface AuthContextValue {
   isAuthenticated: boolean;
@@ -31,6 +35,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<Error | null>(null);
 
   const isLoading = !signInLoaded || !signUpLoaded || !userLoaded;
+
+  useEffect(() => {
+    setSessionExpiredHandler(async () => {
+      try {
+        await signOut();
+      } catch {
+        // signOut failure is non-recoverable here — still clear local state
+      }
+      setError(new Error("session_expired"));
+    });
+
+    return () => {
+      clearSessionExpiredHandler();
+    };
+  }, [signOut]);
 
   const login = async (email: string, password: string): Promise<void> => {
     setError(null);

@@ -1,4 +1,5 @@
 import { errorLink } from "@/apollo/links/errorLink";
+import { setSessionExpiredHandler } from "@/auth/authEventEmitter";
 import { ApolloClient, ApolloLink, InMemoryCache, gql } from "@apollo/client";
 import { of } from "rxjs";
 
@@ -10,8 +11,9 @@ const ME_QUERY = gql`
   }
 `;
 
-it("logs a warning on UNAUTHENTICATED error and does not retry", async () => {
-  const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+it("emits session expired on UNAUTHENTICATED error and does not retry", async () => {
+  const sessionExpiredSpy = jest.fn();
+  setSessionExpiredHandler(sessionExpiredSpy);
 
   let callCount = 0;
   const terminatingLink = new ApolloLink(() => {
@@ -33,15 +35,12 @@ it("logs a warning on UNAUTHENTICATED error and does not retry", async () => {
 
   await expect(client.query({ query: ME_QUERY })).rejects.toThrow();
   expect(callCount).toBe(1); // no retry
-  expect(warnSpy).toHaveBeenCalledWith(
-    expect.stringContaining("UNAUTHENTICATED"),
-  );
-
-  warnSpy.mockRestore();
+  expect(sessionExpiredSpy).toHaveBeenCalledTimes(1);
 });
 
 it("does not intercept non-UNAUTHENTICATED errors", async () => {
-  const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+  const sessionExpiredSpy = jest.fn();
+  setSessionExpiredHandler(sessionExpiredSpy);
 
   let callCount = 0;
   const terminatingLink = new ApolloLink(() => {
@@ -58,7 +57,5 @@ it("does not intercept non-UNAUTHENTICATED errors", async () => {
 
   await expect(client.query({ query: ME_QUERY })).rejects.toThrow();
   expect(callCount).toBe(1);
-  expect(warnSpy).not.toHaveBeenCalled();
-
-  warnSpy.mockRestore();
+  expect(sessionExpiredSpy).not.toHaveBeenCalled();
 });

@@ -1,3 +1,4 @@
+import { emitSessionExpired } from "@/auth/authEventEmitter";
 import { CombinedGraphQLErrors } from "@apollo/client";
 import { ErrorLink } from "@apollo/client/link/error";
 
@@ -9,6 +10,7 @@ export const errorLink = new ErrorLink(({ error }) => {
     error instanceof CombinedGraphQLErrors &&
     error.errors.some((e) => e.extensions?.code === "UNAUTHENTICATED")
   ) {
-    console.warn("[Apollo] UNAUTHENTICATED — Clerk session may be expired");
+    // Signal AuthProvider to sign out.
+    emitSessionExpired();
   }
 });
