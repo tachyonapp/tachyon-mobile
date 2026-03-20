@@ -82,10 +82,6 @@ export default function SignupScreen() {
 
   return (
     <AuthScreen>
-      <Text style={[styles.title, { color: theme.textPrimary }]}>
-        {"Create Account"}
-      </Text>
-
       {errorMessage ? (
         <AuthErrorState message={errorMessage} type="auth_failed" />
       ) : null}
@@ -229,11 +225,6 @@ export default function SignupScreen() {
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    marginBottom: 32,
-  },
   input: {
     borderWidth: 1,
     borderRadius: 10,

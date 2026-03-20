@@ -1,6 +1,6 @@
+import { RingWave } from "@/components/animated/ring-wave";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useEffect } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -8,13 +8,6 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from "react-native-reanimated";
 
 interface AuthScreenProps {
   children: React.ReactNode;
@@ -24,34 +17,18 @@ export function AuthScreen({ children }: AuthScreenProps) {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme];
 
-  const opacity = useSharedValue(0.3);
-
-  useEffect(() => {
-    // Subtle breathing animation for signal wave
-    opacity.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 1800 }),
-        withTiming(0.3, { duration: 1800 }),
-      ),
-      -1, // infinite
-      false,
-    );
-  }, [opacity]);
-
-  const signalStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
-
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* Logo area */}
+      <View style={styles.waveContainer} pointerEvents="none">
+        <RingWave ringCount={4} color={theme.electricBlue} />
+      </View>
+
       <View style={styles.logoContainer}>
         {/*
-              TODO: Replace with actual Tachyon logo asset once available.
-              For now, render a placeholder View with the brand color.
-              Import the logo: import TachyonLogo from '@/assets/images/logo.png';
-              Render: <Image source={TachyonLogo} style={styles.logo} resizeMode="contain" />
-            */}
+          TODO: Replace with actual Tachyon logo asset once available.
+          Import the logo: import TachyonLogo from '@/assets/images/logo.png';
+          Render: <Image source={TachyonLogo} style={styles.logo} resizeMode="contain" />
+        */}
         <View
           style={[
             styles.logoPlaceholder,
@@ -59,15 +36,6 @@ export function AuthScreen({ children }: AuthScreenProps) {
           ]}
         />
       </View>
-
-      {/* Animated signal wave */}
-      <Animated.View
-        style={[
-          styles.signalWave,
-          { backgroundColor: theme.electricBlue },
-          signalStyle,
-        ]}
-      />
 
       {/* Keyboard-aware scroll content */}
       <KeyboardAvoidingView
@@ -88,10 +56,21 @@ export function AuthScreen({ children }: AuthScreenProps) {
 
 const styles = StyleSheet.create({
   flex: {
-    flex: 1,
+    flex: 0,
   },
   container: {
     flex: 1,
+    justifyContent: "center",
+    alignContent: "center",
+  },
+  waveContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
   },
   logoContainer: {
     alignItems: "center",
@@ -102,12 +81,6 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 16,
-  },
-  signalWave: {
-    height: 2,
-    marginHorizontal: 40,
-    borderRadius: 1,
-    marginBottom: 32,
   },
   scrollContent: {
     flexGrow: 1,
