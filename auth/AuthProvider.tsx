@@ -8,6 +8,7 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
+  forgotPassword: (email: string) => Promise<void>;
   error: Error | null;
 }
 
@@ -67,6 +68,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const forgotPassword = async (email: string): Promise<void> => {
+    setError(null);
+    try {
+      await signIn!.create({
+        strategy: "reset_password_email_code",
+        identifier: email,
+      });
+      // Clerk sends a reset email — no further action needed on this screen
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error("Password reset failed"));
+      throw err;
+    }
+  };
+
   const value: AuthContextValue = {
     isAuthenticated: !!isSignedIn,
     isLoading,
@@ -76,6 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     login,
     logout,
     signup,
+    forgotPassword,
     error,
   };
 
