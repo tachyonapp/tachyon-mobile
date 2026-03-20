@@ -28,6 +28,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       apiUrl: envConfig.apiUrl,
       environment,
     },
+    ios: {
+      bundleIdentifier: "com.marczenn.tachyon",
+    },
+    android: {
+      package: "com.marczenn.tachyon",
+    },
     plugins: ["expo-secure-store"],
   };
 };
