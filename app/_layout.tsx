@@ -2,6 +2,7 @@ import { apolloClient } from "@/apollo/client";
 import { AuthProvider, useAuth } from "@/auth/AuthProvider";
 import { ClerkTokenBridge } from "@/auth/clerk-token-bridge";
 import { tokenCache } from "@/auth/token-cache";
+import { AuthLoadingState } from "@/components/auth/auth-loading-state";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { ApolloProvider } from "@apollo/client/react";
 import { ClerkProvider } from "@clerk/clerk-expo";
@@ -15,7 +16,6 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
-import { AuthLoadingState } from "../components/auth/auth-loading-state";
 
 // Hold the native splash screen until auth check resolves.
 SplashScreen.preventAutoHideAsync();
