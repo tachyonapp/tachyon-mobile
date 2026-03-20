@@ -36,7 +36,7 @@ export function AuthScreen({ children }: AuthScreenProps) {
       -1, // infinite
       false,
     );
-  }, []);
+  }, [opacity]);
 
   const signalStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,

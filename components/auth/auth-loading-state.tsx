@@ -21,7 +21,7 @@ export function AuthLoadingState({ message }: AuthLoadingStateProps) {
 
   useEffect(() => {
     opacity.value = withRepeat(withTiming(1, { duration: 900 }), -1, true);
-  }, []);
+  }, [opacity]);
 
   const pulseStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
 
