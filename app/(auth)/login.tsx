@@ -3,8 +3,14 @@ import { AuthErrorState } from "@/components/auth/auth-error-state";
 import { AuthScreen } from "@/components/auth/auth-screen";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import {
+  validateEmail,
+  validateLoginForm,
+  validatePassword,
+} from "@/utils/auth-validators";
+import { isClerkAPIResponseError } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -15,7 +21,7 @@ import {
 } from "react-native";
 
 export default function LoginScreen() {
-  const { login, isLoading, error } = useAuth();
+  const { login, isLoading, error, pendingVerification } = useAuth();
   const router = useRouter();
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme];
@@ -24,9 +30,40 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (pendingVerification === "signin_second_factor") {
+      router.push("/(auth)/verify");
+    }
+  }, [pendingVerification]);
+
+  const handleEmailBlur = async () => {
+    const invalid = validateEmail(email);
+    if (invalid) {
+      setValidationError(invalid);
+      return;
+    } else {
+      setValidationError(null);
+    }
+  };
+
+  const handlePwBlur = async () => {
+    const invalid = validatePassword(password);
+    if (invalid) {
+      setValidationError(invalid);
+      return;
+    }
+  };
 
   const handleLogin = async () => {
-    if (!email || !password || submitting) return;
+    if (submitting) return;
+    const invalid = validateLoginForm(email, password);
+    if (invalid) {
+      setValidationError(invalid);
+      return;
+    }
+    setValidationError(null);
     setSubmitting(true);
     try {
       await login(email, password);
@@ -43,21 +80,33 @@ export default function LoginScreen() {
     if (!error) return null;
     if (error.message === "session_expired")
       return "Your session has expired. Please sign in again.";
+    if (isClerkAPIResponseError(error)) {
+      const code = error.errors[0]?.code;
+      if (
+        code === "form_password_incorrect" ||
+        code === "form_identifier_not_found"
+      )
+        return "Incorrect email or password. Please try again.";
+      if (code === "network_error")
+        return "Unable to connect. Check your internet connection.";
+    }
     if (error.message.toLowerCase().includes("network"))
       return "Unable to connect. Check your internet connection.";
-    if (
-      error.message.toLowerCase().includes("password") ||
-      error.message.toLowerCase().includes("identifier")
-    ) {
-      return "Incorrect email or password. Please try again.";
-    }
-    return "Something went wrong. Please try again.";
+    return "Something went wrong. Please try again later.";
   })();
+
+  const displayedError = validationError ?? errorMessage;
+  const isSubmittable: boolean =
+    !submitting &&
+    !isLoading &&
+    validationError == null &&
+    email !== "" &&
+    password !== "";
 
   return (
     <AuthScreen>
-      {errorMessage ? (
-        <AuthErrorState message={errorMessage} type="auth_failed" />
+      {displayedError ? (
+        <AuthErrorState message={displayedError} type="auth_failed" />
       ) : null}
 
       <TextInput
@@ -72,12 +121,15 @@ export default function LoginScreen() {
         placeholder={"Email"}
         placeholderTextColor={theme.textDisabled}
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(v) => {
+          setEmail(v);
+        }}
         keyboardType="email-address"
         autoCapitalize="none"
         autoComplete="email"
         autoCorrect={false}
         textContentType="emailAddress"
+        onBlur={handleEmailBlur}
       />
 
       <View style={styles.passwordContainer}>
@@ -94,11 +146,14 @@ export default function LoginScreen() {
           placeholder={"Password"}
           placeholderTextColor={theme.textDisabled}
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(v) => {
+            setPassword(v);
+          }}
           secureTextEntry={!showPassword}
           autoCapitalize="none"
           autoComplete="current-password"
           textContentType="password"
+          onBlur={handlePwBlur}
         />
         <Pressable
           style={styles.eyeButton}
@@ -117,9 +172,10 @@ export default function LoginScreen() {
           styles.submitButton,
           { backgroundColor: theme.electricBlue },
           pressed && styles.submitButtonPressed,
+          !isSubmittable && styles.submitButtonDisabled,
         ]}
         onPress={handleLogin}
-        disabled={submitting || isLoading}
+        disabled={!isSubmittable}
         accessibilityRole="button"
       >
         {submitting || isLoading ? (
@@ -192,6 +248,9 @@ const styles = StyleSheet.create({
   },
   submitButtonPressed: {
     opacity: 0.85,
+  },
+  submitButtonDisabled: {
+    opacity: 0.45,
   },
   submitButtonText: {
     fontSize: 16,

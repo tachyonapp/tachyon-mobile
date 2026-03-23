@@ -16,11 +16,8 @@ interface WaveRingProps {
   ringCount: number;
   color: string;
 }
-
-interface RingProps {
-  ringCount: number;
+interface RingProps extends WaveRingProps {
   index: number;
-  color: string;
 }
 
 const Ring = ({ index, color, ringCount }: RingProps) => {

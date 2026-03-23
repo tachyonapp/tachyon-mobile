@@ -1,7 +1,9 @@
+import TachyonLogo from "@/assets/images/logo.png";
 import { RingWave } from "@/components/animated/ring-wave";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -24,17 +26,7 @@ export function AuthScreen({ children }: AuthScreenProps) {
       </View>
 
       <View style={styles.logoContainer}>
-        {/*
-          TODO: Replace with actual Tachyon logo asset once available.
-          Import the logo: import TachyonLogo from '@/assets/images/logo.png';
-          Render: <Image source={TachyonLogo} style={styles.logo} resizeMode="contain" />
-        */}
-        <View
-          style={[
-            styles.logoPlaceholder,
-            { backgroundColor: theme.electricBlue },
-          ]}
-        />
+        <Image source={TachyonLogo} style={styles.logo} resizeMode="contain" />
       </View>
 
       {/* Keyboard-aware scroll content */}
@@ -77,9 +69,9 @@ const styles = StyleSheet.create({
     paddingTop: 72,
     paddingBottom: 24,
   },
-  logoPlaceholder: {
-    width: 64,
-    height: 64,
+  logo: {
+    width: 100,
+    height: 100,
     borderRadius: 16,
   },
   scrollContent: {

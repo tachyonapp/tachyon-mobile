@@ -4,7 +4,7 @@ import { Stack } from "expo-router";
 
 export default function AuthLayout() {
   const colorScheme = useColorScheme();
-  const theme = Colors[colorScheme ?? "dark"];
+  const theme = Colors[colorScheme];
 
   return (
     <Stack
@@ -17,6 +17,7 @@ export default function AuthLayout() {
       <Stack.Screen name="login" />
       <Stack.Screen name="signup" />
       <Stack.Screen name="forgot-password" />
+      <Stack.Screen name="verify" />
     </Stack>
   );
 }

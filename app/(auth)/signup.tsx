@@ -3,8 +3,14 @@ import { AuthErrorState } from "@/components/auth/auth-error-state";
 import { AuthScreen } from "@/components/auth/auth-screen";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Link } from "expo-router";
-import { useState } from "react";
+import {
+  validateEmail,
+  validatePassword,
+  validateSignupForm,
+} from "@/utils/auth-validators";
+import { isClerkAPIResponseError } from "@clerk/clerk-expo";
+import { Link, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -39,7 +45,7 @@ const STRENGTH_SEGMENTS = 4;
 function getPasswordStrength(password: string): number {
   if (password.length === 0) return 0;
   let score = 0;
-  if (password.length >= 8) score++;
+  if (password.length >= 10) score++;
   if (/[A-Z]/.test(password)) score++;
   if (/[0-9]/.test(password)) score++;
   if (/[^A-Za-z0-9]/.test(password)) score++;
@@ -47,7 +53,8 @@ function getPasswordStrength(password: string): number {
 }
 
 export default function SignupScreen() {
-  const { signup, isLoading, error } = useAuth();
+  const { signup, isLoading, error, pendingVerification } = useAuth();
+  const router = useRouter();
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme];
 
@@ -56,13 +63,44 @@ export default function SignupScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (pendingVerification === "signup_email") {
+      router.push("/(auth)/verify");
+    }
+  }, [pendingVerification]);
 
   const strength = getPasswordStrength(password);
   const strengthColor =
     strength > 0 ? STRENGTH_COLORS[strength] : theme.inputBorder;
 
+  const handleEmailBlur = async () => {
+    const invalid = validateEmail(email);
+    if (invalid) {
+      setValidationError(invalid);
+      return;
+    } else {
+      setValidationError(null);
+    }
+  };
+
+  const handlePwBlur = async () => {
+    const invalid = validatePassword(password);
+    if (invalid) {
+      setValidationError(invalid);
+      return;
+    }
+  };
+
   const handleSignup = async () => {
-    if (!email || !password || !termsAccepted || submitting) return;
+    if (!termsAccepted || submitting) return;
+    const invalid = validateSignupForm(email, password);
+    if (invalid) {
+      setValidationError(invalid);
+      return;
+    }
+    setValidationError(null);
     setSubmitting(true);
     try {
       await signup(email, password);
@@ -75,15 +113,29 @@ export default function SignupScreen() {
 
   const errorMessage = (() => {
     if (!error) return null;
+    if (isClerkAPIResponseError(error)) {
+      const code = error.errors[0]?.code;
+      if (code === "form_identifier_exists")
+        return "An account with this email already exists.";
+      if (
+        code === "form_password_pwned" ||
+        code === "form_password_length_too_short"
+      )
+        return "Please choose a stronger password.";
+      if (code === "network_error")
+        return "Unable to connect. Check your internet connection.";
+    }
     if (error.message.toLowerCase().includes("network"))
       return "Unable to connect. Check your internet connection.";
-    return "Something went wrong. Please try again.";
+    return "Something went wrong. Please try again later.";
   })();
+
+  const displayedError = validationError ?? errorMessage;
 
   return (
     <AuthScreen>
-      {errorMessage ? (
-        <AuthErrorState message={errorMessage} type="auth_failed" />
+      {displayedError ? (
+        <AuthErrorState message={displayedError} type="auth_failed" />
       ) : null}
 
       <TextInput
@@ -98,12 +150,15 @@ export default function SignupScreen() {
         placeholder={"Email"}
         placeholderTextColor={theme.textDisabled}
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(v) => {
+          setEmail(v);
+        }}
         keyboardType="email-address"
         autoCapitalize="none"
         autoComplete="email"
         autoCorrect={false}
         textContentType="emailAddress"
+        onBlur={handleEmailBlur}
       />
 
       <View style={styles.passwordContainer}>
@@ -120,11 +175,14 @@ export default function SignupScreen() {
           placeholder={"Password"}
           placeholderTextColor={theme.textDisabled}
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(v) => {
+            setPassword(v);
+          }}
           secureTextEntry={!showPassword}
           autoCapitalize="none"
           autoComplete="new-password"
           textContentType="newPassword"
+          onBlur={handlePwBlur}
         />
         <Pressable
           style={styles.eyeButton}
