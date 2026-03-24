@@ -160,7 +160,7 @@ export default function LoginScreen() {
           onPress={() => setShowPassword((v) => !v)}
           accessibilityLabel={showPassword ? "Hide password" : "Show password"}
         >
-          {/* Replace with an icon from expo/vector-icons once available */}
+          {/* TODO: Replace with an icon from expo/vector-icons once available */}
           <Text style={[styles.eyeButtonText, { color: theme.textSecondary }]}>
             {showPassword ? "Hide" : "Show"}
           </Text>
