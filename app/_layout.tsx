@@ -1,6 +1,8 @@
 import { apolloClient } from "@/apollo/client";
-import { AuthProvider } from "@/auth/AuthProvider";
+import { AuthProvider, useAuth } from "@/auth/AuthProvider";
+import { ClerkTokenBridge } from "@/auth/clerk-token-bridge";
 import { tokenCache } from "@/auth/token-cache";
+import { AuthLoadingState } from "@/components/auth/auth-loading-state";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { ApolloProvider } from "@apollo/client/react";
 import { ClerkProvider } from "@clerk/clerk-expo";
@@ -10,14 +12,49 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import "react-native-reanimated";
+
+// Hold the native splash screen until auth check resolves.
+SplashScreen.preventAutoHideAsync();
 
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
-export const unstable_settings = {
-  anchor: "(tabs)",
-};
+/**
+ * Inner layout reads auth state and handles routing.
+ * Must be inside ClerkProvider + AuthProvider to access useAuth().
+ */
+function RootNavigator() {
+  const { isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading) {
+      // Auth check resolved — hide native splash screen
+      SplashScreen.hideAsync();
+    }
+  }, [isLoading]);
+
+  if (isLoading) {
+    return <AuthLoadingState message="Loading…" />;
+  }
+
+  return (
+    <>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="modal"
+          options={{ presentation: "modal", title: "Modal" }}
+        />
+      </Stack>
+
+      <StatusBar style="auto" />
+    </>
+  );
+}
 
 // ClerkProvider must be outermost — all Clerk hooks require it in the tree.
 // ClerkTokenBridge wires Clerk's getToken() into the Apollo auth link.
@@ -30,19 +67,14 @@ export default function RootLayout() {
       publishableKey={CLERK_PUBLISHABLE_KEY}
       tokenCache={tokenCache}
     >
+      {/* ClerkTokenBridge calls `useAuth` from `@clerk/clerk-expo`, which requires being inside `ClerkProvider` */}
+      <ClerkTokenBridge />
       <AuthProvider>
         <ApolloProvider client={apolloClient}>
           <ThemeProvider
             value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
           >
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen
-                name="modal"
-                options={{ presentation: "modal", title: "Modal" }}
-              />
-            </Stack>
-            <StatusBar style="auto" />
+            <RootNavigator />
           </ThemeProvider>
         </ApolloProvider>
       </AuthProvider>

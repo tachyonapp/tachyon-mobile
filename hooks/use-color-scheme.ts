@@ -1,1 +1,7 @@
-export { useColorScheme } from 'react-native';
+import { useColorScheme as useRNColorScheme } from "react-native";
+import type { ColorScheme } from "@/constants/theme";
+
+export function useColorScheme(): ColorScheme {
+  const scheme = useRNColorScheme();
+  return scheme === "light" ? "light" : "dark";
+}
