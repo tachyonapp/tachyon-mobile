@@ -3,11 +3,7 @@ import { AuthErrorState } from "@/components/auth/auth-error-state";
 import { AuthScreen } from "@/components/auth/auth-screen";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import {
-  validateEmail,
-  validateLoginForm,
-  validatePassword,
-} from "@/utils/auth-validators";
+import { validateEmailFormat, validateLoginForm } from "@/utils/auth-validators";
 import { isClerkAPIResponseError } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -20,8 +16,27 @@ import {
   View,
 } from "react-native";
 
+const mapErrorToMessage = (error: Error | null): string | null => {
+  if (!error) return null;
+  if (error.message === "session_expired")
+    return "Your session has expired. Please sign in again.";
+  if (isClerkAPIResponseError(error)) {
+    const code = error.errors[0]?.code;
+    if (
+      code === "form_password_incorrect" ||
+      code === "form_identifier_not_found"
+    )
+      return "Incorrect email or password. Please try again.";
+    if (code === "network_error")
+      return "Unable to connect. Check your internet connection.";
+  }
+  if (error.message.toLowerCase().includes("network"))
+    return "Unable to connect. Check your internet connection.";
+  return "Something went wrong. Please try again later.";
+};
+
 export default function LoginScreen() {
-  const { login, isLoading, error, pendingVerification } = useAuth();
+  const { login, setError, isLoading, error, pendingVerification } = useAuth();
   const router = useRouter();
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme];
@@ -33,28 +48,11 @@ export default function LoginScreen() {
   const [validationError, setValidationError] = useState<string | null>(null);
 
   useEffect(() => {
+    setError(null);
     if (pendingVerification === "signin_second_factor") {
       router.push("/(auth)/verify");
     }
-  }, [pendingVerification]);
-
-  const handleEmailBlur = async () => {
-    const invalid = validateEmail(email);
-    if (invalid) {
-      setValidationError(invalid);
-      return;
-    } else {
-      setValidationError(null);
-    }
-  };
-
-  const handlePwBlur = async () => {
-    const invalid = validatePassword(password);
-    if (invalid) {
-      setValidationError(invalid);
-      return;
-    }
-  };
+  }, [pendingVerification, router]);
 
   const handleLogin = async () => {
     if (submitting) return;
@@ -75,27 +73,7 @@ export default function LoginScreen() {
     }
   };
 
-  // Map error to message
-  const errorMessage = (() => {
-    if (!error) return null;
-    if (error.message === "session_expired")
-      return "Your session has expired. Please sign in again.";
-    if (isClerkAPIResponseError(error)) {
-      const code = error.errors[0]?.code;
-      if (
-        code === "form_password_incorrect" ||
-        code === "form_identifier_not_found"
-      )
-        return "Incorrect email or password. Please try again.";
-      if (code === "network_error")
-        return "Unable to connect. Check your internet connection.";
-    }
-    if (error.message.toLowerCase().includes("network"))
-      return "Unable to connect. Check your internet connection.";
-    return "Something went wrong. Please try again later.";
-  })();
-
-  const displayedError = validationError ?? errorMessage;
+  const displayedError = validationError ?? mapErrorToMessage(error);
   const isSubmittable: boolean =
     !submitting &&
     !isLoading &&
@@ -123,13 +101,15 @@ export default function LoginScreen() {
         value={email}
         onChangeText={(v) => {
           setEmail(v);
+          if (validationError !== null)
+            setValidationError(validateLoginForm(v, password));
         }}
         keyboardType="email-address"
         autoCapitalize="none"
         autoComplete="email"
         autoCorrect={false}
         textContentType="emailAddress"
-        onBlur={handleEmailBlur}
+        onBlur={() => setValidationError(validateEmailFormat(email))}
       />
 
       <View style={styles.passwordContainer}>
@@ -148,19 +128,20 @@ export default function LoginScreen() {
           value={password}
           onChangeText={(v) => {
             setPassword(v);
+            if (validationError !== null)
+              setValidationError(validateLoginForm(email, v));
           }}
           secureTextEntry={!showPassword}
           autoCapitalize="none"
           autoComplete="current-password"
           textContentType="password"
-          onBlur={handlePwBlur}
+          onBlur={() => setValidationError(validateLoginForm(email, password))}
         />
         <Pressable
           style={styles.eyeButton}
           onPress={() => setShowPassword((v) => !v)}
           accessibilityLabel={showPassword ? "Hide password" : "Show password"}
         >
-          {/* TODO: Replace with an icon from expo/vector-icons once available */}
           <Text style={[styles.eyeButtonText, { color: theme.textSecondary }]}>
             {showPassword ? "Hide" : "Show"}
           </Text>
@@ -189,7 +170,9 @@ export default function LoginScreen() {
 
       <Pressable
         style={styles.linkButton}
-        onPress={() => router.push("/(auth)/forgot-password")}
+        onPress={() => {
+          router.push("/(auth)/forgot-password");
+        }}
       >
         <Text style={[styles.linkText, { color: theme.textSecondary }]}>
           {"Forgot password?"}
@@ -228,6 +211,7 @@ const styles = StyleSheet.create({
   passwordInput: {
     marginBottom: 0,
     paddingRight: 64,
+    height: 52,
   },
   eyeButton: {
     position: "absolute",

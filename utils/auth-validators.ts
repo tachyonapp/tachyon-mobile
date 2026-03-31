@@ -1,14 +1,14 @@
-const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{3,}$/;
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 const MIN_PASSWORD_LENGTH = 10;
 
-export function validateEmail(email: string): string | null {
+export function validateEmailFormat(email: string): string | null {
   if (!email) return "Email is required.";
   if (!EMAIL_REGEX.test(email)) return "Please enter a valid email address.";
   return null;
 }
 
-export function validatePassword(password: string): string | null {
+export function validatePasswordFormat(password: string): string | null {
   if (!password) return "Password is required.";
   if (password.length < MIN_PASSWORD_LENGTH)
     return `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`;
@@ -19,14 +19,14 @@ export function validateLoginForm(
   email: string,
   password: string,
 ): string | null {
-  return validateEmail(email) ?? validatePassword(password);
+  return validateEmailFormat(email) ?? validatePasswordFormat(password);
 }
 
 export function validateSignupForm(
   email: string,
   password: string,
 ): string | null {
-  return validateEmail(email) ?? validatePassword(password);
+  return validateEmailFormat(email) ?? validatePasswordFormat(password);
 }
 
 export function validateVerificationCode(code: string): string | null {
@@ -39,5 +39,5 @@ export function validatePasswordResetForm(
   code: string,
   newPassword: string,
 ): string | null {
-  return validateVerificationCode(code) ?? validatePassword(newPassword);
+  return validateVerificationCode(code) ?? validatePasswordFormat(newPassword);
 }

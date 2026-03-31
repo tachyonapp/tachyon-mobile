@@ -4,7 +4,7 @@ import { AuthScreen } from "@/components/auth/auth-screen";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
-  validateEmail,
+  validateEmailFormat,
   validatePasswordResetForm,
 } from "@/utils/auth-validators";
 import { isClerkAPIResponseError } from "@clerk/clerk-expo";
@@ -38,7 +38,7 @@ const ForgotPasswordScreen = () => {
   // --- Step 1: send code ---
   const handleSendCode = async () => {
     if (submitting) return;
-    const invalid = validateEmail(email);
+    const invalid = validateEmailFormat(email);
     if (invalid) {
       setValidationError(invalid);
       return;
@@ -136,7 +136,10 @@ const ForgotPasswordScreen = () => {
           placeholder={"Email"}
           placeholderTextColor={theme.textDisabled}
           value={email}
-          onChangeText={(v) => { setEmail(v); setValidationError(null); }}
+          onChangeText={(v) => {
+            setEmail(v);
+            setValidationError(null);
+          }}
           keyboardType="email-address"
           autoCapitalize="none"
           autoComplete="email"
@@ -157,7 +160,9 @@ const ForgotPasswordScreen = () => {
           {submitting ? (
             <ActivityIndicator size="small" color={theme.textPrimary} />
           ) : (
-            <Text style={[styles.submitButtonText, { color: theme.textPrimary }]}>
+            <Text
+              style={[styles.submitButtonText, { color: theme.textPrimary }]}
+            >
               {"Send Code"}
             </Text>
           )}
@@ -198,7 +203,10 @@ const ForgotPasswordScreen = () => {
         placeholder={"6-digit code"}
         placeholderTextColor={theme.textDisabled}
         value={code}
-        onChangeText={(v) => { setCode(v); setValidationError(null); }}
+        onChangeText={(v) => {
+          setCode(v);
+          setValidationError(null);
+        }}
         keyboardType="number-pad"
         autoCapitalize="none"
         autoCorrect={false}
@@ -220,7 +228,10 @@ const ForgotPasswordScreen = () => {
           placeholder={"New password"}
           placeholderTextColor={theme.textDisabled}
           value={newPassword}
-          onChangeText={(v) => { setNewPassword(v); setValidationError(null); }}
+          onChangeText={(v) => {
+            setNewPassword(v);
+            setValidationError(null);
+          }}
           secureTextEntry={!showPassword}
           autoCapitalize="none"
           autoComplete="new-password"
@@ -256,13 +267,20 @@ const ForgotPasswordScreen = () => {
         )}
       </Pressable>
 
-      <Pressable style={styles.backLink} onPress={handleResend} disabled={submitting}>
+      <Pressable
+        style={styles.backLink}
+        onPress={handleResend}
+        disabled={submitting}
+      >
         <Text style={[styles.backLinkText, { color: theme.textSecondary }]}>
           {"Didn't receive a code? Resend"}
         </Text>
       </Pressable>
 
-      <Pressable style={styles.backLink} onPress={() => router.replace("/(auth)/login")}>
+      <Pressable
+        style={styles.backLink}
+        onPress={() => router.replace("/(auth)/login")}
+      >
         <Text style={[styles.backLinkText, { color: theme.textSecondary }]}>
           {"Back to Sign In"}
         </Text>
@@ -297,6 +315,7 @@ const styles = StyleSheet.create({
   passwordInput: {
     marginBottom: 0,
     paddingRight: 64,
+    height: 52,
   },
   eyeButton: {
     position: "absolute",

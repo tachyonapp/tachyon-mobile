@@ -4,8 +4,7 @@ import { AuthScreen } from "@/components/auth/auth-screen";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
-  validateEmail,
-  validatePassword,
+  validateEmailFormat,
   validateSignupForm,
 } from "@/utils/auth-validators";
 import { isClerkAPIResponseError } from "@clerk/clerk-expo";
@@ -53,7 +52,7 @@ function getPasswordStrength(password: string): number {
 }
 
 export default function SignupScreen() {
-  const { signup, isLoading, error, pendingVerification } = useAuth();
+  const { signup, setError, isLoading, error, pendingVerification } = useAuth();
   const router = useRouter();
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme];
@@ -66,32 +65,15 @@ export default function SignupScreen() {
   const [validationError, setValidationError] = useState<string | null>(null);
 
   useEffect(() => {
+    setError(null);
     if (pendingVerification === "signup_email") {
       router.push("/(auth)/verify");
     }
-  }, [pendingVerification]);
+  }, [pendingVerification, router]);
 
   const strength = getPasswordStrength(password);
   const strengthColor =
     strength > 0 ? STRENGTH_COLORS[strength] : theme.inputBorder;
-
-  const handleEmailBlur = async () => {
-    const invalid = validateEmail(email);
-    if (invalid) {
-      setValidationError(invalid);
-      return;
-    } else {
-      setValidationError(null);
-    }
-  };
-
-  const handlePwBlur = async () => {
-    const invalid = validatePassword(password);
-    if (invalid) {
-      setValidationError(invalid);
-      return;
-    }
-  };
 
   const handleSignup = async () => {
     if (!termsAccepted || submitting) return;
@@ -152,13 +134,15 @@ export default function SignupScreen() {
         value={email}
         onChangeText={(v) => {
           setEmail(v);
+          if (validationError !== null)
+            setValidationError(validateSignupForm(v, password));
         }}
         keyboardType="email-address"
         autoCapitalize="none"
         autoComplete="email"
         autoCorrect={false}
         textContentType="emailAddress"
-        onBlur={handleEmailBlur}
+        onBlur={() => setValidationError(validateEmailFormat(email))}
       />
 
       <View style={styles.passwordContainer}>
@@ -177,12 +161,14 @@ export default function SignupScreen() {
           value={password}
           onChangeText={(v) => {
             setPassword(v);
+            if (validationError !== null)
+              setValidationError(validateSignupForm(email, v));
           }}
           secureTextEntry={!showPassword}
           autoCapitalize="none"
           autoComplete="new-password"
           textContentType="newPassword"
-          onBlur={handlePwBlur}
+          onBlur={() => setValidationError(validateSignupForm(email, password))}
         />
         <Pressable
           style={styles.eyeButton}
@@ -271,7 +257,7 @@ export default function SignupScreen() {
           {"Already have an account?"}{" "}
         </Text>
         <Link href="/(auth)/login" asChild>
-          <Pressable>
+          <Pressable onPress={() => setError(null)}>
             <Text style={[styles.switchLink, { color: theme.electricBlue }]}>
               {"Sign in"}
             </Text>
@@ -298,6 +284,10 @@ const styles = StyleSheet.create({
   passwordInput: {
     marginBottom: 0,
     paddingRight: 64,
+    // Explicit height prevents iOS layout jump when toggling secureTextEntry.
+    // Without it, iOS remeasures the input because bullet (•) and regular text
+    // use different font metrics.
+    height: 52,
   },
   eyeButton: {
     position: "absolute",

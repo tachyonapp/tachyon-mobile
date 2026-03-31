@@ -5,7 +5,10 @@ import {
 import { useClerk, useSignIn, useSignUp, useUser } from "@clerk/clerk-expo";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-export type PendingVerification = "signin_second_factor" | "signup_email" | null;
+export type PendingVerification =
+  | "signin_second_factor"
+  | "signup_email"
+  | null;
 
 interface AuthContextValue {
   isAuthenticated: boolean;
@@ -16,6 +19,7 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
+  setError: (error: Error | null) => void;
   forgotPassword: (email: string) => Promise<void>;
   confirmPasswordReset: (code: string, newPassword: string) => Promise<void>;
   verifySignIn: (code: string) => Promise<void>;
@@ -101,7 +105,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await setSignUpActive!({ session: result.createdSessionId });
       } else {
         // Email verification required
-        await signUp!.prepareEmailAddressVerification({ strategy: "email_code" });
+        await signUp!.prepareEmailAddressVerification({
+          strategy: "email_code",
+        });
         setPendingEmail(email);
         setPendingVerification("signup_email");
       }
@@ -183,7 +189,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (pendingVerification === "signin_second_factor") {
         await signIn!.prepareSecondFactor({ strategy: "email_code" });
       } else if (pendingVerification === "signup_email") {
-        await signUp!.prepareEmailAddressVerification({ strategy: "email_code" });
+        await signUp!.prepareEmailAddressVerification({
+          strategy: "email_code",
+        });
       }
     } catch (err) {
       setError(err instanceof Error ? err : new Error("Failed to resend code"));
@@ -202,6 +210,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     login,
     logout,
     signup,
+    setError,
     forgotPassword,
     confirmPasswordReset,
     verifySignIn,
