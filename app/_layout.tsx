@@ -7,6 +7,7 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useOnboardingState } from "@/hooks/use-onboarding-state";
 import { ApolloProvider } from "@apollo/client/react";
 import { ClerkProvider } from "@clerk/clerk-expo";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   DarkTheme,
   DefaultTheme,
@@ -73,6 +74,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <ClerkProvider
       publishableKey={CLERK_PUBLISHABLE_KEY}
       tokenCache={tokenCache}
@@ -89,5 +91,6 @@ export default function RootLayout() {
         </ApolloProvider>
       </AuthProvider>
     </ClerkProvider>
+    </GestureHandlerRootView>
   );
 }
