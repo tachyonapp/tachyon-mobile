@@ -2,7 +2,7 @@ import LottieView from "lottie-react-native";
 import { StyleSheet, View } from "react-native";
 
 /**
- * PLACEHOLDER — Lottie asset pending Designer (Katy).
+ * PLACEHOLDER — Lottie asset pending professional designed assets
  *
  * Animation brief:
  *   Concept: You approve every trade — user is in control
@@ -18,9 +18,8 @@ import { StyleSheet, View } from "react-native";
 export function SlideIllustration3() {
   return (
     <View style={styles.container}>
-      {/* TODO: replace source with delivered asset from Katy e.g. require("@/assets/animations/ftue-bot-approval.lottie") */}
       <LottieView
-        source={require("@/assets/animations/placeholder.json")}
+        source={require("@/assets/animations/ftue-bot-approval.json")}
         autoPlay
         loop
         style={styles.animation}

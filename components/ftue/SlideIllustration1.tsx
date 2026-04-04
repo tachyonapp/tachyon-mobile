@@ -2,7 +2,7 @@ import LottieView from "lottie-react-native";
 import { StyleSheet, View } from "react-native";
 
 /**
- * PLACEHOLDER — Lottie asset pending Designer (Katy).
+ * PLACEHOLDER — Lottie asset pending professional designed assets
  *
  * Animation brief:
  *   Concept: RPG-style character creation / bot builder
@@ -16,9 +16,8 @@ import { StyleSheet, View } from "react-native";
 export function SlideIllustration1() {
   return (
     <View style={styles.container}>
-      {/* TODO: replace source with delivered asset from Katy e.g. require("@/assets/animations/ftue-bot-builder.lottie") */}
       <LottieView
-        source={require("@/assets/animations/placeholder.json")}
+        source={require("@/assets/animations/ftue-bot-builder.json")}
         autoPlay
         loop
         style={styles.animation}

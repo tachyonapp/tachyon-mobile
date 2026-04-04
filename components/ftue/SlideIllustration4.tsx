@@ -2,7 +2,7 @@ import LottieView from "lottie-react-native";
 import { StyleSheet, View } from "react-native";
 
 /**
- * PLACEHOLDER — Lottie asset pending Designer (Katy).
+ * PLACEHOLDER — Lottie asset pending professional designed assets
  *
  * Animation brief:
  *   Concept: Victory / bot arena — gamified trading celebration
@@ -17,9 +17,8 @@ import { StyleSheet, View } from "react-native";
 export function SlideIllustration4() {
   return (
     <View style={styles.container}>
-      {/* TODO: replace source with delivered asset from Katy e.g. require("@/assets/animations/ftue-bot-victory.lottie") */}
       <LottieView
-        source={require("@/assets/animations/placeholder.json")}
+        source={require("@/assets/animations/ftue-bot-victory.json")}
         autoPlay
         loop
         style={styles.animation}
