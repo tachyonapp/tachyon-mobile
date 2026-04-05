@@ -21,10 +21,6 @@ export function AuthScreen({ children }: AuthScreenProps) {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* <View style={styles.waveContainer} pointerEvents="none">
-        <RingWave ringCount={4} color={theme.electricBlue} />
-      </View> */}
-
       <View style={styles.logoContainer}>
         <Image source={TachyonLogo} style={styles.logo} resizeMode="contain" />
         <View style={styles.waveContainer} pointerEvents="none">

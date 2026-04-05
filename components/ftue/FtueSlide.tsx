@@ -1,3 +1,5 @@
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import React from "react";
 import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
@@ -61,14 +63,17 @@ export function FtueSlide({
   onSkip,
   isLastSlide,
 }: FtueSlideProps) {
+  const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme];
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Illustration area — top 40% */}
       <View style={styles.illustrationArea}>{illustration}</View>
 
       {/* Headline */}
       <View style={styles.headlineArea}>
-        <Text style={styles.headline}>{headline}</Text>
+        <Text style={[styles.headline, { color: theme.textPrimary }]}>{headline}</Text>
       </View>
 
       {/* Bottom nav: dots + skip + next */}
@@ -78,7 +83,11 @@ export function FtueSlide({
           {Array.from({ length: totalSlides }).map((_, i) => (
             <View
               key={i}
-              style={[styles.dot, i === currentSlide && styles.dotActive]}
+              style={[
+                styles.dot,
+                { backgroundColor: theme.textDisabled },
+                i === currentSlide && { backgroundColor: theme.electricBlue },
+              ]}
             />
           ))}
         </View>
@@ -86,14 +95,14 @@ export function FtueSlide({
         <AnimatedButton
           onPress={onSkip}
           style={styles.skipButton}
-          textStyle={styles.skipText}
+          textStyle={[styles.skipText, { color: theme.textSecondary }]}
           label="Skip"
         />
 
         <AnimatedButton
           onPress={onNext}
-          style={styles.nextButton}
-          textStyle={styles.nextText}
+          style={[styles.nextButton, { backgroundColor: theme.electricBlue }]}
+          textStyle={[styles.nextText, { color: theme.textPrimary }]}
           label={isLastSlide ? "Build My Bot" : "Next"}
         />
       </View>
@@ -104,12 +113,13 @@ export function FtueSlide({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0B0F1A",
+    paddingTop: 300,
   },
   illustrationArea: {
-    height: SCREEN_HEIGHT * 0.4,
+    height: SCREEN_HEIGHT * 0.3,
     alignItems: "center",
     justifyContent: "center",
+    // backgroundColor: "red"
   },
   headlineArea: {
     flex: 1,
@@ -117,9 +127,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headline: {
-    color: "#FFFFFF",
     fontSize: 28,
-    fontWeight: "700",
+    fontWeight: "300",
     textAlign: "center",
     lineHeight: 36,
   },
@@ -139,27 +148,20 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#5A6275",
-  },
-  dotActive: {
-    backgroundColor: "#2C6BED",
   },
   skipButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
   },
   skipText: {
-    color: "#A0A7B8",
     fontSize: 16,
   },
   nextButton: {
-    backgroundColor: "#2C6BED",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
   },
   nextText: {
-    color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600",
   },

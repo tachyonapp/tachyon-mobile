@@ -3,25 +3,34 @@ import { SlideIllustration1 } from "@/components/ftue/SlideIllustration1";
 import { SlideIllustration2 } from "@/components/ftue/SlideIllustration2";
 import { SlideIllustration3 } from "@/components/ftue/SlideIllustration3";
 import { SlideIllustration4 } from "@/components/ftue/SlideIllustration4";
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useOnboardingState } from "@/hooks/use-onboarding-state";
+import { router } from "expo-router";
+import { useState } from "react";
+import { Dimensions, StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
-  Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
-import { router } from "expo-router";
-import { Dimensions, StyleSheet, View } from "react-native";
-import { useState } from "react";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const SLIDE_COUNT = 4;
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
+
+// Cubic ease-out as a worklet — replaces Easing.out(Easing.ease) which isn't
+// safely serializable as a worklet in Reanimated 4.
+const slideEasing = (t: number): number => {
+  "worklet";
+  return 1 - (1 - t) * (1 - t) * (1 - t);
+};
+
 const TIMING_CONFIG = {
   duration: 250,
-  easing: Easing.out(Easing.ease),
+  easing: slideEasing,
 };
 
 const SLIDES = [
@@ -30,7 +39,7 @@ const SLIDES = [
     Illustration: SlideIllustration1,
   },
   {
-    headline: "Unleash them on the market",
+    headline: "Set how, what and when they interact with markets",
     Illustration: SlideIllustration2,
   },
   {
@@ -39,12 +48,14 @@ const SLIDES = [
     Illustration: SlideIllustration3,
   },
   {
-    headline: "Choose only the winners",
+    headline: "Keep the winners.\n Delete the losers.",
     Illustration: SlideIllustration4,
   },
 ];
 
 export default function OnboardingSlidesScreen() {
+  const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme];
   const { markComplete } = useOnboardingState();
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -120,7 +131,7 @@ export default function OnboardingSlidesScreen() {
   }));
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <GestureDetector gesture={panGesture}>
         <Animated.View style={[styles.slidesTrack, animatedStyle]}>
           {SLIDES.map((slide, index) => (
@@ -145,7 +156,6 @@ export default function OnboardingSlidesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0B0F1A",
     overflow: "hidden",
   },
   slidesTrack: {
