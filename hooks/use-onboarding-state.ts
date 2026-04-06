@@ -3,7 +3,7 @@ import { useApolloClient, useMutation } from "@apollo/client/react";
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 
-const ONBOARDING_KEY = "tachyon:onboarding_complete";
+const ONBOARDING_KEY = "tachyon.onboarding_complete";
 const SECURE_STORE_TIMEOUT_MS = 1500;
 
 interface OnboardingState {
