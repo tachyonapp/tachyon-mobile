@@ -60,7 +60,6 @@ function RootNavigator() {
         />
       </Stack>
 
-      {!isAuthenticated && isComplete === true && <Redirect href="/(auth)" />}
       {isAuthenticated && !isComplete && <Redirect href="/(onboarding)" />}
 
       <StatusBar style="auto" />

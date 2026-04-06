@@ -11,7 +11,7 @@ export default function OnboardingLayout() {
 
   // Completed FTUE but not signed up → auth flow
   if (isComplete === true && !isAuthenticated) {
-    return <Redirect href="/(auth)" />;
+    return <Redirect href="/(auth)/login" />;
   }
 
   // Completed FTUE and signed in → main app
