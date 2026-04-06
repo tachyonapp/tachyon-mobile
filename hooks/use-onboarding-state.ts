@@ -1,9 +1,11 @@
+import { useAuth } from "@/auth/AuthProvider";
 import { CompleteOnboardingDocument, MeDocument } from "@/generated/graphql";
 import { useApolloClient, useMutation } from "@apollo/client/react";
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 
 const ONBOARDING_KEY = "tachyon.onboarding_complete";
+export const ONBOARDING_SYNC_PENDING_KEY = "tachyon.onboarding_sync_pending";
 const SECURE_STORE_TIMEOUT_MS = 1500;
 
 interface OnboardingState {
@@ -19,6 +21,7 @@ interface OnboardingState {
 export function useOnboardingState(): OnboardingState {
   const [isComplete, setIsComplete] = useState<boolean | null>(null);
   const [completeOnboarding] = useMutation(CompleteOnboardingDocument);
+  const { isAuthenticated } = useAuth();
   const client = useApolloClient();
 
   // Step 1: Read fast-path local cache on mount
@@ -71,9 +74,14 @@ export function useOnboardingState(): OnboardingState {
       // Cache miss is non-fatal — mutation will reconcile server state
     }
 
-    // 3. Fire mutation async — do NOT await before navigating
+    // 3. Sync to server — deferred if user is not yet authenticated (pre-signup FTUE flow)
+    if (!isAuthenticated) {
+      // Write a pending flag — (tabs)/_layout.tsx will fire the mutation post-auth
+      await SecureStore.setItemAsync(ONBOARDING_SYNC_PENDING_KEY, "true");
+      return;
+    }
+
     completeOnboarding().catch((err) => {
-      // TODO: decide if Sentry is needed on the frontend
       console.error("[completeOnboarding] mutation failed:", err);
     });
   };
