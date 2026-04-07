@@ -1,25 +1,37 @@
 import { useAuth } from "@/auth/AuthProvider";
 import * as LocalAuthentication from "expo-local-authentication";
 import * as SecureStore from "expo-secure-store";
-import { useEffect, useRef, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { AppState } from "react-native";
 
 const BIOMETRIC_ENABLED_KEY = "tachyon.biometric_enabled";
 const LOCK_GRACE_PERIOD_MS = 3000;
 
 interface BiometricAuthState {
-  isSupported: boolean; // device has Face ID / Touch ID hardware
-  isEnrolled: boolean; // user has enrolled biometrics on device
-  isEnabled: boolean; // user has turned on biometrics in Tachyon settings
-  isLocked: boolean; // app is currently gated — prompt required
-  isPrompting: boolean; // biometric prompt is currently showing
-  enable: () => Promise<void>; // prompt once then persist enabled=true
-  disable: () => Promise<void>; // persist enabled=false, set isLocked=false
-  prompt: () => Promise<boolean>; // trigger biometric prompt, returns success
-  lock: () => void; // set isLocked=true (called on app background)
+  isSupported: boolean;
+  isEnrolled: boolean;
+  isEnabled: boolean;
+  isLocked: boolean;
+  isPrompting: boolean;
+  enable: () => Promise<void>;
+  disable: () => Promise<void>;
+  prompt: () => Promise<boolean>;
+  lock: () => void;
 }
 
-export function useBiometricAuth(): BiometricAuthState {
+const BiometricAuthContext = createContext<BiometricAuthState | null>(null);
+
+export function BiometricAuthProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { isAuthenticated } = useAuth();
   const [isSupported, setIsSupported] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
@@ -32,14 +44,18 @@ export function useBiometricAuth(): BiometricAuthState {
   const isAuthenticatedRef = useRef(isAuthenticated);
   const backgroundedAtRef = useRef<number | null>(null);
 
-  useEffect(() => { isEnabledRef.current = isEnabled; }, [isEnabled]);
-  useEffect(() => { isAuthenticatedRef.current = isAuthenticated; }, [isAuthenticated]);
+  useEffect(() => {
+    isEnabledRef.current = isEnabled;
+  }, [isEnabled]);
+
+  useEffect(() => {
+    isAuthenticatedRef.current = isAuthenticated;
+  }, [isAuthenticated]);
 
   // On mount: check hardware/enrollment and read persisted preference
   useEffect(() => {
     let cancelled = false;
 
-    // enrollment/hardware support check
     async function init() {
       const [supported, enrolled] = await Promise.all([
         LocalAuthentication.hasHardwareAsync(),
@@ -50,7 +66,6 @@ export function useBiometricAuth(): BiometricAuthState {
       setIsSupported(supported);
       setIsEnrolled(enrolled);
 
-      // If the device can't support biometrics, nothing else to do
       if (!supported || !enrolled) return;
 
       const stored = await SecureStore.getItemAsync(BIOMETRIC_ENABLED_KEY);
@@ -59,8 +74,8 @@ export function useBiometricAuth(): BiometricAuthState {
       if (stored === "true") {
         setIsEnabled(true);
         // Lock immediately on cold start. This runs before Clerk resolves
-        // isAuthenticated, so the splash screen remains visible (Task 4 gates
-        // SplashScreen.hideAsync on !isLocked) — no app content flashes through.
+        // isAuthenticated, so the splash screen remains visible (RootNavigator
+        // gates SplashScreen.hideAsync on !isLocked) — no app content flashes through.
         setIsLocked(true);
       }
     }
@@ -82,7 +97,6 @@ export function useBiometricAuth(): BiometricAuthState {
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextState) => {
       if (nextState === "background") {
-        // Record the moment the app entered the background
         backgroundedAtRef.current = Date.now();
       } else if (nextState === "active") {
         if (
@@ -152,15 +166,28 @@ export function useBiometricAuth(): BiometricAuthState {
     setIsLocked(true);
   };
 
-  return {
-    isSupported,
-    isEnrolled,
-    isEnabled,
-    isLocked,
-    isPrompting,
-    enable,
-    disable,
-    prompt,
-    lock,
-  };
+  return (
+    <BiometricAuthContext.Provider
+      value={{
+        isSupported,
+        isEnrolled,
+        isEnabled,
+        isLocked,
+        isPrompting,
+        enable,
+        disable,
+        prompt,
+        lock,
+      }}
+    >
+      {children}
+    </BiometricAuthContext.Provider>
+  );
+}
+
+export function useBiometricAuth(): BiometricAuthState {
+  const ctx = useContext(BiometricAuthContext);
+  if (!ctx)
+    throw new Error("useBiometricAuth must be used within BiometricAuthProvider");
+  return ctx;
 }

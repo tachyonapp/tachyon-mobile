@@ -3,8 +3,9 @@ import { AuthProvider, useAuth } from "@/auth/AuthProvider";
 import { ClerkTokenBridge } from "@/auth/clerk-token-bridge";
 import { tokenCache } from "@/auth/token-cache";
 import { AuthLoadingState } from "@/components/auth/auth-loading-state";
+import { BiometricAuthProvider } from "@/auth/BiometricAuthProvider";
 import { BiometricLockScreen } from "@/components/auth/BiometricLockScreen";
-import { useBiometricAuth } from "@/hooks/use-biometric-auth";
+import { useBiometricAuth } from "@/auth/BiometricAuthProvider";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useOnboardingState } from "@/hooks/use-onboarding-state";
 import { ApolloProvider } from "@apollo/client/react";
@@ -105,13 +106,18 @@ export default function RootLayout() {
       {/* ClerkTokenBridge calls `useAuth` from `@clerk/clerk-expo`, which requires being inside `ClerkProvider` */}
       <ClerkTokenBridge />
       <AuthProvider>
-        <ApolloProvider client={apolloClient}>
-          <ThemeProvider
-            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-          >
-            <RootNavigator />
-          </ThemeProvider>
-        </ApolloProvider>
+        {/* BiometricAuthProvider must be inside AuthProvider — it calls useAuth()
+            to gate the AppState lock on isAuthenticated. A single provider instance
+            ensures RootNavigator and settings components share the same state. */}
+        <BiometricAuthProvider>
+          <ApolloProvider client={apolloClient}>
+            <ThemeProvider
+              value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+            >
+              <RootNavigator />
+            </ThemeProvider>
+          </ApolloProvider>
+        </BiometricAuthProvider>
       </AuthProvider>
     </ClerkProvider>
     </GestureHandlerRootView>

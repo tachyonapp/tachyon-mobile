@@ -1,5 +1,5 @@
 import { Colors } from "@/constants/theme";
-import { useBiometricAuth } from "@/hooks/use-biometric-auth";
+import { useBiometricAuth } from "@/auth/BiometricAuthProvider";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useState } from "react";
 import { Platform, StyleSheet, Switch, Text, View } from "react-native";
