@@ -137,6 +137,8 @@ export type Mutation = {
   __typename?: "Mutation";
   activateBot?: Maybe<BotResult>;
   approveProposal?: Maybe<ApproveProposalResult>;
+  /** Mark the authenticated user's FTUE as complete. Idempotent. */
+  completeOnboarding?: Maybe<Scalars["Boolean"]["output"]>;
   connectBroker?: Maybe<ConnectBrokerResult>;
   createBot?: Maybe<CreateBotResult>;
   deleteBot?: Maybe<BotResult>;
@@ -307,6 +309,8 @@ export type User = {
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
   email?: Maybe<Scalars["String"]["output"]>;
   id?: Maybe<Scalars["ID"]["output"]>;
+  /** Whether the user has completed the FTUE onboarding flow. */
+  onboardingCompleted: Scalars["Boolean"]["output"];
 };
 
 export type ValidationError = BaseError & {
@@ -344,6 +348,15 @@ export type ApproveProposalMutation = {
         status?: ProposalStatus | null;
       }
     | null;
+};
+
+export type CompleteOnboardingMutationVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type CompleteOnboardingMutation = {
+  __typename?: "Mutation";
+  completeOnboarding?: boolean | null;
 };
 
 export type ConnectBrokerMutationVariables = Exact<{
@@ -564,6 +577,7 @@ export type MeQuery = {
     email?: string | null;
     auth0Id?: string | null;
     createdAt?: any | null;
+    onboardingCompleted: boolean;
   } | null;
 };
 
@@ -785,6 +799,28 @@ export const ApproveProposalDocument = {
 } as unknown as DocumentNode<
   ApproveProposalMutation,
   ApproveProposalMutationVariables
+>;
+export const CompleteOnboardingDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "CompleteOnboarding" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "completeOnboarding" },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CompleteOnboardingMutation,
+  CompleteOnboardingMutationVariables
 >;
 export const ConnectBrokerDocument = {
   kind: "Document",
@@ -1648,6 +1684,10 @@ export const MeDocument = {
                 { kind: "Field", name: { kind: "Name", value: "email" } },
                 { kind: "Field", name: { kind: "Name", value: "auth0Id" } },
                 { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "onboardingCompleted" },
+                },
               ],
             },
           },

@@ -4,14 +4,16 @@ import { ClerkTokenBridge } from "@/auth/clerk-token-bridge";
 import { tokenCache } from "@/auth/token-cache";
 import { AuthLoadingState } from "@/components/auth/auth-loading-state";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useOnboardingState } from "@/hooks/use-onboarding-state";
 import { ApolloProvider } from "@apollo/client/react";
 import { ClerkProvider } from "@clerk/clerk-expo";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { Stack } from "expo-router";
+import { Redirect, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
@@ -27,29 +29,38 @@ const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
  * Must be inside ClerkProvider + AuthProvider to access useAuth().
  */
 function RootNavigator() {
-  const { isLoading } = useAuth();
+  const { isLoading, isAuthenticated } = useAuth();
+  const { isComplete } = useOnboardingState();
 
   useEffect(() => {
-    if (!isLoading) {
-      // Auth check resolved — hide native splash screen
+    // Defer splash hide until Clerk AND SecureStore are both resolved
+    if (!isLoading && isComplete !== null) {
       SplashScreen.hideAsync();
     }
-  }, [isLoading]);
+  }, [isLoading, isComplete]);
 
-  if (isLoading) {
+  // Show loading state while Clerk resolves OR while SecureStore read is pending
+  if (isLoading || isComplete === null) {
     return <AuthLoadingState message="Loading…" />;
   }
 
+  // Routing decision tree:
+  // 1. Not authenticated → auth flow
+  // 2. Authenticated + not onboarded → FTUE
+  // 3. Authenticated + onboarded → tabs (main app)
   return (
     <>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
         <Stack.Screen
           name="modal"
           options={{ presentation: "modal", title: "Modal" }}
         />
       </Stack>
+
+      {isAuthenticated && !isComplete && <Redirect href="/(onboarding)" />}
 
       <StatusBar style="auto" />
     </>
@@ -63,6 +74,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <ClerkProvider
       publishableKey={CLERK_PUBLISHABLE_KEY}
       tokenCache={tokenCache}
@@ -79,5 +91,6 @@ export default function RootLayout() {
         </ApolloProvider>
       </AuthProvider>
     </ClerkProvider>
+    </GestureHandlerRootView>
   );
 }
