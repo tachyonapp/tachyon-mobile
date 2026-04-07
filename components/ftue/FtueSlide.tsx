@@ -73,7 +73,9 @@ export function FtueSlide({
 
       {/* Headline */}
       <View style={styles.headlineArea}>
-        <Text style={[styles.headline, { color: theme.textPrimary }]}>{headline}</Text>
+        <Text style={[styles.headline, { color: theme.textPrimary }]}>
+          {headline}
+        </Text>
       </View>
 
       {/* Bottom nav: dots + skip + next */}
@@ -103,7 +105,7 @@ export function FtueSlide({
           onPress={onNext}
           style={[styles.nextButton, { backgroundColor: theme.electricBlue }]}
           textStyle={[styles.nextText, { color: theme.textPrimary }]}
-          label={isLastSlide ? "Build My Bot" : "Next"}
+          label={isLastSlide ? "Build" : "Next"}
         />
       </View>
     </View>

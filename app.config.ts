@@ -31,10 +31,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ios: {
       bundleIdentifier: "com.marczenn.tachyon",
       userInterfaceStyle: "automatic",
+      infoPlist: {
+        NSFaceIDUsageDescription:
+          "Tachyon uses Face ID to protect your account.",
+      },
     },
     android: {
       package: "com.marczenn.tachyon",
     },
-    plugins: ["expo-secure-store"],
+    plugins: ["expo-secure-store", "expo-local-authentication"],
   };
 };

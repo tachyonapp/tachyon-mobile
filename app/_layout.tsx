@@ -3,6 +3,9 @@ import { AuthProvider, useAuth } from "@/auth/AuthProvider";
 import { ClerkTokenBridge } from "@/auth/clerk-token-bridge";
 import { tokenCache } from "@/auth/token-cache";
 import { AuthLoadingState } from "@/components/auth/auth-loading-state";
+import { BiometricAuthProvider } from "@/auth/BiometricAuthProvider";
+import { BiometricLockScreen } from "@/components/auth/BiometricLockScreen";
+import { useBiometricAuth } from "@/auth/BiometricAuthProvider";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useOnboardingState } from "@/hooks/use-onboarding-state";
 import { ApolloProvider } from "@apollo/client/react";
@@ -29,11 +32,16 @@ const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
  * Must be inside ClerkProvider + AuthProvider to access useAuth().
  */
 function RootNavigator() {
-  const { isLoading, isAuthenticated } = useAuth();
+  const { isLoading, isAuthenticated, logout } = useAuth();
   const { isComplete } = useOnboardingState();
+  const { isLocked, prompt, disable } = useBiometricAuth(); // isLocked gates RootNavigator output, not the splash
 
   useEffect(() => {
-    // Defer splash hide until Clerk AND SecureStore are both resolved
+    // Defer splash hide until Clerk and SecureStore are both resolved.
+    // isLocked is intentionally excluded — the BiometricLockScreen is the sole
+    // output of RootNavigator when locked, so there is no app content underneath
+    // that could flash through. Blocking hideAsync on isLocked caused the splash
+    // to stay up indefinitely on cold start when biometrics were enabled.
     if (!isLoading && isComplete !== null) {
       SplashScreen.hideAsync();
     }
@@ -44,10 +52,28 @@ function RootNavigator() {
     return <AuthLoadingState message="Loading…" />;
   }
 
+  // Gate authenticated sessions behind biometrics when the user has enabled them.
+  // Unauthenticated users (FTUE, auth screens) are never shown the biometric prompt.
+  if (isAuthenticated && isLocked) {
+    return (
+      <BiometricLockScreen
+        onPrompt={prompt}
+        onFallback={async () => {
+          // disable() clears the SecureStore key and sets isLocked=false so the
+          // lock screen unmounts cleanly before logout triggers a re-render.
+          await disable();
+          await logout();
+        }}
+      />
+    );
+  }
+
   // Routing decision tree:
-  // 1. Not authenticated → auth flow
-  // 2. Authenticated + not onboarded → FTUE
-  // 3. Authenticated + onboarded → tabs (main app)
+  // 1. Clerk or SecureStore pending          → AuthLoadingState       (early return above)
+  // 2. Authenticated + biometrics locked     → BiometricLockScreen    (early return above)
+  // 3. Not authenticated                     → auth flow              ((auth)/_layout.tsx guards entry)
+  // 4. Authenticated + not onboarded         → FTUE                   (Redirect below)
+  // 5. Authenticated + onboarded             → tabs (main app)        (default Stack route)
   return (
     <>
       <Stack>
@@ -82,13 +108,18 @@ export default function RootLayout() {
       {/* ClerkTokenBridge calls `useAuth` from `@clerk/clerk-expo`, which requires being inside `ClerkProvider` */}
       <ClerkTokenBridge />
       <AuthProvider>
-        <ApolloProvider client={apolloClient}>
-          <ThemeProvider
-            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-          >
-            <RootNavigator />
-          </ThemeProvider>
-        </ApolloProvider>
+        {/* BiometricAuthProvider must be inside AuthProvider — it calls useAuth()
+            to gate the AppState lock on isAuthenticated. A single provider instance
+            ensures RootNavigator and settings components share the same state. */}
+        <BiometricAuthProvider>
+          <ApolloProvider client={apolloClient}>
+            <ThemeProvider
+              value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+            >
+              <RootNavigator />
+            </ThemeProvider>
+          </ApolloProvider>
+        </BiometricAuthProvider>
       </AuthProvider>
     </ClerkProvider>
     </GestureHandlerRootView>
