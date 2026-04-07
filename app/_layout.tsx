@@ -3,6 +3,8 @@ import { AuthProvider, useAuth } from "@/auth/AuthProvider";
 import { ClerkTokenBridge } from "@/auth/clerk-token-bridge";
 import { tokenCache } from "@/auth/token-cache";
 import { AuthLoadingState } from "@/components/auth/auth-loading-state";
+import { BiometricLockScreen } from "@/components/auth/BiometricLockScreen";
+import { useBiometricAuth } from "@/hooks/use-biometric-auth";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useOnboardingState } from "@/hooks/use-onboarding-state";
 import { ApolloProvider } from "@apollo/client/react";
@@ -29,25 +31,46 @@ const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
  * Must be inside ClerkProvider + AuthProvider to access useAuth().
  */
 function RootNavigator() {
-  const { isLoading, isAuthenticated } = useAuth();
+  const { isLoading, isAuthenticated, logout } = useAuth();
   const { isComplete } = useOnboardingState();
+  const { isLocked, prompt, disable } = useBiometricAuth();
 
   useEffect(() => {
-    // Defer splash hide until Clerk AND SecureStore are both resolved
-    if (!isLoading && isComplete !== null) {
+    // Defer splash hide until Clerk, SecureStore, AND biometric gate are all resolved.
+    // Keeping the splash up while isLocked=true prevents app content from flashing
+    // through before the biometric prompt has been answered.
+    if (!isLoading && isComplete !== null && !isLocked) {
       SplashScreen.hideAsync();
     }
-  }, [isLoading, isComplete]);
+  }, [isLoading, isComplete, isLocked]);
 
   // Show loading state while Clerk resolves OR while SecureStore read is pending
   if (isLoading || isComplete === null) {
     return <AuthLoadingState message="Loading…" />;
   }
 
+  // Gate authenticated sessions behind biometrics when the user has enabled them.
+  // Unauthenticated users (FTUE, auth screens) are never shown the biometric prompt.
+  if (isAuthenticated && isLocked) {
+    return (
+      <BiometricLockScreen
+        onPrompt={prompt}
+        onFallback={async () => {
+          // disable() clears the SecureStore key and sets isLocked=false so the
+          // lock screen unmounts cleanly before logout triggers a re-render.
+          await disable();
+          await logout();
+        }}
+      />
+    );
+  }
+
   // Routing decision tree:
-  // 1. Not authenticated → auth flow
-  // 2. Authenticated + not onboarded → FTUE
-  // 3. Authenticated + onboarded → tabs (main app)
+  // 1. Clerk or SecureStore pending          → AuthLoadingState       (early return above)
+  // 2. Authenticated + biometrics locked     → BiometricLockScreen    (early return above)
+  // 3. Not authenticated                     → auth flow              ((auth)/_layout.tsx guards entry)
+  // 4. Authenticated + not onboarded         → FTUE                   (Redirect below)
+  // 5. Authenticated + onboarded             → tabs (main app)        (default Stack route)
   return (
     <>
       <Stack>
