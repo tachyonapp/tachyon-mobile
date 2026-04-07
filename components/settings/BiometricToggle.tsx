@@ -1,5 +1,5 @@
-import { Colors } from "@/constants/theme";
 import { useBiometricAuth } from "@/auth/BiometricAuthProvider";
+import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useState } from "react";
 import { Platform, StyleSheet, Switch, Text, View } from "react-native";
@@ -10,7 +10,7 @@ const BIOMETRIC_LABEL =
 export function BiometricToggle() {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme];
-  const { isSupported, isEnrolled, isEnabled, enable, disable } =
+  const { isSupported, isDeviceEnrolled, isEnabled, enable, disable } =
     useBiometricAuth();
 
   // Tracks when enable() is awaiting the biometric prompt — disables the toggle
@@ -19,7 +19,7 @@ export function BiometricToggle() {
 
   // Hidden entirely when the device doesn't support biometrics or the user
   // hasn't enrolled — no point exposing a toggle that can never be used.
-  if (!isSupported || !isEnrolled) return null;
+  if (!isSupported || !isDeviceEnrolled) return null;
 
   const handleToggle = async (value: boolean) => {
     if (isPending) return;

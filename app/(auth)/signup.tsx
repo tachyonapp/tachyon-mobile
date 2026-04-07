@@ -1,4 +1,5 @@
 import { useAuth } from "@/auth/AuthProvider";
+import { useBiometricAuth } from "@/auth/BiometricAuthProvider";
 import { AuthErrorState } from "@/components/auth/auth-error-state";
 import { AuthScreen } from "@/components/auth/auth-screen";
 import { Colors } from "@/constants/theme";
@@ -12,6 +13,7 @@ import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -51,8 +53,14 @@ function getPasswordStrength(password: string): number {
   return score;
 }
 
+const BIOMETRIC_LABEL =
+  Platform.OS === "ios"
+    ? "Enable Face ID for quick access"
+    : "Enable fingerprint for quick access";
+
 export default function SignupScreen() {
   const { signup, setError, isLoading, error, pendingVerification } = useAuth();
+  const { isSupported, isDeviceEnrolled, enableSilently } = useBiometricAuth();
   const router = useRouter();
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme];
@@ -61,8 +69,11 @@ export default function SignupScreen() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [biometricOptIn, setBiometricOptIn] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  console.log(isSupported, "ass");
 
   useEffect(() => {
     setError(null);
@@ -86,6 +97,12 @@ export default function SignupScreen() {
     setSubmitting(true);
     try {
       await signup(email, password);
+      // Write the biometric preference silently after signup succeeds.
+      // We don't prompt Face ID here — the normal cold-start lock handles
+      // the first prompt on the user's next session after email verification.
+      if (biometricOptIn) {
+        await enableSilently();
+      }
     } catch {
       // error state managed by AuthProvider
     } finally {
@@ -231,6 +248,36 @@ export default function SignupScreen() {
           {"I agree to the Terms of Service and Privacy Policy"}
         </Text>
       </Pressable>
+
+      {/* Biometric opt-in — only shown when the device supports biometrics */}
+      {isSupported && isDeviceEnrolled ? (
+        <Pressable
+          style={styles.termsRow}
+          onPress={() => setBiometricOptIn((v) => !v)}
+          accessibilityRole="checkbox"
+          accessibilityState={{ checked: biometricOptIn }}
+        >
+          <View
+            style={[
+              styles.checkbox,
+              { borderColor: theme.inputBorder },
+              biometricOptIn && {
+                backgroundColor: theme.electricBlue,
+                borderColor: theme.electricBlue,
+              },
+            ]}
+          >
+            {biometricOptIn ? (
+              <Text style={[styles.checkmark, { color: theme.textPrimary }]}>
+                ✓
+              </Text>
+            ) : null}
+          </View>
+          <Text style={[styles.termsLabel, { color: theme.textSecondary }]}>
+            {BIOMETRIC_LABEL}
+          </Text>
+        </Pressable>
+      ) : null}
 
       <Pressable
         style={({ pressed }) => [

@@ -15,11 +15,15 @@ const LOCK_GRACE_PERIOD_MS = 3000;
 
 interface BiometricAuthState {
   isSupported: boolean;
-  isEnrolled: boolean;
+  isDeviceEnrolled: boolean;
   isEnabled: boolean;
   isLocked: boolean;
   isPrompting: boolean;
   enable: () => Promise<void>;
+  // Writes the biometric preference without prompting Face ID. Used during
+  // sign-up opt-in so the user isn't interrupted mid-flow; the normal cold-start
+  // lock handles the first prompt on their next session.
+  enableSilently: () => Promise<void>;
   disable: () => Promise<void>;
   prompt: () => Promise<boolean>;
   lock: () => void;
@@ -34,7 +38,7 @@ export function BiometricAuthProvider({
 }) {
   const { isAuthenticated } = useAuth();
   const [isSupported, setIsSupported] = useState(false);
-  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [isDeviceEnrolled, setIsDeviceEnrolled] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [isPrompting, setIsPrompting] = useState(false);
@@ -64,7 +68,7 @@ export function BiometricAuthProvider({
 
       if (cancelled) return;
       setIsSupported(supported);
-      setIsEnrolled(enrolled);
+      setIsDeviceEnrolled(enrolled);
 
       if (!supported || !enrolled) return;
 
@@ -156,6 +160,11 @@ export function BiometricAuthProvider({
     }
   };
 
+  const enableSilently = async (): Promise<void> => {
+    await SecureStore.setItemAsync(BIOMETRIC_ENABLED_KEY, "true");
+    setIsEnabled(true);
+  };
+
   const disable = async (): Promise<void> => {
     await SecureStore.deleteItemAsync(BIOMETRIC_ENABLED_KEY);
     setIsEnabled(false);
@@ -170,11 +179,12 @@ export function BiometricAuthProvider({
     <BiometricAuthContext.Provider
       value={{
         isSupported,
-        isEnrolled,
+        isDeviceEnrolled,
         isEnabled,
         isLocked,
         isPrompting,
         enable,
+        enableSilently,
         disable,
         prompt,
         lock,
@@ -188,6 +198,8 @@ export function BiometricAuthProvider({
 export function useBiometricAuth(): BiometricAuthState {
   const ctx = useContext(BiometricAuthContext);
   if (!ctx)
-    throw new Error("useBiometricAuth must be used within BiometricAuthProvider");
+    throw new Error(
+      "useBiometricAuth must be used within BiometricAuthProvider",
+    );
   return ctx;
 }
