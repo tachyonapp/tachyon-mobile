@@ -1,10 +1,8 @@
-import TachyonLogo from "@/assets/images/logo.png";
 import { Colors } from "@/constants/theme";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   Platform,
   Pressable,
   StyleSheet,
@@ -48,8 +46,6 @@ export function BiometricLockScreen({
   return (
     // Outer Pressable covers the full screen so tapping anywhere triggers the prompt
     <Pressable style={styles.container} onPress={handlePrompt}>
-      <Image source={TachyonLogo} style={styles.logo} resizeMode="contain" />
-
       <View style={styles.iconContainer}>
         {isPrompting ? (
           <ActivityIndicator
@@ -85,17 +81,14 @@ export function BiometricLockScreen({
 
 const styles = StyleSheet.create({
   container: {
-    // Absolute fill — rendered above all app content, no transparency
-    ...StyleSheet.absoluteFillObject,
+    // flex: 1 fills the available space via the flex layout of RootNavigator.
+    // absoluteFillObject (position: absolute) caused the React Navigation
+    // container's background to render on top, making content invisible.
+    flex: 1,
     backgroundColor: theme.background,
     alignItems: "center",
     justifyContent: "center",
     gap: 24,
-  },
-  logo: {
-    width: 100,
-    height: 100,
-    borderRadius: 16,
   },
   iconContainer: {
     width: 80,

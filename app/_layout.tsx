@@ -34,16 +34,18 @@ const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 function RootNavigator() {
   const { isLoading, isAuthenticated, logout } = useAuth();
   const { isComplete } = useOnboardingState();
-  const { isLocked, prompt, disable } = useBiometricAuth();
+  const { isLocked, prompt, disable } = useBiometricAuth(); // isLocked gates RootNavigator output, not the splash
 
   useEffect(() => {
-    // Defer splash hide until Clerk, SecureStore, AND biometric gate are all resolved.
-    // Keeping the splash up while isLocked=true prevents app content from flashing
-    // through before the biometric prompt has been answered.
-    if (!isLoading && isComplete !== null && !isLocked) {
+    // Defer splash hide until Clerk and SecureStore are both resolved.
+    // isLocked is intentionally excluded — the BiometricLockScreen is the sole
+    // output of RootNavigator when locked, so there is no app content underneath
+    // that could flash through. Blocking hideAsync on isLocked caused the splash
+    // to stay up indefinitely on cold start when biometrics were enabled.
+    if (!isLoading && isComplete !== null) {
       SplashScreen.hideAsync();
     }
-  }, [isLoading, isComplete, isLocked]);
+  }, [isLoading, isComplete]);
 
   // Show loading state while Clerk resolves OR while SecureStore read is pending
   if (isLoading || isComplete === null) {

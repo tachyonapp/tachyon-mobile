@@ -73,8 +73,6 @@ export default function SignupScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  console.log(isSupported, "ass");
-
   useEffect(() => {
     setError(null);
     if (pendingVerification === "signup_email") {
