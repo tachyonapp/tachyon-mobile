@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -8,16 +8,6 @@ import Animated, {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
-
-const easeOutQuad = (t: number): number => {
-  "worklet";
-  return 1 - (1 - t) * (1 - t);
-};
-
-const easeInOutSine = (t: number): number => {
-  "worklet";
-  return -(Math.cos(Math.PI * t) - 1) / 2;
-};
 
 /**
  * Slide 3 — You Approve Every Trade (COMPLIANCE CRITICAL)
@@ -30,7 +20,15 @@ const easeInOutSine = (t: number): number => {
  * Implementation: react-native-reanimated, pure View/Text primitives. No Lottie.
  */
 
-import { Text } from "react-native";
+const easeOutQuad = (t: number): number => {
+  "worklet";
+  return 1 - (1 - t) * (1 - t);
+};
+
+const easeInOutSine = (t: number): number => {
+  "worklet";
+  return -(Math.cos(Math.PI * t) - 1) / 2;
+};
 
 const CARD_W = 200;
 const CARD_H = 100;
@@ -49,11 +47,11 @@ function TradeCard() {
       withRepeat(
         withSequence(
           withTiming(-8, { duration: 1200, easing: easeInOutSine }),
-          withTiming(0, { duration: 1200, easing: easeInOutSine })
+          withTiming(0, { duration: 1200, easing: easeInOutSine }),
         ),
         -1,
-        false
-      )
+        false,
+      ),
     );
   }, []);
 
@@ -80,7 +78,7 @@ function TradeCard() {
 
       {/* Amount row */}
       <View style={styles.cardMeta}>
-        <Text style={styles.metaLabel}>10 shares  ·  ~$1,820</Text>
+        <Text style={styles.metaLabel}>10 shares · ~$1,820</Text>
       </View>
     </Animated.View>
   );
@@ -95,11 +93,11 @@ function ApproveButton() {
       withRepeat(
         withSequence(
           withTiming(1.08, { duration: 700, easing: easeInOutSine }),
-          withTiming(1.0, { duration: 700, easing: easeInOutSine })
+          withTiming(1.0, { duration: 700, easing: easeInOutSine }),
         ),
         -1,
-        false
-      )
+        false,
+      ),
     );
   }, []);
 

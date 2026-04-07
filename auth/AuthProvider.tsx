@@ -189,9 +189,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (pendingVerification === "signin_second_factor") {
         await signIn!.prepareSecondFactor({ strategy: "email_code" });
       } else if (pendingVerification === "signup_email") {
-        await signUp!.prepareEmailAddressVerification({
-          strategy: "email_code",
-        });
+        await signUp!.prepareEmailAddressVerification({ strategy: "email_code" });
       }
     } catch (err) {
       setError(err instanceof Error ? err : new Error("Failed to resend code"));

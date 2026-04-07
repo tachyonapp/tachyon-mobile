@@ -3,7 +3,10 @@ import { AuthErrorState } from "@/components/auth/auth-error-state";
 import { AuthScreen } from "@/components/auth/auth-screen";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { validateEmailFormat, validateLoginForm } from "@/utils/auth-validators";
+import {
+  validateEmailFormat,
+  validateLoginForm,
+} from "@/utils/auth-validators";
 import { isClerkAPIResponseError } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -27,6 +30,8 @@ const mapErrorToMessage = (error: Error | null): string | null => {
       code === "form_identifier_not_found"
     )
       return "Incorrect email or password. Please try again.";
+    if (code === "not_allowed_access" || code === "email_address_not_verified")
+      return "Please verify your email address. Check your inbox to continue.";
     if (code === "network_error")
       return "Unable to connect. Check your internet connection.";
   }
@@ -49,7 +54,10 @@ export default function LoginScreen() {
 
   useEffect(() => {
     setError(null);
-    if (pendingVerification === "signin_second_factor") {
+    if (
+      pendingVerification === "signin_second_factor" ||
+      pendingVerification === "signup_email"
+    ) {
       router.push("/(auth)/verify");
     }
   }, [pendingVerification, router]);
