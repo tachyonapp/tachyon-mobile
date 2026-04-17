@@ -1,12 +1,12 @@
 import {
   BotFrame,
-  RiskAttitude,
-  TradeTempo,
   CombatPatience,
   ExitPersonalityName,
+  RiskAttitude,
   StopStyleName,
-  type MarketAwarenessInput,
+  TradeTempo,
   type ExitPersonalityInput,
+  type MarketAwarenessInput,
   type StopLossStyleInput,
 } from "@/generated/graphql";
 
@@ -32,7 +32,12 @@ export const FRAME_DEFAULTS: Record<BotFrame, FrameWizardDefaults> = {
     combatPatience: CombatPatience.Calculated,
     exitPersonality: { name: ExitPersonalityName.Balanced },
     stopLossStyle: { name: StopStyleName.Flexible },
-    marketAwareness: { momentum: 0.75, meanReversion: 0.15, volatility: 0.45, trendFollowing: 0.75 },
+    marketAwareness: {
+      momentum: 0.75,
+      meanReversion: 0.15,
+      volatility: 0.45,
+      trendFollowing: 0.75,
+    },
   },
   [BotFrame.Sniper]: {
     colorway: "#E8F4FF",
@@ -43,7 +48,12 @@ export const FRAME_DEFAULTS: Record<BotFrame, FrameWizardDefaults> = {
     combatPatience: CombatPatience.Patient,
     exitPersonality: { name: ExitPersonalityName.Patient },
     stopLossStyle: { name: StopStyleName.Hard },
-    marketAwareness: { momentum: 0.55, meanReversion: 0.1, volatility: 0.35, trendFollowing: 0.65 },
+    marketAwareness: {
+      momentum: 0.55,
+      meanReversion: 0.1,
+      volatility: 0.35,
+      trendFollowing: 0.65,
+    },
   },
   [BotFrame.Guardian]: {
     colorway: "#1C9C61",
@@ -54,7 +64,12 @@ export const FRAME_DEFAULTS: Record<BotFrame, FrameWizardDefaults> = {
     combatPatience: CombatPatience.Patient,
     exitPersonality: { name: ExitPersonalityName.Balanced },
     stopLossStyle: { name: StopStyleName.Flexible },
-    marketAwareness: { momentum: 0.15, meanReversion: 0.8, volatility: 0.2, trendFollowing: 0.2 },
+    marketAwareness: {
+      momentum: 0.15,
+      meanReversion: 0.8,
+      volatility: 0.2,
+      trendFollowing: 0.2,
+    },
   },
   [BotFrame.Bruiser]: {
     colorway: "#F2B705",
@@ -65,7 +80,12 @@ export const FRAME_DEFAULTS: Record<BotFrame, FrameWizardDefaults> = {
     combatPatience: CombatPatience.Strategic,
     exitPersonality: { name: ExitPersonalityName.Patient },
     stopLossStyle: { name: StopStyleName.Flexible },
-    marketAwareness: { momentum: 0.45, meanReversion: 0.1, volatility: 0.25, trendFollowing: 0.8 },
+    marketAwareness: {
+      momentum: 0.45,
+      meanReversion: 0.1,
+      volatility: 0.25,
+      trendFollowing: 0.8,
+    },
   },
   [BotFrame.Berserker]: {
     colorway: "#D64545",
@@ -76,7 +96,12 @@ export const FRAME_DEFAULTS: Record<BotFrame, FrameWizardDefaults> = {
     combatPatience: CombatPatience.Impulsive,
     exitPersonality: { name: ExitPersonalityName.QuickFinisher },
     stopLossStyle: { name: StopStyleName.Adaptive },
-    marketAwareness: { momentum: 0.7, meanReversion: 0.1, volatility: 0.85, trendFollowing: 0.5 },
+    marketAwareness: {
+      momentum: 0.7,
+      meanReversion: 0.1,
+      volatility: 0.85,
+      trendFollowing: 0.5,
+    },
   },
   [BotFrame.Brawler]: {
     colorway: "#8B7CFF",
@@ -87,6 +112,11 @@ export const FRAME_DEFAULTS: Record<BotFrame, FrameWizardDefaults> = {
     combatPatience: CombatPatience.Calculated,
     exitPersonality: { name: ExitPersonalityName.Balanced },
     stopLossStyle: { name: StopStyleName.Flexible },
-    marketAwareness: { momentum: 0.5, meanReversion: 0.3, volatility: 0.45, trendFollowing: 0.5 },
+    marketAwareness: {
+      momentum: 0.5,
+      meanReversion: 0.3,
+      volatility: 0.45,
+      trendFollowing: 0.5,
+    },
   },
 };
