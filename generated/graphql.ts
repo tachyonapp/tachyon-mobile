@@ -114,11 +114,30 @@ export enum BotStatus {
   Paused = "PAUSED",
 }
 
+export type BrainCatalog = {
+  __typename?: "BrainCatalog";
+  byokProviders?: Maybe<Array<BrainProviderOption>>;
+  defaultBrain?: Maybe<DefaultBrainInfo>;
+};
+
 export type BrainConfigInput = {
   apiKey?: InputMaybe<Scalars["String"]["input"]>;
   brainType: BrainType;
   modelId: Scalars["String"]["input"];
   provider?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type BrainModelOption = {
+  __typename?: "BrainModelOption";
+  displayName?: Maybe<Scalars["String"]["output"]>;
+  modelId?: Maybe<Scalars["String"]["output"]>;
+};
+
+export type BrainProviderOption = {
+  __typename?: "BrainProviderOption";
+  displayName?: Maybe<Scalars["String"]["output"]>;
+  models?: Maybe<Array<BrainModelOption>>;
+  provider?: Maybe<Scalars["String"]["output"]>;
 };
 
 export enum BrainType {
@@ -162,6 +181,15 @@ export type CreateBotInput = {
 };
 
 export type CreateBotResult = Bot | ValidationError;
+
+export type DefaultBrainInfo = {
+  __typename?: "DefaultBrainInfo";
+  brainType?: Maybe<Scalars["String"]["output"]>;
+  description?: Maybe<Scalars["String"]["output"]>;
+  displayName?: Maybe<Scalars["String"]["output"]>;
+  modelId?: Maybe<Scalars["String"]["output"]>;
+  provider?: Maybe<Scalars["String"]["output"]>;
+};
 
 export type EmotionalControlsInput = {
   cooldownAfterVolatility: Scalars["Boolean"]["input"];
@@ -302,6 +330,7 @@ export type Query = {
   balance?: Maybe<Balance>;
   bot?: Maybe<Bot>;
   bots?: Maybe<Array<Bot>>;
+  brainProviders?: Maybe<BrainCatalog>;
   me?: Maybe<User>;
   positions?: Maybe<Array<Position>>;
   proposals?: Maybe<Array<Proposal>>;
