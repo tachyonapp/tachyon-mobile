@@ -12,7 +12,7 @@
  *
  * Frame selection:
  *
- * - When user selects a frame, populate all fields with `FRAME_DEFAULTS[frameName]` (pre-fill).
+ * - When user selects a frame, populate all fields with `FRAME_CONFIG[frameName].defaults` (pre-fill).
  *
  * Step persistence:
  *
@@ -48,7 +48,7 @@
  */
 
 import { apolloClient } from "@/apollo/client";
-import { FRAME_DEFAULTS } from "@/constants/frameConfig";
+import { FRAME_CONFIG } from "@/constants/frameConfig";
 import {
   BotFrame,
   BrainType,
@@ -306,11 +306,11 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const selectFrame = useCallback((frameName: BotFrame) => {
-    const defaults = FRAME_DEFAULTS[frameName];
+    const { colorway, defaults } = FRAME_CONFIG[frameName];
     setState((prev) => ({
       ...prev,
       frameName,
-      colorway: defaults.colorway,
+      colorway,
       allocationPct: defaults.allocationPct,
       dailyMaxLoss: defaults.dailyMaxLoss,
       riskAttitude: defaults.riskAttitude,
