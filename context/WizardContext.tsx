@@ -47,6 +47,23 @@
  *   Mobile never hardcodes provider/model lists — the API is the single source of truth.
  */
 
+import { apolloClient } from "@/apollo/client";
+import { FRAME_DEFAULTS } from "@/constants/frameConfig";
+import {
+  BotFrame,
+  BrainType,
+  type BrainCatalog,
+  type CombatPatience,
+  type EmotionalControlsInput,
+  type ExitPersonalityInput,
+  type MarketAwarenessInput,
+  type RiskAttitude,
+  type RulesOfEngagementInput,
+  type StopLossStyleInput,
+  type TradeTempo,
+} from "@/generated/graphql";
+import { gql } from "@apollo/client";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, {
   createContext,
   useCallback,
@@ -56,23 +73,6 @@ import React, {
   useState,
   type ReactNode,
 } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { gql } from "@apollo/client";
-import { apolloClient } from "@/apollo/client";
-import {
-  BotFrame,
-  BrainType,
-  type BrainCatalog,
-  type MarketAwarenessInput,
-  type EmotionalControlsInput,
-  type RulesOfEngagementInput,
-  type ExitPersonalityInput,
-  type StopLossStyleInput,
-  type RiskAttitude,
-  type TradeTempo,
-  type CombatPatience,
-} from "@/generated/graphql";
-import { FRAME_DEFAULTS } from "@/constants/frameConfig";
 
 const DRAFT_KEY = "tachyon:bot-wizard:draft";
 
@@ -129,7 +129,12 @@ const EMPTY_STATE: WizardState = {
   riskAttitude: null,
   tradeTempo: null,
   combatPatience: null,
-  marketAwareness: { momentum: 0.5, meanReversion: 0.5, volatility: 0.5, trendFollowing: 0.5 },
+  marketAwareness: {
+    momentum: 0.5,
+    meanReversion: 0.5,
+    volatility: 0.5,
+    trendFollowing: 0.5,
+  },
   sectors: [],
   exitPersonality: null,
   stopLossStyle: null,
@@ -189,7 +194,10 @@ interface WizardContextValue {
   /** Non-null when a saved draft was found on cold launch; show Resume / Start Fresh prompt */
   draftPrompt: "resume-or-fresh" | null;
   selectFrame: (frameName: BotFrame) => void;
-  updateField: <K extends keyof WizardState>(field: K, value: WizardState[K]) => void;
+  updateField: <K extends keyof WizardState>(
+    field: K,
+    value: WizardState[K],
+  ) => void;
   updateBrain: (partial: Partial<BrainState>) => void;
   persistDraft: () => Promise<void>;
   clearDraft: () => Promise<void>;
@@ -205,7 +213,9 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<WizardState>(EMPTY_STATE);
   const [brainCatalog, setBrainCatalog] = useState<BrainCatalog | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [draftPrompt, setDraftPrompt] = useState<"resume-or-fresh" | null>(null);
+  const [draftPrompt, setDraftPrompt] = useState<"resume-or-fresh" | null>(
+    null,
+  );
   // Holds the deserialized draft while waiting for the user to choose Resume or Start Fresh
   const pendingDraftRef = useRef<WizardState | null>(null);
 
@@ -214,20 +224,25 @@ export function WizardProvider({ children }: { children: ReactNode }) {
     try {
       // Fetch brain catalog and existing allocation concurrently
       const [catalogResult, allocationResult] = await Promise.allSettled([
-        apolloClient.query({ query: BRAIN_PROVIDERS_QUERY, fetchPolicy: "cache-first" }),
-        apolloClient.query({ query: EXISTING_ALLOCATION_QUERY, fetchPolicy: "network-only" }),
+        apolloClient.query({
+          query: BRAIN_PROVIDERS_QUERY,
+          fetchPolicy: "cache-first",
+        }),
+        apolloClient.query({
+          query: EXISTING_ALLOCATION_QUERY,
+          fetchPolicy: "network-only",
+        }),
       ]);
 
       const catalog =
         catalogResult.status === "fulfilled"
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ? ((catalogResult.value.data as any)?.brainProviders as BrainCatalog | null) ?? null
+          ? (((catalogResult.value.data as any)
+              ?.brainProviders as BrainCatalog | null) ?? null)
           : null;
       setBrainCatalog(catalog);
 
-      const bots: Array<{ allocationPct?: string | null }> =
+      const bots: { allocationPct?: string | null }[] =
         allocationResult.status === "fulfilled"
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ? ((allocationResult.value.data as any)?.bots ?? [])
           : [];
       const existingAllocationTotal = bots.reduce(
@@ -248,7 +263,10 @@ export function WizardProvider({ children }: { children: ReactNode }) {
           };
         }
       } catch (err) {
-        console.error("[WizardContext] AsyncStorage read failed on cold launch:", err);
+        console.error(
+          "[WizardContext] AsyncStorage read failed on cold launch:",
+          err,
+        );
         // Start fresh — no user-visible error
       }
 
@@ -281,7 +299,10 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   const startFresh = useCallback(() => {
     pendingDraftRef.current = null;
     setDraftPrompt(null);
-    setState((prev) => ({ ...EMPTY_STATE, existingAllocationTotal: prev.existingAllocationTotal }));
+    setState((prev) => ({
+      ...EMPTY_STATE,
+      existingAllocationTotal: prev.existingAllocationTotal,
+    }));
   }, []);
 
   const selectFrame = useCallback((frameName: BotFrame) => {
@@ -302,12 +323,12 @@ export function WizardProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
-  const updateField = useCallback(<K extends keyof WizardState>(
-    field: K,
-    value: WizardState[K],
-  ) => {
-    setState((prev) => ({ ...prev, [field]: value }));
-  }, []);
+  const updateField = useCallback(
+    <K extends keyof WizardState>(field: K, value: WizardState[K]) => {
+      setState((prev) => ({ ...prev, [field]: value }));
+    },
+    [],
+  );
 
   const updateBrain = useCallback((partial: Partial<BrainState>) => {
     setState((prev) => ({ ...prev, brain: { ...prev.brain, ...partial } }));
