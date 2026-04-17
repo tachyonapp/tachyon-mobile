@@ -67,6 +67,7 @@ export type Bot = {
   __typename?: "Bot";
   activePosition?: Maybe<Position>;
   allocationPct?: Maybe<Scalars["Decimal"]["output"]>;
+  brain?: Maybe<BotBrainConfig>;
   combatPatience?: Maybe<CombatPatience>;
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
   dailyMaxGain?: Maybe<Scalars["Decimal"]["output"]>;
@@ -87,6 +88,14 @@ export type BotProposalsArgs = {
   status?: InputMaybe<ProposalStatus>;
 };
 
+export type BotBrainConfig = {
+  __typename?: "BotBrainConfig";
+  brainType?: Maybe<Scalars["String"]["output"]>;
+  keyPreview?: Maybe<Scalars["String"]["output"]>;
+  modelId?: Maybe<Scalars["String"]["output"]>;
+  provider?: Maybe<Scalars["String"]["output"]>;
+};
+
 export enum BotFrame {
   Berserker = "BERSERKER",
   Brawler = "BRAWLER",
@@ -103,6 +112,18 @@ export enum BotStatus {
   Archived = "ARCHIVED",
   Draft = "DRAFT",
   Paused = "PAUSED",
+}
+
+export type BrainConfigInput = {
+  apiKey?: InputMaybe<Scalars["String"]["input"]>;
+  brainType: BrainType;
+  modelId: Scalars["String"]["input"];
+  provider?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export enum BrainType {
+  Byok = "BYOK",
+  TachyonHosted = "TACHYON_HOSTED",
 }
 
 export enum BrokerConnStatus {
@@ -122,16 +143,48 @@ export type ConnectBrokerResult = Account | ValidationError;
 
 export type CreateBotInput = {
   allocationPct: Scalars["Decimal"]["input"];
+  avatarId: Scalars["ID"]["input"];
+  brain: BrainConfigInput;
+  colorway: Scalars["String"]["input"];
   combatPatience: CombatPatience;
-  dailyMaxGain: Scalars["Decimal"]["input"];
-  dailyMaxLoss: Scalars["Decimal"]["input"];
+  dailyMaxGain?: InputMaybe<Scalars["Decimal"]["input"]>;
+  dailyMaxLossPct: Scalars["Decimal"]["input"];
+  emotionalControls: EmotionalControlsInput;
+  exitPersonality: ExitPersonalityInput;
   frameName: BotFrame;
+  marketAwareness: MarketAwarenessInput;
   name: Scalars["String"]["input"];
   riskAttitude: RiskAttitude;
+  rulesOfEngagement: RulesOfEngagementInput;
+  sectors: Array<SectorFilter>;
+  stopLossStyle: StopLossStyleInput;
   tradeTempo: TradeTempo;
 };
 
 export type CreateBotResult = Bot | ValidationError;
+
+export type EmotionalControlsInput = {
+  cooldownAfterVolatility: Scalars["Boolean"]["input"];
+  freezeAfterLosses?: InputMaybe<Scalars["Int"]["input"]>;
+  standDownAfterNoonIfLosing: Scalars["Boolean"]["input"];
+};
+
+export type ExitPersonalityInput = {
+  name: ExitPersonalityName;
+};
+
+export enum ExitPersonalityName {
+  Balanced = "BALANCED",
+  Patient = "PATIENT",
+  QuickFinisher = "QUICK_FINISHER",
+}
+
+export type MarketAwarenessInput = {
+  meanReversion: Scalars["Float"]["input"];
+  momentum: Scalars["Float"]["input"];
+  trendFollowing: Scalars["Float"]["input"];
+  volatility: Scalars["Float"]["input"];
+};
 
 export type Mutation = {
   __typename?: "Mutation";
@@ -268,7 +321,33 @@ export enum RiskAttitude {
   Cautious = "CAUTIOUS",
 }
 
+export type RulesOfEngagementInput = {
+  noSameDayExitUnlessStopLoss: Scalars["Boolean"]["input"];
+  overnightHoldAllowed: Scalars["Boolean"]["input"];
+};
+
+export enum SectorFilter {
+  Any = "ANY",
+  Energy = "ENERGY",
+  EtfsOnly = "ETFS_ONLY",
+  Financials = "FINANCIALS",
+  Healthcare = "HEALTHCARE",
+  LiquidLargeCaps = "LIQUID_LARGE_CAPS",
+  MegaCapsOnly = "MEGA_CAPS_ONLY",
+  Tech = "TECH",
+}
+
 export type SkipProposalResult = AuthError | NotFoundError | Proposal;
+
+export type StopLossStyleInput = {
+  name: StopStyleName;
+};
+
+export enum StopStyleName {
+  Adaptive = "ADAPTIVE",
+  Flexible = "FLEXIBLE",
+  Hard = "HARD",
+}
 
 export type Subscription = {
   __typename?: "Subscription";
