@@ -3,7 +3,6 @@ import { WizardOptionCard } from "@/components/wizard/WizardOptionCard";
 import { WizardProgressBar } from "@/components/wizard/WizardProgressBar";
 import { WizardStepAnimation } from "@/components/wizard/WizardStepAnimation";
 import { FRAME_CONFIG } from "@/constants/frameConfig";
-import { COMBAT_PATIENCE_RULES } from "@/constants/wizardRules";
 import { Colors } from "@/constants/theme";
 import { useWizard } from "@/context/WizardContext";
 import { CombatPatience } from "@/generated/graphql";
@@ -19,6 +18,13 @@ import {
 } from "react-native";
 
 const TOTAL_STEPS = 13;
+
+const PATIENCE_HINTS: Record<CombatPatience, string> = {
+  [CombatPatience.Impulsive]: "No minimum hold. Can exit same day.",
+  [CombatPatience.Calculated]: "Minimum hold: 4 hours",
+  [CombatPatience.Patient]: "Minimum hold: 24 hours",
+  [CombatPatience.Strategic]: "Minimum hold: 72 hours (3 days)",
+};
 
 const PATIENCE_OPTIONS: { value: CombatPatience; label: string; description: string }[] = [
   {
@@ -53,9 +59,7 @@ export default function PatienceScreen() {
     ? FRAME_CONFIG[state.frameName].bounds.combatPatience
     : [];
 
-  const patienceHint = state.combatPatience
-    ? COMBAT_PATIENCE_RULES[state.combatPatience].label
-    : null;
+  const patienceHint = state.combatPatience ? PATIENCE_HINTS[state.combatPatience] : null;
 
   const selectedIndex = state.combatPatience
     ? PATIENCE_OPTIONS.findIndex((o) => o.value === state.combatPatience)

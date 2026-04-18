@@ -3,7 +3,6 @@ import { WizardOptionCard } from "@/components/wizard/WizardOptionCard";
 import { WizardProgressBar } from "@/components/wizard/WizardProgressBar";
 import { WizardStepAnimation } from "@/components/wizard/WizardStepAnimation";
 import { FRAME_CONFIG } from "@/constants/frameConfig";
-import { TRADE_TEMPO_RULES } from "@/constants/wizardRules";
 import { Colors } from "@/constants/theme";
 import { useWizard } from "@/context/WizardContext";
 import { TradeTempo } from "@/generated/graphql";
@@ -19,6 +18,12 @@ import {
 } from "react-native";
 
 const TOTAL_STEPS = 13;
+
+const TEMPO_HINTS: Record<TradeTempo, string> = {
+  [TradeTempo.Opportunistic]: "At most one proposal per hour",
+  [TradeTempo.Active]: "At most one proposal every 20 minutes",
+  [TradeTempo.Relentless]: "Scans every 5 minutes — fires when ready",
+};
 
 const TEMPO_OPTIONS: { value: TradeTempo; label: string; description: string }[] = [
   {
@@ -46,9 +51,7 @@ export default function TempoScreen() {
     ? FRAME_CONFIG[state.frameName].bounds.tradeTempo
     : [];
 
-  const tempoHint = state.tradeTempo
-    ? TRADE_TEMPO_RULES[state.tradeTempo].label
-    : null;
+  const tempoHint = state.tradeTempo ? TEMPO_HINTS[state.tradeTempo] : null;
 
   return (
     <SafeAreaView style={styles.safe}>
