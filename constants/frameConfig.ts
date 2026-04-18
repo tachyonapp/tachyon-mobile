@@ -1,3 +1,5 @@
+// TODO: This file is duplicated in tachyon-api/src/config/frameConfig.ts.
+// Extract to a shared @tachyon/frame-config package when the project warrants it.
 import {
   BotFrame,
   CombatPatience,
@@ -17,6 +19,12 @@ export interface FrameConfig {
   colorway: string;
   bounds: {
     allocationPct: { min: number; max: number };
+    marketAwareness: {
+      momentum: { min: number; max: number };
+      meanReversion: { min: number; max: number };
+      volatility: { min: number; max: number };
+      trendFollowing: { min: number; max: number };
+    };
   };
   defaults: {
     allocationPct: number;
@@ -37,7 +45,15 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     description:
       "Quick reactions, low risk. Fires on momentum signals. Enters on confirmed momentum — price above key moving averages with increasing volume. Exits when momentum flattens or reversal signals emerge.",
     colorway: "#2C6BED",
-    bounds: { allocationPct: { min: 0.05, max: 0.50 } },
+    bounds: {
+      allocationPct: { min: 0.05, max: 0.50 },
+      marketAwareness: {
+        momentum: { min: 0.50, max: 1.00 },
+        meanReversion: { min: 0.00, max: 0.30 },
+        volatility: { min: 0.20, max: 0.70 },
+        trendFollowing: { min: 0.50, max: 1.00 },
+      },
+    },
     defaults: {
       allocationPct: 0.2,
       dailyMaxLoss: 0.1,
@@ -55,7 +71,15 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     description:
       "Selective, precision trades. Waits for the perfect setup. Enters on a clean breakout above a defined resistance level with volume confirmation. Holds until price target is reached or a hard stop triggers. Low trade frequency, high selectivity.",
     colorway: "#E8F4FF",
-    bounds: { allocationPct: { min: 0.05, max: 0.60 } },
+    bounds: {
+      allocationPct: { min: 0.05, max: 0.60 },
+      marketAwareness: {
+        momentum: { min: 0.30, max: 0.80 },
+        meanReversion: { min: 0.00, max: 0.20 },
+        volatility: { min: 0.10, max: 0.60 },
+        trendFollowing: { min: 0.40, max: 0.90 },
+      },
+    },
     defaults: {
       allocationPct: 0.2,
       dailyMaxLoss: 0.1,
@@ -73,7 +97,15 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     description:
       "Defensive, capital-preserving. Low risk, mean reversion focus. Buys oversold conditions when price reverts toward its statistical mean after an extended deviation. Exits near mean or when reversion stalls. Avoids trending markets; sized conservatively.",
     colorway: "#1C9C61",
-    bounds: { allocationPct: { min: 0.03, max: 0.40 } },
+    bounds: {
+      allocationPct: { min: 0.03, max: 0.40 },
+      marketAwareness: {
+        momentum: { min: 0.00, max: 0.30 },
+        meanReversion: { min: 0.60, max: 1.00 },
+        volatility: { min: 0.00, max: 0.40 },
+        trendFollowing: { min: 0.00, max: 0.40 },
+      },
+    },
     defaults: {
       allocationPct: 0.15,
       dailyMaxLoss: 0.05,
@@ -91,7 +123,15 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     description:
       "Slower, higher conviction. Rides trends for maximum capture. Enters established uptrends on pullbacks to support, targeting continuation of the primary trend. Holds through minor noise; exits on trend structure break.",
     colorway: "#F2B705",
-    bounds: { allocationPct: { min: 0.10, max: 0.70 } },
+    bounds: {
+      allocationPct: { min: 0.10, max: 0.70 },
+      marketAwareness: {
+        momentum: { min: 0.20, max: 0.70 },
+        meanReversion: { min: 0.00, max: 0.20 },
+        volatility: { min: 0.00, max: 0.50 },
+        trendFollowing: { min: 0.60, max: 1.00 },
+      },
+    },
     defaults: {
       allocationPct: 0.25,
       dailyMaxLoss: 0.12,
@@ -109,7 +149,15 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     description:
       "Aggressive, high volatility. High risk, fast in and out. Targets high-volatility conditions — wide ATR, elevated IV, or momentum surges. Enters on breakouts or volume spikes; exits fast when volatility compresses. Adaptive stops accommodate wide intraday swings.",
     colorway: "#D64545",
-    bounds: { allocationPct: { min: 0.05, max: 0.40 } },
+    bounds: {
+      allocationPct: { min: 0.05, max: 0.40 },
+      marketAwareness: {
+        momentum: { min: 0.40, max: 1.00 },
+        meanReversion: { min: 0.00, max: 0.20 },
+        volatility: { min: 0.60, max: 1.00 },
+        trendFollowing: { min: 0.20, max: 0.80 },
+      },
+    },
     defaults: {
       allocationPct: 0.15,
       dailyMaxLoss: 0.15,
@@ -127,7 +175,15 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     description:
       "Enters early, balanced risk. Medium-duration swing trades. Targets early-stage swing setups — bullish structure at support with neutral-to-improving momentum. Holds for multi-day price expansion toward resistance.",
     colorway: "#8B7CFF",
-    bounds: { allocationPct: { min: 0.05, max: 0.55 } },
+    bounds: {
+      allocationPct: { min: 0.05, max: 0.55 },
+      marketAwareness: {
+        momentum: { min: 0.20, max: 0.80 },
+        meanReversion: { min: 0.10, max: 0.50 },
+        volatility: { min: 0.20, max: 0.70 },
+        trendFollowing: { min: 0.20, max: 0.80 },
+      },
+    },
     defaults: {
       allocationPct: 0.2,
       dailyMaxLoss: 0.1,
