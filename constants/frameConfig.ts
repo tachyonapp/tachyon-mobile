@@ -18,6 +18,9 @@ export interface FrameConfig {
   description: string;
   colorway: string;
   bounds: {
+    riskAttitude: RiskAttitude[];
+    tradeTempo: TradeTempo[];
+    combatPatience: CombatPatience[];
     allocationPct: { min: number; max: number };
     dailyMaxLoss: { minPct: number; maxPct: number };
     marketAwareness: {
@@ -47,6 +50,9 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
       "Quick reactions, low risk. Fires on momentum signals. Enters on confirmed momentum — price above key moving averages with increasing volume. Exits when momentum flattens or reversal signals emerge.",
     colorway: "#2C6BED",
     bounds: {
+      riskAttitude: [RiskAttitude.Cautious, RiskAttitude.Balanced, RiskAttitude.Aggressive],
+      tradeTempo: [TradeTempo.Opportunistic, TradeTempo.Active, TradeTempo.Relentless],
+      combatPatience: [CombatPatience.Impulsive, CombatPatience.Calculated, CombatPatience.Patient],
       allocationPct: { min: 0.05, max: 0.50 },
       dailyMaxLoss: { minPct: 0.04, maxPct: 0.15 },
       marketAwareness: {
@@ -74,6 +80,9 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
       "Selective, precision trades. Waits for the perfect setup. Enters on a clean breakout above a defined resistance level with volume confirmation. Holds until price target is reached or a hard stop triggers. Low trade frequency, high selectivity.",
     colorway: "#E8F4FF",
     bounds: {
+      riskAttitude: [RiskAttitude.Cautious, RiskAttitude.Balanced, RiskAttitude.Aggressive],
+      tradeTempo: [TradeTempo.Opportunistic, TradeTempo.Active],
+      combatPatience: [CombatPatience.Calculated, CombatPatience.Patient, CombatPatience.Strategic],
       allocationPct: { min: 0.05, max: 0.60 },
       dailyMaxLoss: { minPct: 0.03, maxPct: 0.15 },
       marketAwareness: {
@@ -101,6 +110,9 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
       "Defensive, capital-preserving. Low risk, mean reversion focus. Buys oversold conditions when price reverts toward its statistical mean after an extended deviation. Exits near mean or when reversion stalls. Avoids trending markets; sized conservatively.",
     colorway: "#1C9C61",
     bounds: {
+      riskAttitude: [RiskAttitude.Cautious, RiskAttitude.Balanced],
+      tradeTempo: [TradeTempo.Opportunistic, TradeTempo.Active],
+      combatPatience: [CombatPatience.Calculated, CombatPatience.Patient, CombatPatience.Strategic],
       allocationPct: { min: 0.03, max: 0.40 },
       dailyMaxLoss: { minPct: 0.02, maxPct: 0.08 },
       marketAwareness: {
@@ -128,6 +140,9 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
       "Slower, higher conviction. Rides trends for maximum capture. Enters established uptrends on pullbacks to support, targeting continuation of the primary trend. Holds through minor noise; exits on trend structure break.",
     colorway: "#F2B705",
     bounds: {
+      riskAttitude: [RiskAttitude.Balanced, RiskAttitude.Aggressive],
+      tradeTempo: [TradeTempo.Opportunistic, TradeTempo.Active],
+      combatPatience: [CombatPatience.Calculated, CombatPatience.Patient, CombatPatience.Strategic],
       allocationPct: { min: 0.10, max: 0.70 },
       dailyMaxLoss: { minPct: 0.06, maxPct: 0.20 },
       marketAwareness: {
@@ -155,6 +170,9 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
       "Aggressive, high volatility. High risk, fast in and out. Targets high-volatility conditions — wide ATR, elevated IV, or momentum surges. Enters on breakouts or volume spikes; exits fast when volatility compresses. Adaptive stops accommodate wide intraday swings.",
     colorway: "#D64545",
     bounds: {
+      riskAttitude: [RiskAttitude.Balanced, RiskAttitude.Aggressive],
+      tradeTempo: [TradeTempo.Active, TradeTempo.Relentless],
+      combatPatience: [CombatPatience.Impulsive, CombatPatience.Calculated],
       allocationPct: { min: 0.05, max: 0.40 },
       dailyMaxLoss: { minPct: 0.10, maxPct: 0.25 },
       marketAwareness: {
@@ -182,6 +200,9 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
       "Enters early, balanced risk. Medium-duration swing trades. Targets early-stage swing setups — bullish structure at support with neutral-to-improving momentum. Holds for multi-day price expansion toward resistance.",
     colorway: "#8B7CFF",
     bounds: {
+      riskAttitude: [RiskAttitude.Cautious, RiskAttitude.Balanced, RiskAttitude.Aggressive],
+      tradeTempo: [TradeTempo.Opportunistic, TradeTempo.Active, TradeTempo.Relentless],
+      combatPatience: [CombatPatience.Impulsive, CombatPatience.Calculated, CombatPatience.Patient],
       allocationPct: { min: 0.05, max: 0.55 },
       dailyMaxLoss: { minPct: 0.05, maxPct: 0.15 },
       marketAwareness: {
