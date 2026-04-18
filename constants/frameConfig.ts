@@ -19,6 +19,7 @@ export interface FrameConfig {
   colorway: string;
   bounds: {
     allocationPct: { min: number; max: number };
+    dailyMaxLoss: { minPct: number; maxPct: number };
     marketAwareness: {
       momentum: { min: number; max: number };
       meanReversion: { min: number; max: number };
@@ -47,6 +48,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     colorway: "#2C6BED",
     bounds: {
       allocationPct: { min: 0.05, max: 0.50 },
+      dailyMaxLoss: { minPct: 0.04, maxPct: 0.15 },
       marketAwareness: {
         momentum: { min: 0.50, max: 1.00 },
         meanReversion: { min: 0.00, max: 0.30 },
@@ -73,6 +75,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     colorway: "#E8F4FF",
     bounds: {
       allocationPct: { min: 0.05, max: 0.60 },
+      dailyMaxLoss: { minPct: 0.03, maxPct: 0.15 },
       marketAwareness: {
         momentum: { min: 0.30, max: 0.80 },
         meanReversion: { min: 0.00, max: 0.20 },
@@ -99,6 +102,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     colorway: "#1C9C61",
     bounds: {
       allocationPct: { min: 0.03, max: 0.40 },
+      dailyMaxLoss: { minPct: 0.02, maxPct: 0.08 },
       marketAwareness: {
         momentum: { min: 0.00, max: 0.30 },
         meanReversion: { min: 0.60, max: 1.00 },
@@ -125,6 +129,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     colorway: "#F2B705",
     bounds: {
       allocationPct: { min: 0.10, max: 0.70 },
+      dailyMaxLoss: { minPct: 0.06, maxPct: 0.20 },
       marketAwareness: {
         momentum: { min: 0.20, max: 0.70 },
         meanReversion: { min: 0.00, max: 0.20 },
@@ -151,6 +156,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     colorway: "#D64545",
     bounds: {
       allocationPct: { min: 0.05, max: 0.40 },
+      dailyMaxLoss: { minPct: 0.10, maxPct: 0.25 },
       marketAwareness: {
         momentum: { min: 0.40, max: 1.00 },
         meanReversion: { min: 0.00, max: 0.20 },
@@ -177,6 +183,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     colorway: "#8B7CFF",
     bounds: {
       allocationPct: { min: 0.05, max: 0.55 },
+      dailyMaxLoss: { minPct: 0.05, maxPct: 0.15 },
       marketAwareness: {
         momentum: { min: 0.20, max: 0.80 },
         meanReversion: { min: 0.10, max: 0.50 },
