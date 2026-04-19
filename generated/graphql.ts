@@ -226,6 +226,7 @@ export type Mutation = {
   pauseBot?: Maybe<BotResult>;
   skipProposal?: Maybe<SkipProposalResult>;
   updateBot?: Maybe<UpdateBotResult>;
+  validateBrainKey?: Maybe<ValidateBrainKeyResult>;
 };
 
 export type MutationActivateBotArgs = {
@@ -260,6 +261,11 @@ export type MutationSkipProposalArgs = {
 export type MutationUpdateBotArgs = {
   id: Scalars["ID"]["input"];
   input: UpdateBotInput;
+};
+
+export type MutationValidateBrainKeyArgs = {
+  apiKey: Scalars["String"]["input"];
+  provider: Scalars["String"]["input"];
 };
 
 export type NotFoundError = BaseError & {
@@ -419,6 +425,12 @@ export type User = {
   id?: Maybe<Scalars["ID"]["output"]>;
   /** Whether the user has completed the FTUE onboarding flow. */
   onboardingCompleted: Scalars["Boolean"]["output"];
+};
+
+export type ValidateBrainKeyResult = {
+  __typename?: "ValidateBrainKeyResult";
+  error?: Maybe<Scalars["String"]["output"]>;
+  valid?: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type ValidationError = BaseError & {
@@ -582,6 +594,20 @@ export type UpdateBotMutation = {
         code?: string | null;
       }
     | null;
+};
+
+export type ValidateBrainKeyMutationVariables = Exact<{
+  provider: Scalars["String"]["input"];
+  apiKey: Scalars["String"]["input"];
+}>;
+
+export type ValidateBrainKeyMutation = {
+  __typename?: "Mutation";
+  validateBrainKey?: {
+    __typename?: "ValidateBrainKeyResult";
+    valid?: boolean | null;
+    error?: string | null;
+  } | null;
 };
 
 export type AccountQueryVariables = Exact<{ [key: string]: never }>;
@@ -1515,6 +1541,83 @@ export const UpdateBotDocument = {
     },
   ],
 } as unknown as DocumentNode<UpdateBotMutation, UpdateBotMutationVariables>;
+export const ValidateBrainKeyDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "ValidateBrainKey" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "provider" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "String" },
+            },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "apiKey" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "String" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "validateBrainKey" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "provider" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "provider" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "apiKey" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "apiKey" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "valid" } },
+                { kind: "Field", name: { kind: "Name", value: "error" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ValidateBrainKeyMutation,
+  ValidateBrainKeyMutationVariables
+>;
 export const AccountDocument = {
   kind: "Document",
   definitions: [
