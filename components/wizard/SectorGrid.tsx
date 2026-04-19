@@ -17,11 +17,16 @@ const SELECT_ALL_LABEL = "Any liquid battlefield";
 interface SectorGridProps {
   selected: string[];
   onChange: (sectors: string[]) => void;
+  showError?: boolean;
 }
 
-export function SectorGrid({ selected, onChange }: SectorGridProps) {
+export function SectorGrid({
+  selected,
+  onChange,
+  showError = false,
+}: SectorGridProps) {
   const allSelected = ALL_SECTORS.every((s) => selected.includes(s));
-  const hasError = selected.length === 0;
+  const hasError = showError && selected.length === 0;
 
   function toggleSelectAll() {
     onChange(allSelected ? [] : [...ALL_SECTORS]);
@@ -40,9 +45,15 @@ export function SectorGrid({ selected, onChange }: SectorGridProps) {
       {/* Select-all tile — spans full row */}
       <Pressable
         onPress={toggleSelectAll}
-        style={[styles.tile, styles.tileFullWidth, allSelected && styles.tileSelected]}
+        style={[
+          styles.tile,
+          styles.tileFullWidth,
+          allSelected && styles.tileSelected,
+        ]}
       >
-        <Text style={[styles.tileLabel, allSelected && styles.tileLabelSelected]}>
+        <Text
+          style={[styles.tileLabel, allSelected && styles.tileLabelSelected]}
+        >
           {SELECT_ALL_LABEL}
         </Text>
       </Pressable>
@@ -55,9 +66,18 @@ export function SectorGrid({ selected, onChange }: SectorGridProps) {
             <Pressable
               key={sector}
               onPress={() => toggleSector(sector)}
-              style={[styles.tile, styles.tileGridItem, isSelected && styles.tileSelected]}
+              style={[
+                styles.tile,
+                styles.tileGridItem,
+                isSelected && styles.tileSelected,
+              ]}
             >
-              <Text style={[styles.tileLabel, isSelected && styles.tileLabelSelected]}>
+              <Text
+                style={[
+                  styles.tileLabel,
+                  isSelected && styles.tileLabelSelected,
+                ]}
+              >
                 {sector}
               </Text>
             </Pressable>
