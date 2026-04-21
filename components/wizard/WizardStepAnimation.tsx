@@ -10,12 +10,13 @@ interface WizardStepAnimationProps {
   height?: number;
 }
 
-export function WizardStepAnimation({
-  source,
-  autoPlay = true,
-  loop = true,
-  height = 200,
-}: WizardStepAnimationProps) {
+export const WizardStepAnimation = React.forwardRef<
+  LottieView,
+  WizardStepAnimationProps
+>(function WizardStepAnimation(
+  { source, autoPlay = true, loop = true, height = 250 },
+  ref,
+) {
   const shimmerOpacity = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
@@ -42,6 +43,7 @@ export function WizardStepAnimation({
   if (source !== null) {
     return (
       <LottieView
+        ref={ref}
         source={source}
         autoPlay={autoPlay}
         loop={loop}
@@ -57,7 +59,7 @@ export function WizardStepAnimation({
       />
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   lottie: {

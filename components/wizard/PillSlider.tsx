@@ -1,24 +1,25 @@
 import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import React, { useCallback } from "react";
+import { StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Reanimated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
-import { StyleSheet, View } from "react-native";
-import React, { useCallback } from "react";
 
 const TRACK_HEIGHT = 28;
 const THUMB_SIZE = 22;
 const THUMB_INSET = (TRACK_HEIGHT - THUMB_SIZE) / 2;
 
 interface PillSliderProps {
-  value: number;       // 0.0 – 1.0 normalized position
-  min: number;         // raw min (e.g. 0.05)
-  max: number;         // raw max (e.g. 0.50)
+  value: number; // 0.0 – 1.0 normalized position
+  min: number; // raw min (e.g. 0.05)
+  max: number; // raw max (e.g. 0.50)
   onChange: (raw: number) => void;
   fillColor?: string;
-  trackWidth: number;  // must be measured by parent via onLayout
+  trackWidth: number; // must be measured by parent via onLayout
 }
 
 export function PillSlider({
@@ -26,17 +27,21 @@ export function PillSlider({
   min,
   max,
   onChange,
-  fillColor = Colors.dark.electricBlue,
+  fillColor,
   trackWidth,
 }: PillSliderProps) {
+  const theme = Colors[useColorScheme()];
+  const resolvedFillColor = fillColor ?? theme.electricBlue;
   const usableWidth = trackWidth - THUMB_SIZE;
 
   // normalized 0–1
   const normalized = (value - min) / (max - min);
   const thumbX = useSharedValue(normalized * usableWidth);
 
-  const clamp = (v: number, lo: number, hi: number) =>
-    Math.min(hi, Math.max(lo, v));
+  const clamp = (v: number, lo: number, hi: number) => {
+    "worklet";
+    return Math.min(hi, Math.max(lo, v));
+  };
 
   const emitValue = useCallback(
     (x: number) => {
@@ -69,16 +74,33 @@ export function PillSlider({
   }));
 
   const fillStyle = useAnimatedStyle(() => ({
-    width: thumbX.value + THUMB_SIZE / 2,
+    width: thumbX.value + THUMB_SIZE + 5,
   }));
 
   if (trackWidth === 0) return null;
 
   return (
     <GestureDetector gesture={pan}>
-      <View style={[styles.track, { width: trackWidth }]}>
-        <Reanimated.View style={[styles.fill, { backgroundColor: fillColor }, fillStyle]} />
-        <Reanimated.View style={[styles.thumb, thumbStyle]} />
+      <View
+        style={[
+          styles.track,
+          { width: trackWidth, backgroundColor: theme.surface },
+        ]}
+      >
+        <Reanimated.View
+          style={[
+            styles.fill,
+            { backgroundColor: resolvedFillColor },
+            fillStyle,
+          ]}
+        />
+        <Reanimated.View
+          style={[
+            styles.thumb,
+            { backgroundColor: theme.textPrimary },
+            thumbStyle,
+          ]}
+        />
       </View>
     </GestureDetector>
   );
@@ -87,7 +109,6 @@ export function PillSlider({
 const styles = StyleSheet.create({
   track: {
     height: TRACK_HEIGHT,
-    backgroundColor: Colors.dark.surface,
     borderRadius: TRACK_HEIGHT / 2,
     overflow: "hidden",
     justifyContent: "center",
@@ -105,7 +126,6 @@ const styles = StyleSheet.create({
     width: THUMB_SIZE,
     height: THUMB_SIZE,
     borderRadius: THUMB_SIZE / 2,
-    backgroundColor: Colors.dark.textPrimary,
     shadowColor: "#000",
     shadowOpacity: 0.3,
     shadowRadius: 4,

@@ -6,9 +6,10 @@ import { Colors } from "@/constants/theme";
 import { useWizard } from "@/context/WizardContext";
 import { BotFrame } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { swapLottieColors } from "@/utils/lottie-color-swap";
 import { useRouter } from "expo-router";
 import { type LottieViewProps } from "lottie-react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   FlatList,
   Pressable,
@@ -18,7 +19,11 @@ import {
   View,
 } from "react-native";
 
-const DEFAULT_HEADER_ANIMATION = require("@/assets/animations/tachyon-eye.json");
+const BASE_HEADER_ANIMATION = require("@/assets/animations/ftue-bot-builder.json");
+
+// Original accent colors baked into the animation
+const ANIM_PRIMARY = "#2C6BEC";
+const ANIM_SECONDARY = "#8A7BFF";
 
 const FRAME_ANIMATIONS: Partial<Record<BotFrame, LottieViewProps["source"]>> = {
   [BotFrame.Scout]: require("@/assets/animations/scout.json"),
@@ -34,6 +39,15 @@ export default function FrameScreen() {
   const { state, selectFrame } = useWizard();
   const router = useRouter();
 
+  const headerAnimation = useMemo(() => {
+    if (!state.frameName) return BASE_HEADER_ANIMATION;
+    const colorway = FRAME_CONFIG[state.frameName].colorway;
+    return swapLottieColors(BASE_HEADER_ANIMATION, [
+      { from: ANIM_PRIMARY, to: colorway },
+      { from: ANIM_SECONDARY, to: colorway },
+    ]);
+  }, [state.frameName]);
+
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
       <WizardProgressBar currentStep={1} totalSteps={TOTAL_STEPS} />
@@ -46,8 +60,8 @@ export default function FrameScreen() {
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
           <View style={styles.header}>
-            <View style={styles.eye}>
-              <WizardStepAnimation source={DEFAULT_HEADER_ANIMATION} />
+            <View style={styles.headerAnimation}>
+              <WizardStepAnimation source={headerAnimation} />
             </View>
             <Text style={[styles.title, { color: theme.textPrimary }]}>
               {"Choose Your Bot's Frame"}
@@ -98,7 +112,7 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 12,
   },
-  eye: {
+  headerAnimation: {
     marginBottom: 30,
     marginTop: 30,
   },

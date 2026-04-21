@@ -1,9 +1,7 @@
 import { EducationalTooltip } from "@/components/wizard/EducationalTooltip";
-import { RiskShapeIndicator } from "@/components/wizard/RiskShapeIndicator";
-import { TempoWaveform } from "@/components/wizard/TempoWaveformIndicator";
+import { AnimatedTempoWaveform, TempoWaveform } from "@/components/wizard/TempoWaveformIndicator";
 import { WizardOptionCard } from "@/components/wizard/WizardOptionCard";
 import { WizardProgressBar } from "@/components/wizard/WizardProgressBar";
-import { WizardStepAnimation } from "@/components/wizard/WizardStepAnimation";
 import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import { useWizard } from "@/context/WizardContext";
@@ -19,8 +17,6 @@ import {
   Text,
   View,
 } from "react-native";
-
-const EYE_ANIMATION = require("@/assets/animations/tachyon-eye.json");
 
 const TOTAL_STEPS = 13;
 
@@ -61,9 +57,13 @@ export default function TempoScreen() {
   const bounds = state.frameName
     ? FRAME_CONFIG[state.frameName].bounds.tradeTempo
     : [];
-  const frameColorway = state.frameName
-    ? FRAME_CONFIG[state.frameName].colorway
-    : null;
+  const frameConfig = state.frameName ? FRAME_CONFIG[state.frameName] : null;
+  const supportedTempoLabels = bounds
+    .map((t) => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase())
+    .join(", ");
+  const disabledReason = frameConfig
+    ? `${frameConfig.gamifiedName} only supports ${supportedTempoLabels} tempo${bounds.length !== 1 ? "s" : ""}.`
+    : undefined;
   const tempoHint = state.tradeTempo ? TEMPO_HINTS[state.tradeTempo] : null;
 
   return (
@@ -71,19 +71,7 @@ export default function TempoScreen() {
       <WizardProgressBar currentStep={3} totalSteps={TOTAL_STEPS} />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.animationWrapper}>
-          <WizardStepAnimation source={EYE_ANIMATION} />
-          {frameColorway && (
-            <View
-              pointerEvents="none"
-              style={[
-                styles.colorwayRing,
-                { borderColor: frameColorway, shadowColor: frameColorway },
-              ]}
-            />
-          )}
-          {state.riskAttitude && (
-            <RiskShapeIndicator riskAttitude={state.riskAttitude} />
-          )}
+          <AnimatedTempoWaveform tradeTempo={state.tradeTempo} />
         </View>
         <View style={styles.titleRow}>
           <Text style={[styles.title, { color: theme.textPrimary }]}>
@@ -111,6 +99,7 @@ export default function TempoScreen() {
               selected={state.tradeTempo === opt.value}
               onSelect={() => updateField("tradeTempo", opt.value)}
               disabled={!bounds.includes(opt.value)}
+              disabledReason={!bounds.includes(opt.value) ? disabledReason : undefined}
               icon={<TempoWaveform tradeTempo={opt.value} />}
             />
           ))}
@@ -142,19 +131,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 30,
     marginTop: 30,
-  },
-  colorwayRing: {
-    position: "absolute",
-    alignSelf: "center",
-    width: 208,
-    height: 208,
-    borderRadius: 104,
-    borderWidth: 2,
-    top: (200 - 208) / 2,
-    shadowOpacity: 0.75,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 8,
   },
   titleRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   title: { fontSize: 22, fontWeight: "700", flex: 1 },

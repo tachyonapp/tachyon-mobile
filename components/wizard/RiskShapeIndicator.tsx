@@ -3,9 +3,9 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 
 const RISK_COLORS: Record<RiskAttitude, string> = {
-  [RiskAttitude.Cautious]:   "#2C6BED",
-  [RiskAttitude.Balanced]:   "#8B7CFF",
-  [RiskAttitude.Aggressive]: "#D64545",
+  [RiskAttitude.Cautious]: "green",
+  [RiskAttitude.Balanced]: "yellow",
+  [RiskAttitude.Aggressive]: "red",
 };
 
 // Ring is 208px tall, centered in a 200px animationWrapper.
@@ -51,7 +51,14 @@ export function RiskShape({ riskAttitude, size = 14 }: RiskShapeProps) {
   const tw = size;
   const th = Math.round(size * 0.875);
   return (
-    <View style={{ width: tw, height: th, justifyContent: "center", alignItems: "center" }}>
+    <View
+      style={{
+        width: tw,
+        height: th,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       <View
         style={{
           width: 0,

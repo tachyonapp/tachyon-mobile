@@ -9,7 +9,8 @@ import { useWizard } from "@/context/WizardContext";
 import { RiskAttitude } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useRouter } from "expo-router";
-import React from "react";
+import LottieView from "lottie-react-native";
+import React, { useEffect, useRef } from "react";
 import {
   Pressable,
   SafeAreaView,
@@ -19,9 +20,18 @@ import {
   View,
 } from "react-native";
 
-const EYE_ANIMATION = require("@/assets/animations/tachyon-eye.json");
+const RISK_ANIMATION = require("@/assets/animations/risk.json");
+
+const NEEDLE_FRAMES: Record<RiskAttitude, number> = {
+  [RiskAttitude.Cautious]: 27,
+  [RiskAttitude.Balanced]: 52,
+  [RiskAttitude.Aggressive]: 70,
+};
 
 const TOTAL_STEPS = 13;
+type LottieViewWithGoToAndStop = LottieView & {
+  play: (startFrame?: number, endFrame?: number) => void;
+};
 
 const RISK_OPTIONS: {
   value: RiskAttitude;
@@ -50,32 +60,37 @@ export default function RiskScreen() {
   const theme = Colors[useColorScheme()];
   const { state, updateField } = useWizard();
   const router = useRouter();
+  const lottieRef = useRef<LottieViewWithGoToAndStop>(null);
 
   const bounds = state.frameName
     ? FRAME_CONFIG[state.frameName].bounds.riskAttitude
     : [];
-  const frameColorway = state.frameName
-    ? FRAME_CONFIG[state.frameName].colorway
-    : null;
+
+  const frameConfig = state.frameName ? FRAME_CONFIG[state.frameName] : null;
+  const supportedRiskLabels = bounds
+    .map((r) => r.charAt(0).toUpperCase() + r.slice(1).toLowerCase())
+    .join(", ");
+  const disabledReason = frameConfig
+    ? `${frameConfig.gamifiedName} only supports ${supportedRiskLabels} risk attitude${bounds.length !== 1 ? "s" : ""}.`
+    : undefined;
+
+  useEffect(() => {
+    const ref = lottieRef.current;
+    if (!ref) return;
+    if (state.riskAttitude) {
+      const frame = NEEDLE_FRAMES[state.riskAttitude];
+      ref.play(frame, frame + 1);
+    } else {
+      ref.play();
+    }
+  }, [state.riskAttitude]);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
       <WizardProgressBar currentStep={2} totalSteps={TOTAL_STEPS} />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.animationWrapper}>
-          <WizardStepAnimation source={EYE_ANIMATION} />
-          {frameColorway && (
-            <View
-              pointerEvents="none"
-              style={[
-                styles.colorwayRing,
-                {
-                  borderColor: frameColorway,
-                  shadowColor: frameColorway,
-                },
-              ]}
-            />
-          )}
+          <WizardStepAnimation ref={lottieRef} source={RISK_ANIMATION} />
         </View>
         <View style={styles.titleRow}>
           <Text style={[styles.title, { color: theme.textPrimary }]}>
@@ -98,6 +113,9 @@ export default function RiskScreen() {
               selected={state.riskAttitude === opt.value}
               onSelect={() => updateField("riskAttitude", opt.value)}
               disabled={!bounds.includes(opt.value)}
+              disabledReason={
+                !bounds.includes(opt.value) ? disabledReason : undefined
+              }
               icon={<RiskShape riskAttitude={opt.value} size={14} />}
             />
           ))}
@@ -129,19 +147,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 30,
     marginTop: 30,
-  },
-  colorwayRing: {
-    position: "absolute",
-    alignSelf: "center",
-    width: 208,
-    height: 208,
-    borderRadius: 104,
-    borderWidth: 2,
-    top: (200 - 208) / 2,
-    shadowOpacity: 0.75,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 8,
   },
   titleRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   title: { fontSize: 22, fontWeight: "700", flex: 1 },

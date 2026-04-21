@@ -1,3 +1,4 @@
+import { EducationalTooltip } from "@/components/wizard/EducationalTooltip";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React from "react";
@@ -9,6 +10,7 @@ interface WizardOptionCardProps {
   selected: boolean;
   onSelect: () => void;
   disabled?: boolean;
+  disabledReason?: string;
   icon?: React.ReactNode;
 }
 
@@ -18,52 +20,69 @@ export function WizardOptionCard({
   selected,
   onSelect,
   disabled = false,
+  disabledReason,
   icon,
 }: WizardOptionCardProps) {
   const theme = Colors[useColorScheme()];
+
+  const cardContent = (
+    <View
+      style={[
+        styles.card,
+        selected
+          ? {
+              borderColor: theme.electricBlue,
+              backgroundColor: "rgba(44,107,237,0.1)",
+            }
+          : {
+              borderColor: theme.textDisabled,
+              backgroundColor: theme.surface,
+            },
+        disabled && styles.cardDisabled,
+      ]}
+    >
+      {icon && <View style={styles.iconSlot}>{icon}</View>}
+      <View style={styles.textStack}>
+        <Text
+          style={[
+            styles.label,
+            { color: theme.textPrimary },
+            disabled && { color: theme.textDisabled },
+          ]}
+        >
+          {label}
+        </Text>
+        <Text
+          style={[
+            styles.description,
+            { color: theme.textSecondary },
+            disabled && { color: theme.textDisabled },
+          ]}
+        >
+          {description}
+        </Text>
+      </View>
+    </View>
+  );
+
+  if (disabled && disabledReason) {
+    return (
+      <View style={styles.pressable}>
+        <EducationalTooltip
+          title="Not available"
+          body={disabledReason}
+          trigger={cardContent}
+        />
+      </View>
+    );
+  }
 
   return (
     <Pressable
       onPress={disabled ? undefined : onSelect}
       style={styles.pressable}
     >
-      <View
-        style={[
-          styles.card,
-          selected
-            ? {
-                borderColor: theme.electricBlue,
-                backgroundColor: "rgba(44,107,237,0.1)",
-              }
-            : {
-                borderColor: theme.textDisabled,
-                backgroundColor: theme.surface,
-              },
-          disabled && styles.cardDisabled,
-        ]}
-      >
-        {icon && <View style={styles.iconSlot}>{icon}</View>}
-        <View style={styles.textStack}>
-          <Text
-            style={[
-              styles.label,
-              { color: theme.textPrimary },
-              disabled && { color: theme.textDisabled },
-            ]}
-          >
-            {label}
-          </Text>
-          <Text
-            style={[
-              styles.description,
-              { color: theme.textSecondary },
-              disabled && { color: theme.textDisabled },
-            ]}
-          >
-            {description}
-          </Text>
-        </View>
-      </View>
+      {cardContent}
     </Pressable>
   );
 }
