@@ -7,7 +7,9 @@ import { type ComponentProps } from "react";
 import { OpaqueColorValue, type StyleProp, type TextStyle } from "react-native";
 
 type MaterialIconName = ComponentProps<typeof MaterialIcons>["name"];
-type MaterialCommunityIconName = ComponentProps<typeof MaterialCommunityIcons>["name"];
+type MaterialCommunityIconName = ComponentProps<
+  typeof MaterialCommunityIcons
+>["name"];
 
 /**
  * SF Symbol name → MaterialIcons name.
@@ -18,7 +20,11 @@ const MATERIAL_MAPPING = {
   "paperplane.fill": "send",
   "chevron.left.forwardslash.chevron.right": "code",
   "chevron.right": "chevron-right",
+  "chevron.left": "chevron-left",
+  "info.circle": "info-outline",
   "gearshape.fill": "settings",
+  xmark: "close",
+  checkmark: "check",
 } as const satisfies Record<string, MaterialIconName>;
 
 /**
@@ -29,7 +35,9 @@ const COMMUNITY_MAPPING = {
   "robot-outline": "robot-outline",
 } as const satisfies Record<string, MaterialCommunityIconName>;
 
-type IconSymbolName = keyof typeof MATERIAL_MAPPING | keyof typeof COMMUNITY_MAPPING;
+type IconSymbolName =
+  | keyof typeof MATERIAL_MAPPING
+  | keyof typeof COMMUNITY_MAPPING;
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.

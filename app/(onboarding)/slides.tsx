@@ -72,7 +72,7 @@ export default function OnboardingSlidesScreen() {
 
   const handleComplete = async () => {
     await markComplete();
-    router.replace("/(bot-wizard)/frame");
+    router.replace("/(tabs)");
   };
 
   const handleNext = () => {

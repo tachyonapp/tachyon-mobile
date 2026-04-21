@@ -15,6 +15,7 @@ import {
 export interface FrameConfig {
   gamifiedName: string;
   strategyName: string;
+  shortDescription: string;
   description: string;
   colorway: string;
   bounds: {
@@ -46,6 +47,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
   [BotFrame.Scout]: {
     gamifiedName: "The Scout",
     strategyName: "Momentum Confirmation",
+    shortDescription: "Quick reactions, low risk. Fires on momentum signals.",
     description:
       "Quick reactions, low risk. Fires on momentum signals. Enters on confirmed momentum — price above key moving averages with increasing volume. Exits when momentum flattens or reversal signals emerge.",
     colorway: "#2C6BED",
@@ -76,6 +78,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
   [BotFrame.Sniper]: {
     gamifiedName: "The Sniper",
     strategyName: "Breakout Trading",
+    shortDescription: "Selective, precision trades. Waits for the perfect setup.",
     description:
       "Selective, precision trades. Waits for the perfect setup. Enters on a clean breakout above a defined resistance level with volume confirmation. Holds until price target is reached or a hard stop triggers. Low trade frequency, high selectivity.",
     colorway: "#E8F4FF",
@@ -106,6 +109,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
   [BotFrame.Guardian]: {
     gamifiedName: "The Guardian",
     strategyName: "Mean Reversion",
+    shortDescription: "Defensive, capital-preserving. Low risk, mean reversion focus.",
     description:
       "Defensive, capital-preserving. Low risk, mean reversion focus. Buys oversold conditions when price reverts toward its statistical mean after an extended deviation. Exits near mean or when reversion stalls. Avoids trending markets; sized conservatively.",
     colorway: "#1C9C61",
@@ -136,6 +140,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
   [BotFrame.Bruiser]: {
     gamifiedName: "The Bruiser",
     strategyName: "Trend Following",
+    shortDescription: "Slower, higher conviction. Rides trends for maximum capture.",
     description:
       "Slower, higher conviction. Rides trends for maximum capture. Enters established uptrends on pullbacks to support, targeting continuation of the primary trend. Holds through minor noise; exits on trend structure break.",
     colorway: "#F2B705",
@@ -166,6 +171,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
   [BotFrame.Berserker]: {
     gamifiedName: "The Berserker",
     strategyName: "Volatility Trading",
+    shortDescription: "Aggressive, high volatility. High risk, fast in and out.",
     description:
       "Aggressive, high volatility. High risk, fast in and out. Targets high-volatility conditions — wide ATR, elevated IV, or momentum surges. Enters on breakouts or volume spikes; exits fast when volatility compresses. Adaptive stops accommodate wide intraday swings.",
     colorway: "#D64545",
@@ -196,6 +202,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
   [BotFrame.Brawler]: {
     gamifiedName: "The Brawler",
     strategyName: "Swing Trading",
+    shortDescription: "Enters early, balanced risk. Medium-duration swing trades.",
     description:
       "Enters early, balanced risk. Medium-duration swing trades. Targets early-stage swing setups — bullish structure at support with neutral-to-improving momentum. Holds for multi-day price expansion toward resistance.",
     colorway: "#8B7CFF",

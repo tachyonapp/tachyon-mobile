@@ -7,12 +7,14 @@ interface WizardStepAnimationProps {
   source: LottieViewProps["source"] | null;
   autoPlay?: boolean;
   loop?: boolean;
+  height?: number;
 }
 
 export function WizardStepAnimation({
   source,
   autoPlay = true,
   loop = true,
+  height = 200,
 }: WizardStepAnimationProps) {
   const shimmerOpacity = useRef(new Animated.Value(0.3)).current;
 
@@ -43,13 +45,13 @@ export function WizardStepAnimation({
         source={source}
         autoPlay={autoPlay}
         loop={loop}
-        style={styles.lottie}
+        style={[styles.lottie, { height }]}
       />
     );
   }
 
   return (
-    <View style={styles.shimmerContainer}>
+    <View style={[styles.shimmerContainer, { height }]}>
       <Animated.View
         style={[styles.shimmerForeground, { opacity: shimmerOpacity }]}
       />

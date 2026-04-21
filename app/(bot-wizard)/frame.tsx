@@ -5,7 +5,9 @@ import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import { useWizard } from "@/context/WizardContext";
 import { BotFrame } from "@/generated/graphql";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useRouter } from "expo-router";
+import { type LottieViewProps } from "lottie-react-native";
 import React from "react";
 import {
   FlatList,
@@ -16,15 +18,24 @@ import {
   View,
 } from "react-native";
 
+const DEFAULT_HEADER_ANIMATION = require("@/assets/animations/tachyon-eye.json");
+
+const FRAME_ANIMATIONS: Partial<Record<BotFrame, LottieViewProps["source"]>> = {
+  [BotFrame.Scout]: require("@/assets/animations/scout.json"),
+  [BotFrame.Sniper]: require("@/assets/animations/sniper.json"),
+  [BotFrame.Guardian]: require("@/assets/animations/shield.json"),
+};
+
 const FRAMES = Object.values(BotFrame);
 const TOTAL_STEPS = 13;
 
 export default function FrameScreen() {
+  const theme = Colors[useColorScheme()];
   const { state, selectFrame } = useWizard();
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
       <WizardProgressBar currentStep={1} totalSteps={TOTAL_STEPS} />
 
       <FlatList
@@ -35,9 +46,13 @@ export default function FrameScreen() {
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
           <View style={styles.header}>
-            <WizardStepAnimation source={null} />
-            <Text style={styles.title}>Choose Your Bot Type</Text>
-            <Text style={styles.subtitle}>
+            <View style={styles.eye}>
+              <WizardStepAnimation source={DEFAULT_HEADER_ANIMATION} />
+            </View>
+            <Text style={[styles.title, { color: theme.textPrimary }]}>
+              {"Choose Your Bot's Frame"}
+            </Text>
+            <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
               {
                 "Each frame defines your bot's trading personality and strategy."
               }
@@ -50,6 +65,7 @@ export default function FrameScreen() {
               frame={FRAME_CONFIG[item]}
               selected={state.frameName === item}
               onSelect={() => selectFrame(item)}
+              animationSource={FRAME_ANIMATIONS[item]}
             />
           </View>
         )}
@@ -61,10 +77,13 @@ export default function FrameScreen() {
           disabled={state.frameName === null}
           style={[
             styles.nextBtn,
+            { backgroundColor: theme.electricBlue },
             state.frameName === null && styles.nextBtnDisabled,
           ]}
         >
-          <Text style={styles.nextBtnLabel}>Next</Text>
+          <Text style={[styles.nextBtnLabel, { color: theme.textPrimary }]}>
+            Next
+          </Text>
         </Pressable>
       </View>
     </SafeAreaView>
@@ -74,19 +93,20 @@ export default function FrameScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: Colors.dark.background,
   },
   header: {
     gap: 12,
-    marginBottom: 20,
+    marginBottom: 12,
+  },
+  eye: {
+    marginBottom: 30,
+    marginTop: 30,
   },
   title: {
-    color: Colors.dark.textPrimary,
     fontSize: 22,
     fontWeight: "700",
   },
   subtitle: {
-    color: Colors.dark.textSecondary,
     fontSize: 14,
   },
   listContent: {
@@ -106,7 +126,6 @@ const styles = StyleSheet.create({
   nextBtn: {
     height: 52,
     borderRadius: 10,
-    backgroundColor: Colors.dark.electricBlue,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -114,7 +133,6 @@ const styles = StyleSheet.create({
     opacity: 0.35,
   },
   nextBtnLabel: {
-    color: Colors.dark.textPrimary,
     fontSize: 16,
     fontWeight: "700",
   },

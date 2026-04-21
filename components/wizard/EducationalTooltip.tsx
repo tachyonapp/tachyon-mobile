@@ -1,4 +1,6 @@
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import React, { useRef, useState } from "react";
 import {
   Animated,
@@ -15,7 +17,12 @@ interface EducationalTooltipProps {
   trigger?: React.ReactNode;
 }
 
-export function EducationalTooltip({ title, body, trigger }: EducationalTooltipProps) {
+export function EducationalTooltip({
+  title,
+  body,
+  trigger,
+}: EducationalTooltipProps) {
+  const theme = Colors[useColorScheme()];
   const [visible, setVisible] = useState(false);
   const translateY = useRef(new Animated.Value(300)).current;
 
@@ -40,7 +47,13 @@ export function EducationalTooltip({ title, body, trigger }: EducationalTooltipP
   return (
     <>
       <Pressable onPress={open} hitSlop={12}>
-        {trigger ?? <Text style={styles.defaultTrigger}>ℹ️</Text>}
+        {trigger ?? (
+          <IconSymbol
+            name="info.circle"
+            size={18}
+            color={theme.textSecondary}
+          />
+        )}
       </Pressable>
 
       <Modal
@@ -50,16 +63,28 @@ export function EducationalTooltip({ title, body, trigger }: EducationalTooltipP
         onRequestClose={close}
         statusBarTranslucent
       >
-        {/* Backdrop — tap to dismiss */}
         <Pressable style={styles.backdrop} onPress={close} />
 
         <Animated.View
-          style={[styles.sheet, { transform: [{ translateY }] }]}
+          style={[
+            styles.sheet,
+            { backgroundColor: theme.surface },
+            { transform: [{ translateY }] },
+          ]}
         >
-          <View style={styles.handle} />
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.body}>{body}</Text>
-          <Pressable onPress={close} style={styles.dismissBtn}>
+          <View
+            style={[styles.handle, { backgroundColor: theme.textDisabled }]}
+          />
+          <Text style={[styles.title, { color: theme.textPrimary }]}>
+            {title}
+          </Text>
+          <Text style={[styles.body, { color: theme.textSecondary }]}>
+            {body}
+          </Text>
+          <Pressable
+            onPress={close}
+            style={[styles.dismissBtn, { backgroundColor: theme.electricBlue }]}
+          >
             <Text style={styles.dismissLabel}>Got it</Text>
           </Pressable>
         </Animated.View>
@@ -69,9 +94,6 @@ export function EducationalTooltip({ title, body, trigger }: EducationalTooltipP
 }
 
 const styles = StyleSheet.create({
-  defaultTrigger: {
-    fontSize: 16,
-  },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -81,7 +103,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: Colors.dark.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 24,
@@ -92,30 +113,26 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: Colors.dark.textDisabled,
     alignSelf: "center",
     marginBottom: 6,
   },
   title: {
-    color: Colors.dark.textPrimary,
     fontSize: 17,
     fontWeight: "700",
   },
   body: {
-    color: Colors.dark.textSecondary,
     fontSize: 14,
     lineHeight: 22,
   },
   dismissBtn: {
     height: 44,
     borderRadius: 8,
-    backgroundColor: Colors.dark.electricBlue,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 4,
   },
   dismissLabel: {
-    color: Colors.dark.textPrimary,
+    color: "#FFFFFF",
     fontSize: 15,
     fontWeight: "600",
   },

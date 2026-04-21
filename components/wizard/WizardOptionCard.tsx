@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -8,6 +9,7 @@ interface WizardOptionCardProps {
   selected: boolean;
   onSelect: () => void;
   disabled?: boolean;
+  icon?: React.ReactNode;
 }
 
 export function WizardOptionCard({
@@ -16,7 +18,10 @@ export function WizardOptionCard({
   selected,
   onSelect,
   disabled = false,
+  icon,
 }: WizardOptionCardProps) {
+  const theme = Colors[useColorScheme()];
+
   return (
     <Pressable
       onPress={disabled ? undefined : onSelect}
@@ -25,26 +30,39 @@ export function WizardOptionCard({
       <View
         style={[
           styles.card,
-          selected ? styles.cardSelected : styles.cardUnselected,
+          selected
+            ? {
+                borderColor: theme.electricBlue,
+                backgroundColor: "rgba(44,107,237,0.1)",
+              }
+            : {
+                borderColor: theme.textDisabled,
+                backgroundColor: theme.surface,
+              },
           disabled && styles.cardDisabled,
         ]}
       >
-        <Text
-          style={[
-            styles.label,
-            disabled && styles.textDisabled,
-          ]}
-        >
-          {label}
-        </Text>
-        <Text
-          style={[
-            styles.description,
-            disabled && styles.textDisabled,
-          ]}
-        >
-          {description}
-        </Text>
+        {icon && <View style={styles.iconSlot}>{icon}</View>}
+        <View style={styles.textStack}>
+          <Text
+            style={[
+              styles.label,
+              { color: theme.textPrimary },
+              disabled && { color: theme.textDisabled },
+            ]}
+          >
+            {label}
+          </Text>
+          <Text
+            style={[
+              styles.description,
+              { color: theme.textSecondary },
+              disabled && { color: theme.textDisabled },
+            ]}
+          >
+            {description}
+          </Text>
+        </View>
       </View>
     </Pressable>
   );
@@ -56,32 +74,28 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: 10,
+    borderWidth: 1,
     padding: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+  },
+  iconSlot: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  textStack: {
+    flex: 1,
     gap: 4,
-  },
-  cardSelected: {
-    borderWidth: 1,
-    borderColor: Colors.dark.electricBlue,
-    backgroundColor: "rgba(44, 107, 237, 0.1)",
-  },
-  cardUnselected: {
-    borderWidth: 1,
-    borderColor: Colors.dark.textDisabled,
-    backgroundColor: Colors.dark.surface,
   },
   cardDisabled: {
     opacity: 0.4,
   },
   label: {
-    color: Colors.dark.textPrimary,
     fontSize: 15,
     fontWeight: "500",
   },
   description: {
-    color: Colors.dark.textSecondary,
     fontSize: 13,
-  },
-  textDisabled: {
-    color: Colors.dark.textDisabled,
   },
 });
