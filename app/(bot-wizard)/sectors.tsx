@@ -3,6 +3,7 @@ import { WizardProgressBar } from "@/components/wizard/WizardProgressBar";
 import { WizardStepAnimation } from "@/components/wizard/WizardStepAnimation";
 import { Colors } from "@/constants/theme";
 import { useWizard } from "@/context/WizardContext";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -17,6 +18,7 @@ import {
 const TOTAL_STEPS = 13;
 
 export default function SectorsScreen() {
+  const theme = Colors[useColorScheme()];
   const { state, updateField, persistDraft } = useWizard();
   const router = useRouter();
   const [attempted, setAttempted] = useState(false);
@@ -31,12 +33,14 @@ export default function SectorsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
       <WizardProgressBar currentStep={7} totalSteps={TOTAL_STEPS} />
       <ScrollView contentContainerStyle={styles.content}>
         <WizardStepAnimation source={null} />
-        <Text style={styles.title}>Where Does It Fight?</Text>
-        <Text style={styles.subtitle}>
+        <Text style={[styles.title, { color: theme.textPrimary }]}>
+          Where Does It Fight?
+        </Text>
+        <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
           Choose which market sectors your bot can trade in.
         </Text>
         <SectorGrid
@@ -49,8 +53,13 @@ export default function SectorsScreen() {
         />
       </ScrollView>
       <View style={styles.footer}>
-        <Pressable onPress={handleNext} style={styles.nextBtn}>
-          <Text style={styles.nextBtnLabel}>Next</Text>
+        <Pressable
+          onPress={handleNext}
+          style={[styles.nextBtn, { backgroundColor: theme.electricBlue }]}
+        >
+          <Text style={[styles.nextBtnLabel, { color: theme.textPrimary }]}>
+            Next
+          </Text>
         </Pressable>
       </View>
     </SafeAreaView>
@@ -58,25 +67,16 @@ export default function SectorsScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.dark.background },
+  safe: { flex: 1 },
   content: { padding: 16, gap: 16 },
-  title: {
-    color: Colors.dark.textPrimary,
-    fontSize: 22,
-    fontWeight: "700",
-  },
-  subtitle: { color: Colors.dark.textSecondary, fontSize: 14 },
+  title: { fontSize: 22, fontWeight: "700" },
+  subtitle: { fontSize: 14 },
   footer: { padding: 16, paddingBottom: 32 },
   nextBtn: {
     height: 52,
     borderRadius: 10,
-    backgroundColor: Colors.dark.electricBlue,
     justifyContent: "center",
     alignItems: "center",
   },
-  nextBtnLabel: {
-    color: Colors.dark.textPrimary,
-    fontSize: 16,
-    fontWeight: "700",
-  },
+  nextBtnLabel: { fontSize: 16, fontWeight: "700" },
 });

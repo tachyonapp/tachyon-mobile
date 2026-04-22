@@ -306,12 +306,12 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const selectFrame = useCallback((frameName: BotFrame) => {
-    const { colorway, defaults } = FRAME_CONFIG[frameName];
+    const { colorway, defaults, bounds } = FRAME_CONFIG[frameName];
     setState((prev) => ({
       ...prev,
       frameName,
       colorway,
-      allocationPct: defaults.allocationPct,
+      allocationPct: bounds.allocationPct.min,
       dailyMaxLoss: defaults.dailyMaxLoss,
       riskAttitude: defaults.riskAttitude,
       tradeTempo: defaults.tradeTempo,

@@ -1,4 +1,5 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import { useWizard } from "@/context/WizardContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -11,6 +12,7 @@ import {
   Easing,
   Pressable,
   StyleSheet,
+  Text,
   View,
 } from "react-native";
 
@@ -28,7 +30,8 @@ export function WizardProgressBar({
   const theme = Colors[useColorScheme()];
   const animatedWidth = useRef(new Animated.Value(0)).current;
   const router = useRouter();
-  const { clearDraft } = useWizard();
+  const { state, clearDraft } = useWizard();
+  const frameConfig = state.frameName ? FRAME_CONFIG[state.frameName] : null;
 
   useEffect(() => {
     const targetWidth = (currentStep / totalSteps) * SCREEN_WIDTH;
@@ -76,6 +79,21 @@ export function WizardProgressBar({
             color={theme.textSecondary}
           />
         </Pressable>
+        {frameConfig && (
+          <View
+            style={[styles.frameBadge, { borderColor: frameConfig.colorway }]}
+          >
+            <View
+              style={[
+                styles.frameDot,
+                { backgroundColor: frameConfig.colorway },
+              ]}
+            />
+            <Text style={[styles.frameLabel, { color: frameConfig.colorway }]}>
+              {frameConfig.gamifiedName}
+            </Text>
+          </View>
+        )}
         <Pressable onPress={handleClose} style={styles.navBtn} hitSlop={10}>
           <IconSymbol name="xmark" size={18} color={theme.textSecondary} />
         </Pressable>
@@ -102,5 +120,24 @@ const styles = StyleSheet.create({
   },
   navBtn: {
     padding: 4,
+  },
+  frameBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  frameDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  frameLabel: {
+    fontSize: 11,
+    fontWeight: "600",
+    letterSpacing: 0.3,
   },
 });

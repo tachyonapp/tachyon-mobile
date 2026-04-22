@@ -1,14 +1,14 @@
 import { AllocationControl } from "@/components/wizard/AllocationControl";
 import { WizardProgressBar } from "@/components/wizard/WizardProgressBar";
-import { WizardStepAnimation } from "@/components/wizard/WizardStepAnimation";
 import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import { useWizard } from "@/context/WizardContext";
 import { BalanceDocument, type BalanceQuery } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useQuery } from "@apollo/client/react";
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import LottieView from "lottie-react-native";
+import React, { useCallback, useState } from "react";
 import {
   Pressable,
   SafeAreaView,
@@ -18,6 +18,13 @@ import {
   View,
 } from "react-native";
 
+const BATTERY_ANIMATION = require("@/assets/animations/battery.json");
+// The animation's fill bars physically exit the battery casing top before the
+// mathematical scale peak (frame 53), creating a visual discharge effect from
+// frame ~48 onward. Frame 47 is the last frame where the battery looks visually
+// full before the bars begin leaving the casing.
+const BATTERY_FULL_PROGRESS = 47 / 104;
+
 const TOTAL_STEPS = 13;
 
 export default function AllocationScreen() {
@@ -25,6 +32,9 @@ export default function AllocationScreen() {
   const { state, updateField, persistDraft } = useWizard();
   const router = useRouter();
   const [zeroBalanceAcknowledged, setZeroBalanceAcknowledged] = useState(false);
+  // batteryPct is 0–1 and drives the animation independently of allocationPct.
+  // It resets to 0 each time the screen comes into focus.
+  const [batteryPct, setBatteryPct] = useState(0);
 
   const { data } = useQuery<BalanceQuery>(BalanceDocument, {
     fetchPolicy: "cache-first",
@@ -43,6 +53,18 @@ export default function AllocationScreen() {
     Math.max(0, 1.0 - state.existingAllocationTotal),
   );
 
+  useFocusEffect(
+    useCallback(() => {
+      setBatteryPct(0);
+    }, []),
+  );
+
+  function handleAllocationChange(v: number) {
+    updateField("allocationPct", v);
+    const pct = allocationMax > 0 ? v / allocationMax : 0;
+    setBatteryPct(Math.min(1, Math.max(0, pct)));
+  }
+
   async function handleNext() {
     await persistDraft();
     router.push("/(bot-wizard)/awareness");
@@ -52,16 +74,30 @@ export default function AllocationScreen() {
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
       <WizardProgressBar currentStep={5} totalSteps={TOTAL_STEPS} />
       <ScrollView contentContainerStyle={styles.content}>
-        <WizardStepAnimation source={null} />
+        <View style={styles.batteryWrapper}>
+          <LottieView
+            source={BATTERY_ANIMATION}
+            progress={batteryPct * BATTERY_FULL_PROGRESS}
+            loop={false}
+            style={styles.batteryLottie}
+          />
+          <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+            <View style={styles.dollarContainer}>
+              <Text style={[styles.dollarSign, { color: theme.textPrimary }]}>
+                $
+              </Text>
+            </View>
+          </View>
+        </View>
         <Text style={[styles.title, { color: theme.textPrimary }]}>
-          Assign Power
+          Power Up Your Bot
         </Text>
         <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-          How much of your account does this bot control?
+          How much of your account funds does this bot control?
         </Text>
         <AllocationControl
           value={state.allocationPct}
-          onChange={(v) => updateField("allocationPct", v)}
+          onChange={handleAllocationChange}
           min={frameBounds.min}
           max={allocationMax}
           existingTotal={state.existingAllocationTotal}
@@ -114,6 +150,24 @@ export default function AllocationScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   content: { padding: 16, gap: 16 },
+  batteryWrapper: {
+    alignSelf: "center",
+    width: 200,
+    height: 200,
+  },
+  batteryLottie: {
+    width: 200,
+    height: 200,
+  },
+  dollarContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dollarSign: {
+    fontSize: 36,
+    fontWeight: "700",
+  },
   title: { fontSize: 22, fontWeight: "700" },
   subtitle: { fontSize: 14 },
   footer: { padding: 16, paddingBottom: 32 },

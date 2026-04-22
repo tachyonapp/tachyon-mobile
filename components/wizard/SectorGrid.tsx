@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -25,6 +26,7 @@ export function SectorGrid({
   onChange,
   showError = false,
 }: SectorGridProps) {
+  const theme = Colors[useColorScheme()];
   const allSelected = ALL_SECTORS.every((s) => selected.includes(s));
   const hasError = showError && selected.length === 0;
 
@@ -42,23 +44,29 @@ export function SectorGrid({
 
   return (
     <View style={styles.container}>
-      {/* Select-all tile — spans full row */}
       <Pressable
         onPress={toggleSelectAll}
         style={[
           styles.tile,
           styles.tileFullWidth,
-          allSelected && styles.tileSelected,
+          { borderColor: theme.textDisabled, backgroundColor: theme.surface },
+          allSelected && {
+            borderColor: theme.electricBlue,
+            backgroundColor: "rgba(44, 107, 237, 0.1)",
+          },
         ]}
       >
         <Text
-          style={[styles.tileLabel, allSelected && styles.tileLabelSelected]}
+          style={[
+            styles.tileLabel,
+            { color: theme.textSecondary },
+            allSelected && { color: theme.electricBlue, fontWeight: "600" },
+          ]}
         >
           {SELECT_ALL_LABEL}
         </Text>
       </Pressable>
 
-      {/* 3-column grid */}
       <View style={styles.grid}>
         {ALL_SECTORS.map((sector) => {
           const isSelected = selected.includes(sector);
@@ -69,13 +77,24 @@ export function SectorGrid({
               style={[
                 styles.tile,
                 styles.tileGridItem,
-                isSelected && styles.tileSelected,
+                {
+                  borderColor: theme.textDisabled,
+                  backgroundColor: theme.surface,
+                },
+                isSelected && {
+                  borderColor: theme.electricBlue,
+                  backgroundColor: "rgba(44, 107, 237, 0.1)",
+                },
               ]}
             >
               <Text
                 style={[
                   styles.tileLabel,
-                  isSelected && styles.tileLabelSelected,
+                  { color: theme.textSecondary },
+                  isSelected && {
+                    color: theme.electricBlue,
+                    fontWeight: "600",
+                  },
                 ]}
               >
                 {sector}
@@ -86,7 +105,9 @@ export function SectorGrid({
       </View>
 
       {hasError && (
-        <Text style={styles.errorText}>Select at least one sector</Text>
+        <Text style={[styles.errorText, { color: theme.danger }]}>
+          Select at least one sector
+        </Text>
       )}
     </View>
   );
@@ -105,8 +126,6 @@ const styles = StyleSheet.create({
     minHeight: 44,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: Colors.dark.textDisabled,
-    backgroundColor: Colors.dark.surface,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 12,
@@ -116,25 +135,14 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   tileGridItem: {
-    // 3 columns: (100% - 2 gaps of 10) / 3 ≈ 30.67%
     flexBasis: "30.67%",
     flexGrow: 1,
   },
-  tileSelected: {
-    borderColor: Colors.dark.electricBlue,
-    backgroundColor: "rgba(44, 107, 237, 0.1)",
-  },
   tileLabel: {
-    color: Colors.dark.textSecondary,
     fontSize: 13,
     textAlign: "center",
   },
-  tileLabelSelected: {
-    color: Colors.dark.electricBlue,
-    fontWeight: "600",
-  },
   errorText: {
-    color: Colors.dark.danger,
     fontSize: 13,
   },
 });

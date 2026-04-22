@@ -64,7 +64,7 @@ export default function FrameScreen() {
               <WizardStepAnimation source={headerAnimation} />
             </View>
             <Text style={[styles.title, { color: theme.textPrimary }]}>
-              {"Choose Your Bot's Frame"}
+              {"Select Your Bot's Personality"}
             </Text>
             <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
               {

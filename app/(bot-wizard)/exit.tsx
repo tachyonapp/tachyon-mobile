@@ -5,6 +5,7 @@ import { WizardStepAnimation } from "@/components/wizard/WizardStepAnimation";
 import { Colors } from "@/constants/theme";
 import { useWizard } from "@/context/WizardContext";
 import { ExitPersonalityName } from "@/generated/graphql";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
@@ -41,6 +42,7 @@ const EXIT_OPTIONS: {
 ];
 
 export default function ExitScreen() {
+  const theme = Colors[useColorScheme()];
   const { state, updateField, persistDraft } = useWizard();
   const router = useRouter();
 
@@ -50,18 +52,18 @@ export default function ExitScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
       <WizardProgressBar currentStep={8} totalSteps={TOTAL_STEPS} />
       <ScrollView contentContainerStyle={styles.content}>
         <WizardStepAnimation source={null} />
         <View style={styles.titleRow}>
-          <Text style={styles.title}>Exit Personality</Text>
+          <Text style={[styles.title, { color: theme.textPrimary }]}>Exit Personality</Text>
           <EducationalTooltip
             title="Exit Personality"
             body="Exit personality controls when your bot closes a winning position."
           />
         </View>
-        <Text style={styles.subtitle}>How should your bot take profits?</Text>
+        <Text style={[styles.subtitle, { color: theme.textSecondary }]}>How should your bot take profits?</Text>
         <View style={styles.options}>
           {EXIT_OPTIONS.map((opt) => (
             <WizardOptionCard
@@ -82,10 +84,11 @@ export default function ExitScreen() {
           disabled={state.exitPersonality === null}
           style={[
             styles.nextBtn,
+            { backgroundColor: theme.electricBlue },
             state.exitPersonality === null && styles.nextBtnDisabled,
           ]}
         >
-          <Text style={styles.nextBtnLabel}>Next</Text>
+          <Text style={[styles.nextBtnLabel, { color: theme.textPrimary }]}>Next</Text>
         </Pressable>
       </View>
     </SafeAreaView>
@@ -93,29 +96,19 @@ export default function ExitScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.dark.background },
+  safe: { flex: 1 },
   content: { padding: 16, gap: 16 },
   titleRow: { flexDirection: "row", alignItems: "center", gap: 10 },
-  title: {
-    color: Colors.dark.textPrimary,
-    fontSize: 22,
-    fontWeight: "700",
-    flex: 1,
-  },
-  subtitle: { color: Colors.dark.textSecondary, fontSize: 14 },
+  title: { fontSize: 22, fontWeight: "700", flex: 1 },
+  subtitle: { fontSize: 14 },
   options: { gap: 10 },
   footer: { padding: 16, paddingBottom: 32 },
   nextBtn: {
     height: 52,
     borderRadius: 10,
-    backgroundColor: Colors.dark.electricBlue,
     justifyContent: "center",
     alignItems: "center",
   },
   nextBtnDisabled: { opacity: 0.35 },
-  nextBtnLabel: {
-    color: Colors.dark.textPrimary,
-    fontSize: 16,
-    fontWeight: "700",
-  },
+  nextBtnLabel: { fontSize: 16, fontWeight: "700" },
 });
