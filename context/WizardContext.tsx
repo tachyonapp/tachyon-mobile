@@ -78,7 +78,7 @@ const DRAFT_KEY = "tachyon:bot-wizard:draft";
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
-interface BrainState {
+export interface BrainState {
   brainType: BrainType;
   provider: string;
   modelId: string;
@@ -307,20 +307,82 @@ export function WizardProvider({ children }: { children: ReactNode }) {
 
   const selectFrame = useCallback((frameName: BotFrame) => {
     const { colorway, defaults, bounds } = FRAME_CONFIG[frameName];
-    setState((prev) => ({
-      ...prev,
-      frameName,
-      colorway,
-      allocationPct: bounds.allocationPct.min,
-      dailyMaxLoss: defaults.dailyMaxLoss,
-      riskAttitude: defaults.riskAttitude,
-      tradeTempo: defaults.tradeTempo,
-      combatPatience: defaults.combatPatience,
-      exitPersonality: defaults.exitPersonality,
-      stopLossStyle: defaults.stopLossStyle,
-      marketAwareness: defaults.marketAwareness,
-      // brain is preserved across frame changes
-    }));
+    setState((prev) => {
+      // First frame selection — apply all defaults as a good starting point
+      if (!prev.frameName) {
+        return {
+          ...prev,
+          frameName,
+          colorway,
+          allocationPct: bounds.allocationPct.min,
+          dailyMaxLoss: defaults.dailyMaxLoss,
+          riskAttitude: defaults.riskAttitude,
+          tradeTempo: defaults.tradeTempo,
+          combatPatience: defaults.combatPatience,
+          exitPersonality: defaults.exitPersonality,
+          stopLossStyle: defaults.stopLossStyle,
+          marketAwareness: defaults.marketAwareness,
+        };
+      }
+
+      // Re-selecting the same frame — no-op
+      if (prev.frameName === frameName) {
+        return prev;
+      }
+
+      // Frame switch: keep settings still valid under the new frame's bounds,
+      // null out incompatible enum selections, clamp numeric/range values.
+      const ma = bounds.marketAwareness;
+      return {
+        ...prev,
+        frameName,
+        colorway,
+        allocationPct: Math.min(
+          Math.max(prev.allocationPct, bounds.allocationPct.min),
+          bounds.allocationPct.max,
+        ),
+        dailyMaxLoss: Math.min(
+          Math.max(prev.dailyMaxLoss, bounds.dailyMaxLoss.minPct),
+          bounds.dailyMaxLoss.maxPct,
+        ),
+        marketAwareness: {
+          momentum: Math.min(
+            Math.max(prev.marketAwareness.momentum, ma.momentum.min),
+            ma.momentum.max,
+          ),
+          meanReversion: Math.min(
+            Math.max(prev.marketAwareness.meanReversion, ma.meanReversion.min),
+            ma.meanReversion.max,
+          ),
+          volatility: Math.min(
+            Math.max(prev.marketAwareness.volatility, ma.volatility.min),
+            ma.volatility.max,
+          ),
+          trendFollowing: Math.min(
+            Math.max(
+              prev.marketAwareness.trendFollowing,
+              ma.trendFollowing.min,
+            ),
+            ma.trendFollowing.max,
+          ),
+        },
+        riskAttitude:
+          prev.riskAttitude && bounds.riskAttitude.includes(prev.riskAttitude)
+            ? prev.riskAttitude
+            : null,
+        tradeTempo:
+          prev.tradeTempo && bounds.tradeTempo.includes(prev.tradeTempo)
+            ? prev.tradeTempo
+            : null,
+        combatPatience:
+          prev.combatPatience &&
+          bounds.combatPatience.includes(prev.combatPatience)
+            ? prev.combatPatience
+            : null,
+        // exitPersonality and stopLossStyle have no per-frame bounds — preserve user's choice
+        // brain is preserved across frame changes
+      };
+    });
   }, []);
 
   const updateField = useCallback(

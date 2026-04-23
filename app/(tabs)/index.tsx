@@ -130,7 +130,7 @@ export default function HomeScreen() {
             { backgroundColor: theme.electricBlue },
             pressed && styles.createButtonPressed,
           ]}
-          onPress={() => router.push("/(bot-wizard)/frame")}
+          onPress={() => router.push("/(bot-forge)")}
           accessibilityRole="button"
           accessibilityLabel="Create a new bot"
         >
