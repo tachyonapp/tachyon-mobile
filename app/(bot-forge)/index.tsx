@@ -158,7 +158,7 @@ export default function ForgeScreen() {
     setDeployError(null);
 
     try {
-      const { data, error: mutationError } = await createBot({
+      const { data } = await createBot({
         variables: {
           input: {
             name: state.name,
@@ -190,19 +190,6 @@ export default function ForgeScreen() {
         },
       });
 
-      if (mutationError) {
-        const gqlErrors: { extensions?: { code?: string } }[] =
-          (mutationError as any).graphQLErrors ?? [];
-        const rateLimited = gqlErrors.some(
-          (e) => e.extensions?.code === "RATE_LIMITED",
-        );
-        setDeployError(
-          rateLimited ? { kind: "rate_limited" } : { kind: "network" },
-        );
-        setDeploying(false);
-        return;
-      }
-
       const result = data?.createBot;
       if (result?.__typename === "ValidationError") {
         setDeployError({
@@ -216,8 +203,13 @@ export default function ForgeScreen() {
 
       await clearDraft();
       router.replace("/(tabs)/index");
-    } catch {
-      setDeployError({ kind: "network" });
+    } catch (err) {
+      const gqlErrors: { extensions?: { code?: string } }[] =
+        (err as any)?.graphQLErrors ?? [];
+      const rateLimited = gqlErrors.some(
+        (e) => e.extensions?.code === "RATE_LIMITED",
+      );
+      setDeployError(rateLimited ? { kind: "rate_limited" } : { kind: "network" });
       setDeploying(false);
     }
   }
