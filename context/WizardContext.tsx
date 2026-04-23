@@ -303,6 +303,7 @@ export function WizardProvider({ children }: { children: ReactNode }) {
       ...EMPTY_STATE,
       existingAllocationTotal: prev.existingAllocationTotal,
     }));
+    AsyncStorage.removeItem(DRAFT_KEY).catch(console.error);
   }, []);
 
   const selectFrame = useCallback((frameName: BotFrame) => {

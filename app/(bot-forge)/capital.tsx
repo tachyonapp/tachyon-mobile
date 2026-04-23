@@ -1,6 +1,9 @@
 import { ForgeSection } from "@/components/forge/ForgeSection";
 import { AllocationControl } from "@/components/wizard/AllocationControl";
+import { Colors } from "@/constants/theme";
 import type { WizardState } from "@/context/WizardContext";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Text } from "react-native";
 
 interface CapitalProps {
   allocationPct: number;
@@ -22,10 +25,12 @@ export const Capital = ({
   existingAllocationTotal,
   userCashBalance,
 }: CapitalProps) => {
+  const theme = Colors[useColorScheme()];
   const allocationMax = Math.min(
     allocationBounds.max,
     Math.max(0, 1.0 - existingAllocationTotal),
   );
+  const fullyAllocated = allocationMax < allocationBounds.min;
 
   return (
     <ForgeSection
@@ -38,16 +43,23 @@ export const Capital = ({
       locked={!combatComplete}
       lockedMessage="Complete your Combat Profile first."
     >
-      <AllocationControl
-        value={allocationPct}
-        onChange={(v) => {
-          updateField("allocationPct", v);
-        }}
-        min={allocationBounds.min}
-        max={allocationMax}
-        existingTotal={existingAllocationTotal}
-        userCashBalance={userCashBalance}
-      />
+      {fullyAllocated ? (
+        <Text style={{ color: theme.warning, fontSize: 13 }}>
+          Your other bots are using 100% of your capital. Free up allocation by
+          editing or removing an existing bot before adding a new one.
+        </Text>
+      ) : (
+        <AllocationControl
+          value={allocationPct}
+          onChange={(v) => {
+            updateField("allocationPct", v);
+          }}
+          min={allocationBounds.min}
+          max={allocationMax}
+          existingTotal={existingAllocationTotal}
+          userCashBalance={userCashBalance}
+        />
+      )}
     </ForgeSection>
   );
 };

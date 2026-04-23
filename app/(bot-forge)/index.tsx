@@ -270,7 +270,7 @@ export default function ForgeScreen() {
         <ForgeSection
           title="Combat Profile"
           subtitle="How your bot sizes and times its trades."
-          locked={state.frameName !== null}
+          locked={state.frameName === null}
           lockedMessage="Choose a frame first."
         >
           <Risk
