@@ -24,7 +24,6 @@ export function ForgeSection({
   const theme = Colors[useColorScheme()];
   return (
     <View style={styles.section}>
-      <View style={[styles.divider, { backgroundColor: theme.inputBorder }]} />
       <View style={[styles.header, locked && styles.headerLocked]}>
         <View style={styles.titleRow}>
           <Text
@@ -67,6 +66,7 @@ export function ForgeSection({
       ) : (
         children
       )}
+      <View style={[styles.divider, { backgroundColor: theme.inputBorder }]} />
     </View>
   );
 }
@@ -77,6 +77,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: StyleSheet.hairlineWidth,
+    marginTop: 15,
     marginHorizontal: -16,
   },
   header: {

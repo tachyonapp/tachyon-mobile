@@ -43,6 +43,9 @@ export function BrainSelector({
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [validationState, setValidationState] = useState<ValidationState>("idle");
   const loadingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // True only when component mounted with BYOK already set — indicates a resumed draft,
+  // not a fresh selection by the user.
+  const mountedAsByok = useRef(brainType === BrainType.Byok);
 
   const selectedProvider = byokProviders.find((p) => p.provider === provider);
   const availableModels = selectedProvider?.models ?? [];
@@ -116,8 +119,8 @@ export function BrainSelector({
 
         {brainType === BrainType.Byok && (
           <View style={styles.byokExpanded}>
-            {/* Draft resume warning */}
-            {hasByokDraft && !isKeyValidated && (
+            {/* Draft resume warning — only shown when BYOK was already set on mount (resumed draft) */}
+            {hasByokDraft && !isKeyValidated && mountedAsByok.current && (
               <Text style={styles.draftWarning}>
                 Your API key was cleared for security. Please re-enter it.
               </Text>

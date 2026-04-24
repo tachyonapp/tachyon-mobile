@@ -17,6 +17,8 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   AppState,
+  Keyboard,
+  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -72,7 +74,6 @@ export default function ForgeScreen() {
   const [isKeyValidated, setIsKeyValidated] = useState(false);
   const [deploying, setDeploying] = useState(false);
   const [deployError, setDeployError] = useState<DeployError | null>(null);
-  const panelHeight = Math.round(screenHeight * 0.55);
 
   // When the app is backgrounded while the forge is open, persist the draft so
   // data isn't lost. When it returns to the foreground, navigate back to the
@@ -209,7 +210,9 @@ export default function ForgeScreen() {
       const rateLimited = gqlErrors.some(
         (e) => e.extensions?.code === "RATE_LIMITED",
       );
-      setDeployError(rateLimited ? { kind: "rate_limited" } : { kind: "network" });
+      setDeployError(
+        rateLimited ? { kind: "rate_limited" } : { kind: "network" },
+      );
       setDeploying(false);
     }
   }
@@ -219,8 +222,9 @@ export default function ForgeScreen() {
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
       <View style={styles.statPanelContainer}>
         <ForgeStatPanel
+          name={state.name}
           state={state}
-          height={panelHeight}
+          height={Math.round(screenHeight * 0.49)}
           onClose={() => {
             if (router.canGoBack()) {
               router.back();
@@ -232,133 +236,136 @@ export default function ForgeScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
       >
-        {/* Draft resume banner */}
-        {draftPrompt === "resume-or-fresh" && (
-          <Draft resumeDraft={resumeDraft} startFresh={startFresh} />
-        )}
-
-        {/* ── 1. Identity ── */}
-        <Identity
-          frameConfig={frameConfig}
-          colorway={state.colorway}
-          name={state.name}
-          nameFocused={nameFocused}
-          nameError={nameError}
-          updateField={updateField}
-          setNameError={setNameError}
-          setNameFocused={setNameFocused}
-        />
-
-        {/* ── 2. Frame ── */}
-        <Frame
-          name={state.name}
-          frameName={state.frameName}
-          selectFrame={selectFrame}
-        />
-
-        <ForgeSection
-          title="Combat Profile"
-          subtitle="How your bot sizes and times its trades."
-          locked={state.frameName === null}
-          lockedMessage="Choose a frame first."
+        <Pressable
+          onPress={() => Keyboard.dismiss()}
+          style={styles.scrollContent}
         >
-          <Risk
-            frameConfig={frameConfig}
+          {/* Draft resume banner */}
+          {draftPrompt === "resume-or-fresh" && (
+            <Draft resumeDraft={resumeDraft} startFresh={startFresh} />
+          )}
+
+          {/* ── 1. Identity ── */}
+          <Identity
+            name={state.name}
+            nameFocused={nameFocused}
+            nameError={nameError}
             updateField={updateField}
-            disabledReasonFor={disabledReasonFor}
-            riskAttitude={state.riskAttitude}
+            setNameError={setNameError}
+            setNameFocused={setNameFocused}
           />
 
-          <Tempo
-            frameConfig={frameConfig}
-            tradeTempo={state.tradeTempo}
-            updateField={updateField}
-            disabledReasonFor={disabledReasonFor}
+          {/* ── 2. Frame ── */}
+          <Frame
+            name={state.name}
+            frameName={state.frameName}
+            selectFrame={selectFrame}
           />
 
-          <Patience
-            frameConfig={frameConfig}
-            combatPatience={state.combatPatience}
+          {/* ── 4. Combat Profile ── */}
+          <ForgeSection
+            title="Combat Profile"
+            subtitle="How your bot sizes and times its trades."
+            locked={state.frameName === null}
+            lockedMessage="Choose a frame first."
+          >
+            <Risk
+              frameConfig={frameConfig}
+              updateField={updateField}
+              disabledReasonFor={disabledReasonFor}
+              riskAttitude={state.riskAttitude}
+            />
+            <Tempo
+              frameConfig={frameConfig}
+              tradeTempo={state.tradeTempo}
+              updateField={updateField}
+              disabledReasonFor={disabledReasonFor}
+            />
+            <Patience
+              frameConfig={frameConfig}
+              combatPatience={state.combatPatience}
+              updateField={updateField}
+              disabledReasonFor={disabledReasonFor}
+            />
+          </ForgeSection>
+
+          {/* ── 4. Capital Allocation ── */}
+          <Capital
+            allocationPct={state.allocationPct}
             updateField={updateField}
-            disabledReasonFor={disabledReasonFor}
+            allocationBounds={allocationBounds}
+            combatComplete={combatComplete}
+            existingAllocationTotal={state.existingAllocationTotal}
+            userCashBalance={userCashBalance}
+            frameName={frameConfig?.gamifiedName ?? null}
           />
-        </ForgeSection>
 
-        {/* ── 4. Capital Allocation ── */}
-        <Capital
-          allocationPct={state.allocationPct}
-          updateField={updateField}
-          allocationBounds={allocationBounds}
-          combatComplete={combatComplete}
-          existingAllocationTotal={state.existingAllocationTotal}
-          userCashBalance={userCashBalance}
-        />
+          {/* ── 5. Market Intelligence ── */}
+          <MarketIntelligence
+            combatComplete={combatComplete}
+            marketAwareness={state.marketAwareness}
+            frameConfig={frameConfig}
+            updateField={updateField}
+          />
 
-        {/* ── 5. Market Intelligence ── */}
-        <MarketIntelligence
-          combatComplete={combatComplete}
-          marketAwareness={state.marketAwareness}
-          frameConfig={frameConfig}
-          updateField={updateField}
-        />
+          {/* ── 6. Sectors ── */}
+          <Sectors
+            combatComplete={combatComplete}
+            sectors={state.sectors}
+            updateField={updateField}
+            sectorAttempted={sectorAttempted}
+            setSectorAttempted={setSectorAttempted}
+          />
 
-        {/* ── 6. Sectors ── */}
-        <Sectors
-          combatComplete={combatComplete}
-          sectors={state.sectors}
-          updateField={updateField}
-          sectorAttempted={sectorAttempted}
-          setSectorAttempted={setSectorAttempted}
-        />
+          {/* ── 7. Exit Strategy ── */}
+          <Exit
+            sectors={state.sectors}
+            updateField={updateField}
+            exitPersonality={state.exitPersonality}
+          />
 
-        {/* ── 7. Exit Strategy ── */}
-        <Exit
-          sectors={state.sectors}
-          updateField={updateField}
-          exitPersonality={state.exitPersonality}
-        />
+          {/* ── 8. Protections ── */}
+          <Protections
+            frameConfig={frameConfig}
+            exitPersonality={state.exitPersonality}
+            dailyMaxLoss={state.dailyMaxLoss}
+            allocationPct={state.allocationPct}
+            userCashBalance={userCashBalance}
+            dailyMaxLossBounds={dailyMaxLossBounds}
+            dailyMaxGain={state.dailyMaxGain}
+            stopLossStyle={state.stopLossStyle}
+            emotionalControls={state.emotionalControls}
+            updateField={updateField}
+          />
 
-        {/* ── 8. Protections ── */}
-        <Protections
-          frameConfig={frameConfig}
-          exitPersonality={state.exitPersonality}
-          dailyMaxLoss={state.dailyMaxLoss}
-          allocationPct={state.allocationPct}
-          userCashBalance={userCashBalance}
-          dailyMaxLossBounds={dailyMaxLossBounds}
-          dailyMaxGain={state.dailyMaxGain}
-          stopLossStyle={state.stopLossStyle}
-          emotionalControls={state.emotionalControls}
-          updateField={updateField}
-        />
+          {/* ── 9. Rules of Engagement ── */}
+          <Engagement
+            stopLossSet={stopLossSet}
+            rulesOfEngagement={state.rulesOfEngagement}
+            updateField={updateField}
+          />
 
-        {/* ── 9. Rules of Engagement ── */}
-        <Engagement
-          stopLossSet={stopLossSet}
-          rulesOfEngagement={state.rulesOfEngagement}
-          updateField={updateField}
-        />
+          {/* ── 10. Brain ── */}
+          <Brain
+            stopLossSet={stopLossSet}
+            brain={state.brain}
+            brainCatalog={brainCatalog}
+            isKeyValidated={isKeyValidated}
+            updateBrain={updateBrain}
+            setIsKeyValidated={setIsKeyValidated}
+          />
 
-        {/* ── 10. Brain ── */}
-        <Brain
-          stopLossSet={stopLossSet}
-          brain={state.brain}
-          brainCatalog={brainCatalog}
-          isKeyValidated={isKeyValidated}
-          updateBrain={updateBrain}
-          setIsKeyValidated={setIsKeyValidated}
-        />
-
-        {/* ── Compliance + Deploy ── */}
-        <Deploy
-          deploying={deploying}
-          canDeploy={canDeploy}
-          deployError={deployError}
-          handleDeploy={handleDeploy}
-        />
+          {/* ── Compliance + Deploy ── */}
+          <Deploy
+            deploying={deploying}
+            canDeploy={canDeploy}
+            deployError={deployError}
+            handleDeploy={handleDeploy}
+          />
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -366,7 +373,7 @@ export default function ForgeScreen() {
 
 const styles = StyleSheet.create({
   statPanelContainer: {
-    marginTop: 20,
+    marginTop: 2,
   },
   safe: { flex: 1 },
   scrollContent: {

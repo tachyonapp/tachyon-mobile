@@ -3,39 +3,56 @@ import { Colors } from "@/constants/theme";
 import { type WizardState } from "@/context/WizardContext";
 import { BrainType } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { botttsNeutral } from "@dicebear/collection";
+import { createAvatar } from "@dicebear/core";
 import LottieView from "lottie-react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
   useWindowDimensions,
 } from "react-native";
+import { SvgXml } from "react-native-svg";
 import { ForgeStatChip } from "./ForgeStatChip";
 
 const POD_ANIMATION = require("@/assets/animations/pod.json");
-
-const LEFT_COL_WIDTH = 55;
+const LEFT_COL_WIDTH = 60;
+const AVATAR_SIZE = 60;
 
 interface ForgeStatPanelProps {
   state: WizardState;
   height: number;
   onClose: () => void;
+  name: string;
 }
 
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 }
 
+function formatEnumLabel(s: string): string {
+  return s
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+}
+
 export function ForgeStatPanel({
   state,
   height,
   onClose,
+  name,
 }: ForgeStatPanelProps) {
   const theme = Colors[useColorScheme()];
   const { width: screenWidth } = useWindowDimensions();
   const frameConfig = state.frameName ? FRAME_CONFIG[state.frameName] : null;
+  const avatarSvg = useMemo(
+    () => createAvatar(botttsNeutral, { seed: name || "default" }).toString(),
+    [name],
+  );
 
   const brainLabel =
     state.brain.brainType === BrainType.TachyonHosted
@@ -44,10 +61,26 @@ export function ForgeStatPanel({
         ? capitalize(state.brain.provider)
         : "BYOK";
 
-  // Animation sits in the space to the right of the left column.
-  // Cap by both available width and a height budget so it stays compact.
   const animAreaWidth = screenWidth - 32 - LEFT_COL_WIDTH - 12;
   const lottieSize = Math.min(animAreaWidth, height - 240);
+
+  const exitLabel = state.exitPersonality?.name
+    ? formatEnumLabel(state.exitPersonality.name)
+    : null;
+
+  const stopLabel = state.stopLossStyle?.name
+    ? formatEnumLabel(state.stopLossStyle.name)
+    : null;
+
+  const sectorsLabel =
+    state.sectors.length > 0 ? String(state.sectors.length) : null;
+
+  const maxLossLabel = `${Math.round(state.dailyMaxLoss * 100)}%`;
+
+  const maxGainLabel =
+    state.dailyMaxGain !== null
+      ? `${Math.round(state.dailyMaxGain * 100)}%`
+      : null;
 
   return (
     <View
@@ -56,11 +89,11 @@ export function ForgeStatPanel({
         {
           height,
           backgroundColor: theme.background,
-          borderBottomColor: frameConfig?.colorway ?? theme.inputBorder,
+          borderBottomColor: theme.inputBorder,
         },
       ]}
     >
-      {/* Close button */}
+      {/* Close button sits outside scroll so it stays fixed */}
       <Pressable
         style={styles.closeBtn}
         onPress={onClose}
@@ -73,77 +106,111 @@ export function ForgeStatPanel({
         </Text>
       </Pressable>
 
-      {/* Top area: market awareness chips left, animation right */}
-      <View style={styles.topArea}>
-        <View style={styles.leftChipsCol}>
-          <ForgeStatChip
-            label="MOM"
-            value={`${Math.round(state.marketAwareness.momentum * 100)}%`}
-          />
-          <ForgeStatChip
-            label="M/R"
-            value={`${Math.round(state.marketAwareness.meanReversion * 100)}%`}
-          />
-          <ForgeStatChip
-            label="VOL"
-            value={`${Math.round(state.marketAwareness.volatility * 100)}%`}
-          />
-          <ForgeStatChip
-            label="TRND"
-            value={`${Math.round(state.marketAwareness.trendFollowing * 100)}%`}
-          />
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Top area: animation left, market awareness chips + avatar right */}
+        <View style={styles.topArea}>
+          <View style={styles.animationArea}>
+            <LottieView
+              source={POD_ANIMATION}
+              autoPlay
+              loop
+              style={{ width: lottieSize, height: lottieSize }}
+            />
+          </View>
+          <View style={styles.leftChipsCol}>
+            <View style={styles.chipsRow}>
+              <View
+                style={[
+                  styles.previewAvatar,
+                  { backgroundColor: theme.background },
+                ]}
+              >
+                <SvgXml
+                  xml={avatarSvg}
+                  width={AVATAR_SIZE}
+                  height={AVATAR_SIZE}
+                />
+              </View>
+            </View>
+            <ForgeStatChip
+              label="MOM"
+              value={`${Math.round(state.marketAwareness.momentum * 100)}%`}
+            />
+            <ForgeStatChip
+              label="M/R"
+              value={`${Math.round(state.marketAwareness.meanReversion * 100)}%`}
+            />
+            <ForgeStatChip
+              label="VOL"
+              value={`${Math.round(state.marketAwareness.volatility * 100)}%`}
+            />
+            <ForgeStatChip
+              label="TRND"
+              value={`${Math.round(state.marketAwareness.trendFollowing * 100)}%`}
+            />
+          </View>
         </View>
 
-        <View style={styles.animationArea}>
-          <LottieView
-            source={POD_ANIMATION}
-            autoPlay
-            loop
-            style={{ width: lottieSize, height: lottieSize }}
-          />
+        {/* Stat chip rows */}
+        <View style={styles.chipsGrid}>
+          <View style={styles.chipsRow}>
+            <ForgeStatChip label="NAME" value={state.name.trim() || null} />
+            <ForgeStatChip
+              label="FRAME"
+              value={frameConfig?.gamifiedName ?? null}
+              colorway={frameConfig?.colorway ?? null}
+            />
+            <ForgeStatChip label="BRAIN" value={brainLabel} />
+          </View>
+          <View style={styles.chipsRow}>
+            <ForgeStatChip
+              label="RISK"
+              value={state.riskAttitude ? capitalize(state.riskAttitude) : null}
+            />
+            <ForgeStatChip
+              label="TEMPO"
+              value={state.tradeTempo ? capitalize(state.tradeTempo) : null}
+            />
+            <ForgeStatChip
+              label="ALLOC"
+              value={`${Math.round(state.allocationPct * 100)}%`}
+            />
+          </View>
+          <View style={styles.chipsRow}>
+            <ForgeStatChip
+              label="PATIENCE"
+              value={
+                state.combatPatience ? capitalize(state.combatPatience) : null
+              }
+            />
+            <ForgeStatChip label="EXIT" value={exitLabel} />
+            <ForgeStatChip label="STOP" value={stopLabel} />
+          </View>
+          <View style={styles.chipsRow}>
+            <ForgeStatChip label="SECTORS" value={sectorsLabel} />
+            <ForgeStatChip label="MAX LOSS" value={maxLossLabel} />
+            <ForgeStatChip label="MAX GAIN" value={maxGainLabel} />
+          </View>
         </View>
-      </View>
-
-      {/* Bottom stat cards — 2 rows of 3 */}
-      <View style={styles.chipsGrid}>
-        <View style={styles.chipsRow}>
-          <ForgeStatChip label="NAME" value={state.name.trim() || null} />
-          <ForgeStatChip
-            label="FRAME"
-            value={frameConfig?.gamifiedName ?? null}
-            colorway={frameConfig?.colorway ?? null}
-          />
-          <ForgeStatChip label="BRAIN" value={brainLabel} />
-        </View>
-        <View style={styles.chipsRow}>
-          <ForgeStatChip
-            label="RISK"
-            value={state.riskAttitude ? capitalize(state.riskAttitude) : null}
-          />
-          <ForgeStatChip
-            label="TEMPO"
-            value={state.tradeTempo ? capitalize(state.tradeTempo) : null}
-          />
-          <ForgeStatChip
-            label="ALLOC"
-            value={`${Math.round(state.allocationPct * 100)}%`}
-          />
-        </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   panel: {
-    borderBottomWidth: 1.5,
+    borderBottomWidth: 5,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingTop: 12,
   },
   closeBtn: {
     position: "absolute",
     top: 12,
-    right: 16,
+    left: 16,
     width: 28,
     height: 28,
     justifyContent: "center",
@@ -153,20 +220,32 @@ const styles = StyleSheet.create({
   closeBtnText: {
     fontSize: 16,
   },
-  topArea: {
+  previewAvatar: {
+    width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    gap: 12,
+    paddingBottom: 12,
+  },
+  topArea: {
     flexDirection: "row",
     gap: 12,
-  },
-  leftChipsCol: {
-    width: LEFT_COL_WIDTH,
-    gap: 6,
-    marginBottom: 10,
+    minHeight: 120,
   },
   animationArea: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  leftChipsCol: {
+    width: LEFT_COL_WIDTH,
+    gap: 6,
   },
   chipsGrid: {
     gap: 6,

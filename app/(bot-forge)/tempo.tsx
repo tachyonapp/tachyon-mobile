@@ -104,7 +104,7 @@ export const Tempo = ({
 };
 
 const styles = StyleSheet.create({
-  subSection: { gap: 10 },
+  subSection: { gap: 10, marginBottom: 20, marginTop: 20 },
   subSectionHeader: {
     flexDirection: "row",
     alignItems: "center",

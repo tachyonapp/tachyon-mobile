@@ -46,11 +46,11 @@ export function EducationalTooltip({
 
   return (
     <>
-      <Pressable onPress={open} hitSlop={12}>
+      <Pressable onPress={open} hitSlop={16}>
         {trigger ?? (
           <IconSymbol
             name="info.circle"
-            size={18}
+            size={22}
             color={theme.textSecondary}
           />
         )}

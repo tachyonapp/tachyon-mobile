@@ -15,6 +15,7 @@ interface CapitalProps {
   combatComplete: boolean;
   existingAllocationTotal: number;
   userCashBalance: number;
+  frameName: string | null;
 }
 
 export const Capital = ({
@@ -24,6 +25,7 @@ export const Capital = ({
   combatComplete,
   existingAllocationTotal,
   userCashBalance,
+  frameName,
 }: CapitalProps) => {
   const theme = Colors[useColorScheme()];
   const allocationMax = Math.min(
@@ -43,6 +45,11 @@ export const Capital = ({
       locked={!combatComplete}
       lockedMessage="Complete your Combat Profile first."
     >
+      {frameName && (
+        <Text style={{ color: theme.textSecondary, fontSize: 13 }}>
+          {`${frameName} requires a minimum ${Math.round(allocationBounds.min * 100)}% allocation.`}
+        </Text>
+      )}
       {fullyAllocated ? (
         <Text style={{ color: theme.warning, fontSize: 13 }}>
           Your other bots are using 100% of your capital. Free up allocation by

@@ -14,7 +14,11 @@ interface RiskProps {
     field: K,
     value: WizardState[K],
   ) => void;
-  disabledReasonFor: (frameName: string, label: string, count: number) => string;
+  disabledReasonFor: (
+    frameName: string,
+    label: string,
+    count: number,
+  ) => string;
   riskAttitude: RiskAttitude | null;
 }
 
@@ -89,7 +93,7 @@ export const Risk = ({
 };
 
 const styles = StyleSheet.create({
-  subSection: { gap: 10 },
+  subSection: { gap: 10, marginBottom: 20, marginTop: 20 },
   subSectionHeader: {
     flexDirection: "row",
     alignItems: "center",

@@ -32,21 +32,28 @@ interface SafetySystemsFormProps {
   onEmotionalControlsChange: (v: EmotionalControlsInput) => void;
 }
 
-const STOP_LOSS_OPTIONS: { name: StopStyleName; label: string; description: string }[] = [
+const STOP_LOSS_OPTIONS: {
+  name: StopStyleName;
+  label: string;
+  description: string;
+}[] = [
   {
     name: StopStyleName.Hard,
     label: "Hard Stop",
-    description: "Fixed stop-loss level. Exits immediately when hit, no exceptions.",
+    description:
+      "Fixed stop-loss level. Exits immediately when hit, no exceptions.",
   },
   {
     name: StopStyleName.Flexible,
     label: "Flexible Stop",
-    description: "Adapts to volatility. Gives the trade room to breathe within limits.",
+    description:
+      "Adapts to volatility. Gives the trade room to breathe within limits.",
   },
   {
     name: StopStyleName.Adaptive,
     label: "Adaptive Stop",
-    description: "Trails price as it moves in your favor. Locks in gains dynamically.",
+    description:
+      "Trails price as it moves in your favor. Locks in gains dynamically.",
   },
 ];
 
@@ -94,14 +101,18 @@ export function SafetySystemsForm({
     <View style={styles.container}>
       {/* 1. Daily Max Loss */}
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Daily Loss Armor</Text>
+        <Text style={styles.sectionLabel}>Daily Loss Limit</Text>
         <Text style={styles.boundsHint}>
           {lossMinPct}%–{lossMaxPct}% for {frameName}
         </Text>
         <View style={styles.lossValueRow}>
-          <Text style={styles.lossValue}>{Math.round(dailyMaxLossPct * 100)}%</Text>
+          <Text style={styles.lossValue}>
+            {Math.round(dailyMaxLossPct * 100)}%
+          </Text>
           {lossUsd ? (
-            <Text style={styles.lossUsd}>≈ {lossUsd} based on your allocation</Text>
+            <Text style={styles.lossUsd}>
+              ≈ {lossUsd} based on your allocation
+            </Text>
           ) : (
             <Text style={styles.lossUsd}>% of your allocated capital</Text>
           )}
@@ -126,7 +137,7 @@ export function SafetySystemsForm({
           value={gainInput}
           onChangeText={setGainInput}
           onEndEditing={handleGainInputEnd}
-          placeholder="Leave blank for no cap."
+          placeholder="e.g. 0.05 for a 5% cap. Leave blank for no cap."
           placeholderTextColor={Colors.dark.textDisabled}
           keyboardType="decimal-pad"
           returnKeyType="done"
@@ -165,7 +176,9 @@ export function SafetySystemsForm({
                     const n = parseInt(t, 10);
                     onEmotionalControlsChange({
                       ...emotionalControls,
-                      freezeAfterLosses: isNaN(n) ? 1 : Math.min(5, Math.max(1, n)),
+                      freezeAfterLosses: isNaN(n)
+                        ? 1
+                        : Math.min(5, Math.max(1, n)),
                     });
                   }}
                   keyboardType="number-pad"
@@ -185,27 +198,40 @@ export function SafetySystemsForm({
                   freezeAfterLosses: on ? 3 : null,
                 })
               }
-              trackColor={{ true: Colors.dark.electricBlue, false: Colors.dark.surface }}
+              trackColor={{
+                true: Colors.dark.electricBlue,
+                false: Colors.dark.surface,
+              }}
               thumbColor={Colors.dark.textPrimary}
             />
           </View>
 
           {/* Cooldown after volatility spike */}
           <View style={styles.toggleRow}>
-            <Text style={styles.toggleLabel}>Cooldown after volatility spike</Text>
+            <Text style={styles.toggleLabel}>
+              Cooldown after volatility spike
+            </Text>
             <Switch
               value={emotionalControls.cooldownAfterVolatility}
               onValueChange={(on) =>
-                onEmotionalControlsChange({ ...emotionalControls, cooldownAfterVolatility: on })
+                onEmotionalControlsChange({
+                  ...emotionalControls,
+                  cooldownAfterVolatility: on,
+                })
               }
-              trackColor={{ true: Colors.dark.electricBlue, false: Colors.dark.surface }}
+              trackColor={{
+                true: Colors.dark.electricBlue,
+                false: Colors.dark.surface,
+              }}
               thumbColor={Colors.dark.textPrimary}
             />
           </View>
 
           {/* Stand down after noon if losing */}
           <View style={styles.toggleRow}>
-            <Text style={styles.toggleLabel}>Stand down after noon if losing</Text>
+            <Text style={styles.toggleLabel}>
+              Stand down after noon if losing
+            </Text>
             <Switch
               value={emotionalControls.standDownAfterNoonIfLosing}
               onValueChange={(on) =>
@@ -214,7 +240,10 @@ export function SafetySystemsForm({
                   standDownAfterNoonIfLosing: on,
                 })
               }
-              trackColor={{ true: Colors.dark.electricBlue, false: Colors.dark.surface }}
+              trackColor={{
+                true: Colors.dark.electricBlue,
+                false: Colors.dark.surface,
+              }}
               thumbColor={Colors.dark.textPrimary}
             />
           </View>

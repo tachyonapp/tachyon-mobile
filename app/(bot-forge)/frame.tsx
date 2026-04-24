@@ -23,7 +23,7 @@ export const Frame = ({ name, frameName, selectFrame }: FrameProps) => {
   const nameSet = name.trim().length > 0;
   return (
     <ForgeSection
-      title="Frame"
+      title="Personality"
       subtitle="Your bot's trading personality and strategy."
       tooltip={{
         title: "Bot Frame",
