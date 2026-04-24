@@ -2,7 +2,6 @@ import { ForgeSection } from "@/components/forge/ForgeSection";
 import { FrameCard } from "@/components/wizard/FrameCard";
 import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { BotFrame } from "@/generated/graphql";
-import { type LottieViewProps } from "lottie-react-native";
 import { StyleSheet, View } from "react-native";
 
 interface FrameProps {
@@ -10,12 +9,6 @@ interface FrameProps {
   frameName: BotFrame | null;
   selectFrame: (frameName: BotFrame) => void;
 }
-
-const FRAME_ANIMATIONS: Partial<Record<BotFrame, LottieViewProps["source"]>> = {
-  [BotFrame.Scout]: require("@/assets/animations/scout.json"),
-  [BotFrame.Sniper]: require("@/assets/animations/sniper.json"),
-  [BotFrame.Guardian]: require("@/assets/animations/shield.json"),
-};
 
 const FRAMES = Object.values(BotFrame);
 
@@ -39,7 +32,6 @@ export const Frame = ({ name, frameName, selectFrame }: FrameProps) => {
               frame={FRAME_CONFIG[frame]}
               selected={frameName === frame}
               onSelect={() => selectFrame(frame)}
-              animationSource={FRAME_ANIMATIONS[frame]}
             />
           </View>
         ))}

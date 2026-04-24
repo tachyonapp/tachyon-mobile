@@ -52,6 +52,7 @@ import { FRAME_CONFIG } from "@/constants/frameConfig";
 import {
   BotFrame,
   BrainType,
+  SectorFilter,
   type BrainCatalog,
   type CombatPatience,
   type EmotionalControlsInput,
@@ -95,7 +96,7 @@ export interface WizardState {
   tradeTempo: TradeTempo | null;
   combatPatience: CombatPatience | null;
   marketAwareness: MarketAwarenessInput;
-  sectors: string[];
+  sectors: SectorFilter[];
   exitPersonality: ExitPersonalityInput | null;
   stopLossStyle: StopLossStyleInput | null;
   dailyMaxLoss: number;

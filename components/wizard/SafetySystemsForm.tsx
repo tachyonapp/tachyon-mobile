@@ -5,6 +5,7 @@ import {
   type EmotionalControlsInput,
   type StopLossStyleInput,
 } from "@/generated/graphql";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import React, { useState } from "react";
 import {
   LayoutChangeEvent,
@@ -75,6 +76,7 @@ export function SafetySystemsForm({
   emotionalControls,
   onEmotionalControlsChange,
 }: SafetySystemsFormProps) {
+  const theme = Colors[useColorScheme()];
   const [trackWidth, setTrackWidth] = useState(0);
   const [gainInput, setGainInput] = useState(
     dailyMaxGain !== null ? String(dailyMaxGain) : "",
@@ -101,20 +103,24 @@ export function SafetySystemsForm({
     <View style={styles.container}>
       {/* 1. Daily Max Loss */}
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Daily Loss Limit</Text>
-        <Text style={styles.boundsHint}>
+        <Text style={[styles.sectionLabel, { color: theme.textPrimary }]}>
+          Daily Loss Limit
+        </Text>
+        <Text style={[styles.boundsHint, { color: theme.textSecondary }]}>
           {lossMinPct}%–{lossMaxPct}% for {frameName}
         </Text>
         <View style={styles.lossValueRow}>
-          <Text style={styles.lossValue}>
+          <Text style={[styles.lossValue, { color: theme.textPrimary }]}>
             {Math.round(dailyMaxLossPct * 100)}%
           </Text>
           {lossUsd ? (
-            <Text style={styles.lossUsd}>
+            <Text style={[styles.lossUsd, { color: theme.textSecondary }]}>
               ≈ {lossUsd} based on your allocation
             </Text>
           ) : (
-            <Text style={styles.lossUsd}>% of your allocated capital</Text>
+            <Text style={[styles.lossUsd, { color: theme.textSecondary }]}>
+              % of your allocated capital
+            </Text>
           )}
         </View>
         <View onLayout={handleLayout}>
@@ -123,7 +129,7 @@ export function SafetySystemsForm({
             min={dailyMaxLossBounds.minPct}
             max={dailyMaxLossBounds.maxPct}
             onChange={onDailyMaxLossChange}
-            fillColor={Colors.dark.danger}
+            fillColor={theme.danger}
             trackWidth={trackWidth}
           />
         </View>
@@ -131,22 +137,34 @@ export function SafetySystemsForm({
 
       {/* 2. Daily Max Gain */}
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Daily Gain Cap (optional)</Text>
+        <Text style={[styles.sectionLabel, { color: theme.textPrimary }]}>
+          Daily Gain Cap (optional)
+        </Text>
         <TextInput
-          style={styles.textInput}
+          style={[
+            styles.textInput,
+            {
+              borderColor: theme.inputBorder,
+              color: theme.textPrimary,
+              backgroundColor: theme.inputBackground,
+            },
+          ]}
           value={gainInput}
           onChangeText={setGainInput}
           onEndEditing={handleGainInputEnd}
           placeholder="e.g. 0.05 for a 5% cap. Leave blank for no cap."
-          placeholderTextColor={Colors.dark.textDisabled}
+          placeholderTextColor={theme.textDisabled}
           keyboardType="decimal-pad"
           returnKeyType="done"
+          autoCorrect={false}
         />
       </View>
 
       {/* 3. Stop-loss style */}
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Stop-Loss Style</Text>
+        <Text style={[styles.sectionLabel, { color: theme.textPrimary }]}>
+          Stop-Loss Style
+        </Text>
         <View style={styles.optionCards}>
           {STOP_LOSS_OPTIONS.map((opt) => (
             <WizardOptionCard
@@ -162,15 +180,26 @@ export function SafetySystemsForm({
 
       {/* 4. Emotional Controls */}
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Emotional Controls</Text>
+        <Text style={[styles.sectionLabel, { color: theme.textPrimary }]}>
+          Emotional Controls
+        </Text>
         <View style={styles.toggleGroup}>
           {/* Freeze after N losses */}
           <View style={styles.toggleRow}>
             <View style={styles.toggleLabelGroup}>
-              <Text style={styles.toggleLabel}>Freeze after losses</Text>
+              <Text style={[styles.toggleLabel, { color: theme.textPrimary }]}>
+                Freeze after losses
+              </Text>
               {emotionalControls.freezeAfterLosses !== null && (
                 <TextInput
-                  style={styles.nInput}
+                  style={[
+                    styles.nInput,
+                    {
+                      borderColor: theme.electricBlue,
+                      color: theme.textPrimary,
+                      backgroundColor: theme.inputBackground,
+                    },
+                  ]}
                   value={String(emotionalControls.freezeAfterLosses ?? "")}
                   onChangeText={(t) => {
                     const n = parseInt(t, 10);
@@ -187,7 +216,12 @@ export function SafetySystemsForm({
                 />
               )}
               {emotionalControls.freezeAfterLosses !== null && (
-                <Text style={styles.toggleLabel}> losses in a row</Text>
+                <Text
+                  style={[styles.toggleLabel, { color: theme.textPrimary }]}
+                >
+                  {" "}
+                  losses in a row
+                </Text>
               )}
             </View>
             <Switch
@@ -198,17 +232,14 @@ export function SafetySystemsForm({
                   freezeAfterLosses: on ? 3 : null,
                 })
               }
-              trackColor={{
-                true: Colors.dark.electricBlue,
-                false: Colors.dark.surface,
-              }}
-              thumbColor={Colors.dark.textPrimary}
+              trackColor={{ true: theme.electricBlue, false: theme.surface }}
+              thumbColor={theme.textPrimary}
             />
           </View>
 
           {/* Cooldown after volatility spike */}
           <View style={styles.toggleRow}>
-            <Text style={styles.toggleLabel}>
+            <Text style={[styles.toggleLabel, { color: theme.textPrimary }]}>
               Cooldown after volatility spike
             </Text>
             <Switch
@@ -219,17 +250,14 @@ export function SafetySystemsForm({
                   cooldownAfterVolatility: on,
                 })
               }
-              trackColor={{
-                true: Colors.dark.electricBlue,
-                false: Colors.dark.surface,
-              }}
-              thumbColor={Colors.dark.textPrimary}
+              trackColor={{ true: theme.electricBlue, false: theme.surface }}
+              thumbColor={theme.textPrimary}
             />
           </View>
 
           {/* Stand down after noon if losing */}
           <View style={styles.toggleRow}>
-            <Text style={styles.toggleLabel}>
+            <Text style={[styles.toggleLabel, { color: theme.textPrimary }]}>
               Stand down after noon if losing
             </Text>
             <Switch
@@ -240,11 +268,8 @@ export function SafetySystemsForm({
                   standDownAfterNoonIfLosing: on,
                 })
               }
-              trackColor={{
-                true: Colors.dark.electricBlue,
-                false: Colors.dark.surface,
-              }}
-              thumbColor={Colors.dark.textPrimary}
+              trackColor={{ true: theme.electricBlue, false: theme.surface }}
+              thumbColor={theme.textPrimary}
             />
           </View>
         </View>
@@ -261,12 +286,10 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   sectionLabel: {
-    color: Colors.dark.textPrimary,
     fontSize: 15,
     fontWeight: "600",
   },
   boundsHint: {
-    color: Colors.dark.textSecondary,
     fontSize: 12,
   },
   lossValueRow: {
@@ -276,22 +299,17 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   lossValue: {
-    color: Colors.dark.textPrimary,
     fontSize: 16,
     fontWeight: "700",
   },
   lossUsd: {
-    color: Colors.dark.textSecondary,
     fontSize: 13,
   },
   textInput: {
     height: 44,
     borderWidth: 1,
-    borderColor: Colors.dark.inputBorder,
     borderRadius: 8,
     paddingHorizontal: 12,
-    color: Colors.dark.textPrimary,
-    backgroundColor: Colors.dark.inputBackground,
     fontSize: 15,
   },
   optionCards: {
@@ -314,7 +332,6 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   toggleLabel: {
-    color: Colors.dark.textPrimary,
     fontSize: 14,
     flex: 1,
   },
@@ -322,10 +339,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 36,
     borderWidth: 1,
-    borderColor: Colors.dark.electricBlue,
     borderRadius: 6,
-    color: Colors.dark.textPrimary,
-    backgroundColor: Colors.dark.inputBackground,
     textAlign: "center",
     fontSize: 15,
     fontWeight: "600",

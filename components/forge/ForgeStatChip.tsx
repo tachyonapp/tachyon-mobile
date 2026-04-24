@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 7,
     gap: 2,
-    height: 66,
+    height: 64,
     justifyContent: "center",
   },
   label: {

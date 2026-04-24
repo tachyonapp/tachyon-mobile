@@ -79,7 +79,7 @@ export const Patience = ({
     <View style={styles.subSection}>
       <View style={styles.subSectionHeader}>
         <Text style={[styles.subSectionTitle, { color: theme.textPrimary }]}>
-          Combat Patience
+          Trade Patience
         </Text>
         <EducationalTooltip
           title="Combat Patience"

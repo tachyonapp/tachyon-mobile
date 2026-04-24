@@ -171,7 +171,7 @@ export default function ForgeScreen() {
             tradeTempo: state.tradeTempo!,
             combatPatience: state.combatPatience!,
             marketAwareness: state.marketAwareness,
-            sectors: state.sectors as any,
+            sectors: state.sectors,
             exitPersonality: state.exitPersonality!,
             stopLossStyle: state.stopLossStyle!,
             dailyMaxLossPct: String(state.dailyMaxLoss),
@@ -205,6 +205,7 @@ export default function ForgeScreen() {
       await clearDraft();
       router.replace("/(tabs)/index");
     } catch (err) {
+      console.log(err, "ass");
       const gqlErrors: { extensions?: { code?: string } }[] =
         (err as any)?.graphQLErrors ?? [];
       const rateLimited = gqlErrors.some(
@@ -265,9 +266,9 @@ export default function ForgeScreen() {
             selectFrame={selectFrame}
           />
 
-          {/* ── 4. Combat Profile ── */}
+          {/* ── 4. Trade Profile ── */}
           <ForgeSection
-            title="Combat Profile"
+            title="Trade Profile"
             subtitle="How your bot sizes and times its trades."
             locked={state.frameName === null}
             lockedMessage="Choose a frame first."

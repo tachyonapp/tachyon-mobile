@@ -20,10 +20,11 @@ import {
 import { SvgXml } from "react-native-svg";
 import { ForgeStatChip } from "./ForgeStatChip";
 
+// TODO:: Make this an interactive animation - changes in bot settings produces changes in the animated bot character.
 const POD_ANIMATION = require("@/assets/animations/pod.json");
 const LEFT_COL_WIDTH = 60;
 const AVATAR_SIZE = 60;
-const HEADER_HEIGHT = 48;
+const HEADER_HEIGHT = 30;
 
 interface ForgeStatPanelProps {
   state: WizardState;
@@ -80,7 +81,7 @@ export function ForgeStatPanel({
         : "BYOK";
 
   const animAreaWidth = screenWidth - 32 - LEFT_COL_WIDTH - 12;
-  const lottieSize = Math.min(animAreaWidth, height - 240);
+  const lottieSize = Math.min(animAreaWidth, height - 230);
 
   const exitLabel = state.exitPersonality?.name
     ? formatEnumLabel(state.exitPersonality.name)
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
     height: HEADER_HEIGHT,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
+    paddingHorizontal: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   headerBtn: {

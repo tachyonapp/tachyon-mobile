@@ -8,13 +8,14 @@ interface WizardStepAnimationProps {
   autoPlay?: boolean;
   loop?: boolean;
   height?: number;
+  colorFilters?: LottieViewProps["colorFilters"];
 }
 
 export const WizardStepAnimation = React.forwardRef<
   LottieView,
   WizardStepAnimationProps
 >(function WizardStepAnimation(
-  { source, autoPlay = true, loop = true, height = 250 },
+  { source, autoPlay = true, loop = true, height = 250, colorFilters },
   ref,
 ) {
   const shimmerOpacity = useRef(new Animated.Value(0.3)).current;
@@ -48,6 +49,7 @@ export const WizardStepAnimation = React.forwardRef<
         autoPlay={autoPlay}
         loop={loop}
         style={[styles.lottie, { height }]}
+        colorFilters={colorFilters}
       />
     );
   }
@@ -64,16 +66,20 @@ export const WizardStepAnimation = React.forwardRef<
 const styles = StyleSheet.create({
   lottie: {
     width: "100%",
-    height: 200,
+    height: 300,
   },
   shimmerContainer: {
     width: "100%",
-    height: 200,
+    height: 300,
     backgroundColor: Colors.dark.surface, // #1A2133
     overflow: "hidden",
   },
   shimmerForeground: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     backgroundColor: Colors.dark.electricBlue, // #2C6BED
   },
 });

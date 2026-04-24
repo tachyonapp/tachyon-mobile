@@ -1,23 +1,25 @@
 import { Colors } from "@/constants/theme";
+import { SectorFilter } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-const ALL_SECTORS = [
-  "Tech",
-  "Energy",
-  "Financials",
-  "Healthcare",
-  "ETFs Only",
-  "Mega Caps Only",
-  "Liquid Large Caps",
+const SECTOR_OPTIONS: { value: SectorFilter; label: string }[] = [
+  { value: SectorFilter.Tech, label: "Tech" },
+  { value: SectorFilter.Energy, label: "Energy" },
+  { value: SectorFilter.Financials, label: "Financials" },
+  { value: SectorFilter.Healthcare, label: "Healthcare" },
+  { value: SectorFilter.EtfsOnly, label: "ETFs Only" },
+  { value: SectorFilter.MegaCapsOnly, label: "Mega Caps Only" },
+  { value: SectorFilter.LiquidLargeCaps, label: "Liquid Large Caps" },
 ];
 
+const ALL_SECTOR_VALUES = SECTOR_OPTIONS.map((s) => s.value);
 const SELECT_ALL_LABEL = "Any liquid battlefield";
 
 interface SectorGridProps {
-  selected: string[];
-  onChange: (sectors: string[]) => void;
+  selected: SectorFilter[];
+  onChange: (sectors: SectorFilter[]) => void;
   showError?: boolean;
 }
 
@@ -27,18 +29,18 @@ export function SectorGrid({
   showError = false,
 }: SectorGridProps) {
   const theme = Colors[useColorScheme()];
-  const allSelected = ALL_SECTORS.every((s) => selected.includes(s));
+  const allSelected = ALL_SECTOR_VALUES.every((v) => selected.includes(v));
   const hasError = showError && selected.length === 0;
 
   function toggleSelectAll() {
-    onChange(allSelected ? [] : [...ALL_SECTORS]);
+    onChange(allSelected ? [] : [...ALL_SECTOR_VALUES]);
   }
 
-  function toggleSector(sector: string) {
-    if (selected.includes(sector)) {
-      onChange(selected.filter((s) => s !== sector));
+  function toggleSector(value: SectorFilter) {
+    if (selected.includes(value)) {
+      onChange(selected.filter((s) => s !== value));
     } else {
-      onChange([...selected, sector]);
+      onChange([...selected, value]);
     }
   }
 
@@ -68,12 +70,12 @@ export function SectorGrid({
       </Pressable>
 
       <View style={styles.grid}>
-        {ALL_SECTORS.map((sector) => {
-          const isSelected = selected.includes(sector);
+        {SECTOR_OPTIONS.map(({ value, label }) => {
+          const isSelected = selected.includes(value);
           return (
             <Pressable
-              key={sector}
-              onPress={() => toggleSector(sector)}
+              key={value}
+              onPress={() => toggleSector(value)}
               style={[
                 styles.tile,
                 styles.tileGridItem,
@@ -97,7 +99,7 @@ export function SectorGrid({
                   },
                 ]}
               >
-                {sector}
+                {label}
               </Text>
             </Pressable>
           );

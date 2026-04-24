@@ -61,6 +61,9 @@ export const Identity = ({
           placeholder="e.g. Iron Scout"
           placeholderTextColor={theme.textDisabled}
           returnKeyType="done"
+          selectTextOnFocus={false}
+          autoCorrect={false}
+          spellCheck={false}
         />
         {nameError && (
           <Text style={[styles.errorInline, { color: theme.danger }]}>

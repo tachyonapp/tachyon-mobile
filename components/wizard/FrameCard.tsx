@@ -1,9 +1,7 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { WizardStepAnimation } from "@/components/wizard/WizardStepAnimation";
 import { type FrameConfig } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { type LottieViewProps } from "lottie-react-native";
 import React, { useRef, useState } from "react";
 import {
   Animated,
@@ -18,19 +16,14 @@ interface FrameCardProps {
   frame: FrameConfig;
   selected: boolean;
   onSelect: () => void;
-  animationSource?: LottieViewProps["source"];
 }
 
-export function FrameCard({
-  frame,
-  selected,
-  onSelect,
-  animationSource,
-}: FrameCardProps) {
+export function FrameCard({ frame, selected, onSelect }: FrameCardProps) {
   const theme = Colors[useColorScheme()];
   const scale = useRef(new Animated.Value(1)).current;
   const translateY = useRef(new Animated.Value(400)).current;
   const [modalVisible, setModalVisible] = useState(false);
+
 
   function handlePress() {
     Animated.sequence([
@@ -131,12 +124,6 @@ export function FrameCard({
         >
           <View
             style={[styles.handle, { backgroundColor: theme.textDisabled }]}
-          />
-          <WizardStepAnimation
-            source={animationSource ?? null}
-            loop
-            autoPlay
-            height={240}
           />
           <View
             style={[styles.colorwayAccent, { backgroundColor: frame.colorway }]}

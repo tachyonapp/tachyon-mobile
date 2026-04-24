@@ -56,8 +56,8 @@ export const Brain = ({
 
   return (
     <ForgeSection
-      title="Brain"
-      subtitle="Your bot uses AI to explain why it found a trade — you approve every trade before it executes."
+      title="AI Model"
+      subtitle="Your bot uses AI to analyze and interact with markets as well as explain and propose trades — YOU approve every trade before it executes."
       locked={!stopLossSet}
       lockedMessage="Configure your protections first."
     >

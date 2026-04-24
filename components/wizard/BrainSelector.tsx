@@ -3,6 +3,7 @@ import {
   BrainType,
   type BrainProviderOption,
 } from "@/generated/graphql";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -19,7 +20,7 @@ interface BrainSelectorProps {
   modelId: string;
   byokProviders: BrainProviderOption[];
   isKeyValidated: boolean;
-  hasByokDraft: boolean; // true when resuming a BYOK draft (key was cleared)
+  hasByokDraft: boolean;
   onBrainTypeChange: (type: BrainType) => void;
   onProviderChange: (provider: string) => void;
   onModelChange: (modelId: string) => void;
@@ -40,11 +41,10 @@ export function BrainSelector({
   onModelChange,
   onValidateKey,
 }: BrainSelectorProps) {
+  const theme = Colors[useColorScheme()];
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [validationState, setValidationState] = useState<ValidationState>("idle");
   const loadingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // True only when component mounted with BYOK already set — indicates a resumed draft,
-  // not a fresh selection by the user.
   const mountedAsByok = useRef(brainType === BrainType.Byok);
 
   const selectedProvider = byokProviders.find((p) => p.provider === provider);
@@ -60,7 +60,6 @@ export function BrainSelector({
     if (!apiKeyInput) return;
     setValidationState("idle");
 
-    // Show loading spinner only after 500ms to avoid flash for fast responses
     loadingTimer.current = setTimeout(() => setValidationState("loading"), 500);
 
     try {
@@ -75,7 +74,6 @@ export function BrainSelector({
 
   function handleProviderSelect(p: string) {
     onProviderChange(p);
-    // Reset model to first available for new provider
     const prov = byokProviders.find((x) => x.provider === p);
     const firstModel = prov?.models?.[0]?.modelId ?? "";
     onModelChange(firstModel);
@@ -90,16 +88,24 @@ export function BrainSelector({
         onPress={() => onBrainTypeChange(BrainType.TachyonHosted)}
         style={[
           styles.card,
-          brainType === BrainType.TachyonHosted && styles.cardSelected,
+          { backgroundColor: theme.surface, borderColor: theme.textDisabled },
+          brainType === BrainType.TachyonHosted && {
+            borderWidth: 2,
+            borderColor: theme.electricBlue,
+          },
         ]}
       >
         <View style={styles.cardHeader}>
-          <Text style={styles.cardTitle}>Tachyon Default</Text>
+          <Text style={[styles.cardTitle, { color: theme.textPrimary }]}>
+            Tachyon Default
+          </Text>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>Usage-capped · No setup required</Text>
+            <Text style={[styles.badgeText, { color: theme.electricBlue }]}>
+              Usage-capped · No setup required
+            </Text>
           </View>
         </View>
-        <Text style={styles.cardBody}>
+        <Text style={[styles.cardBody, { color: theme.textSecondary }]}>
           Powered by Claude Haiku. Free, built-in, usage-capped.
         </Text>
       </Pressable>
@@ -109,19 +115,29 @@ export function BrainSelector({
         onPress={() => onBrainTypeChange(BrainType.Byok)}
         style={[
           styles.card,
-          brainType === BrainType.Byok && styles.cardSelected,
+          { backgroundColor: theme.surface, borderColor: theme.textDisabled },
+          brainType === BrainType.Byok && {
+            borderWidth: 2,
+            borderColor: theme.electricBlue,
+          },
         ]}
       >
-        <Text style={styles.cardTitle}>Bring Your Own Key</Text>
-        <Text style={styles.cardBody}>
+        <Text style={[styles.cardTitle, { color: theme.textPrimary }]}>
+          Bring Your Own Key
+        </Text>
+        <Text style={[styles.cardBody, { color: theme.textSecondary }]}>
           Use your own API key for the best experience.
         </Text>
 
         {brainType === BrainType.Byok && (
-          <View style={styles.byokExpanded}>
-            {/* Draft resume warning — only shown when BYOK was already set on mount (resumed draft) */}
+          <View
+            style={[
+              styles.byokExpanded,
+              { borderTopColor: theme.inputBorder },
+            ]}
+          >
             {hasByokDraft && !isKeyValidated && mountedAsByok.current && (
-              <Text style={styles.draftWarning}>
+              <Text style={[styles.draftWarning, { color: theme.warning }]}>
                 Your API key was cleared for security. Please re-enter it.
               </Text>
             )}
@@ -129,7 +145,9 @@ export function BrainSelector({
             {/* Provider selector */}
             {byokProviders.length > 0 && (
               <View style={styles.fieldGroup}>
-                <Text style={styles.fieldLabel}>Provider</Text>
+                <Text style={[styles.fieldLabel, { color: theme.textSecondary }]}>
+                  Provider
+                </Text>
                 <View style={styles.segmentRow}>
                   {byokProviders.map((p) => (
                     <Pressable
@@ -137,13 +155,24 @@ export function BrainSelector({
                       onPress={() => handleProviderSelect(p.provider ?? "")}
                       style={[
                         styles.segment,
-                        provider === p.provider && styles.segmentSelected,
+                        {
+                          borderColor: theme.textDisabled,
+                          backgroundColor: theme.inputBackground,
+                        },
+                        provider === p.provider && {
+                          borderColor: theme.electricBlue,
+                          backgroundColor: "rgba(44, 107, 237, 0.1)",
+                        },
                       ]}
                     >
                       <Text
                         style={[
                           styles.segmentLabel,
-                          provider === p.provider && styles.segmentLabelSelected,
+                          { color: theme.textSecondary },
+                          provider === p.provider && {
+                            color: theme.electricBlue,
+                            fontWeight: "600",
+                          },
                         ]}
                       >
                         {p.displayName ?? p.provider}
@@ -157,7 +186,9 @@ export function BrainSelector({
             {/* Model selector */}
             {availableModels.length > 0 && (
               <View style={styles.fieldGroup}>
-                <Text style={styles.fieldLabel}>Model</Text>
+                <Text style={[styles.fieldLabel, { color: theme.textSecondary }]}>
+                  Model
+                </Text>
                 <View style={styles.segmentRow}>
                   {availableModels.map((m) => (
                     <Pressable
@@ -165,13 +196,24 @@ export function BrainSelector({
                       onPress={() => onModelChange(m.modelId ?? "")}
                       style={[
                         styles.segment,
-                        modelId === m.modelId && styles.segmentSelected,
+                        {
+                          borderColor: theme.textDisabled,
+                          backgroundColor: theme.inputBackground,
+                        },
+                        modelId === m.modelId && {
+                          borderColor: theme.electricBlue,
+                          backgroundColor: "rgba(44, 107, 237, 0.1)",
+                        },
                       ]}
                     >
                       <Text
                         style={[
                           styles.segmentLabel,
-                          modelId === m.modelId && styles.segmentLabelSelected,
+                          { color: theme.textSecondary },
+                          modelId === m.modelId && {
+                            color: theme.electricBlue,
+                            fontWeight: "600",
+                          },
                         ]}
                         numberOfLines={1}
                       >
@@ -185,16 +227,25 @@ export function BrainSelector({
 
             {/* API key input */}
             <View style={styles.fieldGroup}>
-              <Text style={styles.fieldLabel}>API Key</Text>
+              <Text style={[styles.fieldLabel, { color: theme.textSecondary }]}>
+                API Key
+              </Text>
               <TextInput
-                style={styles.keyInput}
+                style={[
+                  styles.keyInput,
+                  {
+                    borderColor: theme.inputBorder,
+                    color: theme.textPrimary,
+                    backgroundColor: theme.inputBackground,
+                  },
+                ]}
                 value={apiKeyInput}
                 onChangeText={(t) => {
                   setApiKeyInput(t);
                   setValidationState("idle");
                 }}
                 placeholder="Enter your API key"
-                placeholderTextColor={Colors.dark.textDisabled}
+                placeholderTextColor={theme.textDisabled}
                 secureTextEntry
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -207,21 +258,29 @@ export function BrainSelector({
               disabled={!apiKeyInput || validationState === "loading"}
               style={[
                 styles.validateBtn,
-                (!apiKeyInput || validationState === "loading") && styles.validateBtnDisabled,
+                { backgroundColor: theme.electricBlue },
+                (!apiKeyInput || validationState === "loading") &&
+                  styles.validateBtnDisabled,
               ]}
             >
               {validationState === "loading" ? (
-                <ActivityIndicator size="small" color={Colors.dark.textPrimary} />
+                <ActivityIndicator size="small" color={theme.textPrimary} />
               ) : (
-                <Text style={styles.validateBtnLabel}>Validate Key</Text>
+                <Text style={[styles.validateBtnLabel, { color: "#FFFFFF" }]}>
+                  Validate Key
+                </Text>
               )}
             </Pressable>
 
             {validationState === "success" && (
-              <Text style={styles.validationSuccess}>Key validated successfully.</Text>
+              <Text style={[styles.validationMsg, { color: theme.success }]}>
+                Key validated successfully.
+              </Text>
             )}
             {validationState === "error" && (
-              <Text style={styles.validationError}>Invalid key. Please check and try again.</Text>
+              <Text style={[styles.validationMsg, { color: theme.danger }]}>
+                Invalid key. Please check and try again.
+              </Text>
             )}
           </View>
         )}
@@ -235,16 +294,10 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   card: {
-    backgroundColor: Colors.dark.surface,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: Colors.dark.textDisabled,
     padding: 16,
     gap: 8,
-  },
-  cardSelected: {
-    borderWidth: 2,
-    borderColor: Colors.dark.electricBlue,
   },
   cardHeader: {
     flexDirection: "row",
@@ -253,12 +306,10 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   cardTitle: {
-    color: Colors.dark.textPrimary,
     fontSize: 15,
     fontWeight: "600",
   },
   cardBody: {
-    color: Colors.dark.textSecondary,
     fontSize: 13,
   },
   badge: {
@@ -268,7 +319,6 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   badgeText: {
-    color: Colors.dark.electricBlue,
     fontSize: 11,
     fontWeight: "500",
   },
@@ -276,18 +326,15 @@ const styles = StyleSheet.create({
     marginTop: 8,
     gap: 14,
     borderTopWidth: 1,
-    borderTopColor: Colors.dark.inputBorder,
     paddingTop: 14,
   },
   draftWarning: {
-    color: Colors.dark.warning,
     fontSize: 13,
   },
   fieldGroup: {
     gap: 8,
   },
   fieldLabel: {
-    color: Colors.dark.textSecondary,
     fontSize: 12,
     fontWeight: "500",
     textTransform: "uppercase",
@@ -303,37 +350,22 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: Colors.dark.textDisabled,
-    backgroundColor: Colors.dark.inputBackground,
     minHeight: 44,
     justifyContent: "center",
   },
-  segmentSelected: {
-    borderColor: Colors.dark.electricBlue,
-    backgroundColor: "rgba(44, 107, 237, 0.1)",
-  },
   segmentLabel: {
-    color: Colors.dark.textSecondary,
     fontSize: 13,
-  },
-  segmentLabelSelected: {
-    color: Colors.dark.electricBlue,
-    fontWeight: "600",
   },
   keyInput: {
     height: 44,
     borderWidth: 1,
-    borderColor: Colors.dark.inputBorder,
     borderRadius: 8,
     paddingHorizontal: 12,
-    color: Colors.dark.textPrimary,
-    backgroundColor: Colors.dark.inputBackground,
     fontSize: 15,
   },
   validateBtn: {
     height: 44,
     borderRadius: 8,
-    backgroundColor: Colors.dark.electricBlue,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -341,16 +373,10 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   validateBtnLabel: {
-    color: Colors.dark.textPrimary,
     fontSize: 15,
     fontWeight: "600",
   },
-  validationSuccess: {
-    color: Colors.dark.success,
-    fontSize: 13,
-  },
-  validationError: {
-    color: Colors.dark.danger,
+  validationMsg: {
     fontSize: 13,
   },
 });
