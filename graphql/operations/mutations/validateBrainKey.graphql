@@ -1,0 +1,6 @@
+mutation ValidateBrainKey($provider: String!, $apiKey: String!) {
+  validateBrainKey(provider: $provider, apiKey: $apiKey) {
+    valid
+    error
+  }
+}

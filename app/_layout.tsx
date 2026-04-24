@@ -1,16 +1,17 @@
 import { apolloClient } from "@/apollo/client";
 import { AuthProvider, useAuth } from "@/auth/AuthProvider";
+import {
+  BiometricAuthProvider,
+  useBiometricAuth,
+} from "@/auth/BiometricAuthProvider";
 import { ClerkTokenBridge } from "@/auth/clerk-token-bridge";
 import { tokenCache } from "@/auth/token-cache";
 import { AuthLoadingState } from "@/components/auth/auth-loading-state";
-import { BiometricAuthProvider } from "@/auth/BiometricAuthProvider";
 import { BiometricLockScreen } from "@/components/auth/BiometricLockScreen";
-import { useBiometricAuth } from "@/auth/BiometricAuthProvider";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useOnboardingState } from "@/hooks/use-onboarding-state";
 import { ApolloProvider } from "@apollo/client/react";
 import { ClerkProvider } from "@clerk/clerk-expo";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   DarkTheme,
   DefaultTheme,
@@ -20,6 +21,7 @@ import { Redirect, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
 // Hold the native splash screen until auth check resolves.
@@ -80,6 +82,7 @@ function RootNavigator() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+        <Stack.Screen name="(bot-forge)" options={{ headerShown: false }} />
         <Stack.Screen
           name="modal"
           options={{ presentation: "modal", title: "Modal" }}
@@ -101,27 +104,27 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-    <ClerkProvider
-      publishableKey={CLERK_PUBLISHABLE_KEY}
-      tokenCache={tokenCache}
-    >
-      {/* ClerkTokenBridge calls `useAuth` from `@clerk/clerk-expo`, which requires being inside `ClerkProvider` */}
-      <ClerkTokenBridge />
-      <AuthProvider>
-        {/* BiometricAuthProvider must be inside AuthProvider — it calls useAuth()
+      <ClerkProvider
+        publishableKey={CLERK_PUBLISHABLE_KEY}
+        tokenCache={tokenCache}
+      >
+        {/* ClerkTokenBridge calls `useAuth` from `@clerk/clerk-expo`, which requires being inside `ClerkProvider` */}
+        <ClerkTokenBridge />
+        <AuthProvider>
+          {/* BiometricAuthProvider must be inside AuthProvider — it calls useAuth()
             to gate the AppState lock on isAuthenticated. A single provider instance
             ensures RootNavigator and settings components share the same state. */}
-        <BiometricAuthProvider>
-          <ApolloProvider client={apolloClient}>
-            <ThemeProvider
-              value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-            >
-              <RootNavigator />
-            </ThemeProvider>
-          </ApolloProvider>
-        </BiometricAuthProvider>
-      </AuthProvider>
-    </ClerkProvider>
+          <BiometricAuthProvider>
+            <ApolloProvider client={apolloClient}>
+              <ThemeProvider
+                value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+              >
+                <RootNavigator />
+              </ThemeProvider>
+            </ApolloProvider>
+          </BiometricAuthProvider>
+        </AuthProvider>
+      </ClerkProvider>
     </GestureHandlerRootView>
   );
 }

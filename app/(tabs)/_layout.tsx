@@ -2,12 +2,12 @@ import { useAuth } from "@/auth/AuthProvider";
 import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
+import { CompleteOnboardingDocument, MeDocument } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { ONBOARDING_SYNC_PENDING_KEY } from "@/hooks/use-onboarding-state";
-import { CompleteOnboardingDocument, MeDocument } from "@/generated/graphql";
 import { useMutation, useQuery } from "@apollo/client/react";
-import * as SecureStore from "expo-secure-store";
 import { Redirect, Tabs } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import React, { useEffect } from "react";
 
 export default function TabLayout() {
@@ -26,14 +26,18 @@ export default function TabLayout() {
     if (!meData?.me?.id) return;
 
     async function syncPendingOnboarding() {
-      const pending = await SecureStore.getItemAsync(ONBOARDING_SYNC_PENDING_KEY);
+      const pending = await SecureStore.getItemAsync(
+        ONBOARDING_SYNC_PENDING_KEY,
+      );
       if (pending !== "true") return;
 
       try {
         await completeOnboarding();
         await SecureStore.deleteItemAsync(ONBOARDING_SYNC_PENDING_KEY);
       } catch {
-        console.warn("[completeOnboarding] deferred sync failed, will retry on next launch");
+        console.warn(
+          "[completeOnboarding] deferred sync failed, will retry on next launch",
+        );
       }
     }
 
@@ -55,9 +59,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: "Bots",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+            <IconSymbol size={28} name="robot-outline" color={color} />
           ),
         }}
       />

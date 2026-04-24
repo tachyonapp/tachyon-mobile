@@ -23,6 +23,7 @@ type Documents = {
   "mutation PauseBot($id: ID!) {\n  pauseBot(id: $id) {\n    ... on Bot {\n      id\n      status\n    }\n    ... on NotFoundError {\n      message\n    }\n  }\n}": typeof types.PauseBotDocument;
   "mutation SkipProposal($id: ID!) {\n  skipProposal(id: $id) {\n    ... on Proposal {\n      id\n      status\n    }\n    ... on NotFoundError {\n      message\n    }\n    ... on AuthError {\n      message\n    }\n  }\n}": typeof types.SkipProposalDocument;
   "mutation UpdateBot($id: ID!, $input: UpdateBotInput!) {\n  updateBot(id: $id, input: $input) {\n    ... on Bot {\n      id\n      name\n      allocationPct\n      dailyMaxLoss\n      dailyMaxGain\n      updatedAt\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n    ... on NotFoundError {\n      message\n    }\n  }\n}": typeof types.UpdateBotDocument;
+  "mutation ValidateBrainKey($provider: String!, $apiKey: String!) {\n  validateBrainKey(provider: $provider, apiKey: $apiKey) {\n    valid\n    error\n  }\n}": typeof types.ValidateBrainKeyDocument;
   "query Account {\n  account {\n    id\n    status\n    providerName\n  }\n}": typeof types.AccountDocument;
   "query Balance {\n  balance {\n    totalValue\n    cashBalance\n    investedValue\n    dayPnl\n    dayPnlPercent\n  }\n}": typeof types.BalanceDocument;
   "query Bot($id: ID!) {\n  bot(id: $id) {\n    id\n    name\n    frame\n    status\n    allocationPct\n    dailyMaxLoss\n    dailyMaxGain\n    riskAttitude\n    tradeTempo\n    combatPatience\n    activePosition {\n      id\n      symbol\n      qty\n      avgEntryPrice\n      status\n      openedAt\n    }\n    proposals(status: PENDING) {\n      id\n      symbol\n      side\n      qty\n      limitPrice\n      rationaleText\n      status\n      expiresAt\n      createdAt\n    }\n    createdAt\n    updatedAt\n  }\n}": typeof types.BotDocument;
@@ -50,6 +51,8 @@ const documents: Documents = {
     types.SkipProposalDocument,
   "mutation UpdateBot($id: ID!, $input: UpdateBotInput!) {\n  updateBot(id: $id, input: $input) {\n    ... on Bot {\n      id\n      name\n      allocationPct\n      dailyMaxLoss\n      dailyMaxGain\n      updatedAt\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n    ... on NotFoundError {\n      message\n    }\n  }\n}":
     types.UpdateBotDocument,
+  "mutation ValidateBrainKey($provider: String!, $apiKey: String!) {\n  validateBrainKey(provider: $provider, apiKey: $apiKey) {\n    valid\n    error\n  }\n}":
+    types.ValidateBrainKeyDocument,
   "query Account {\n  account {\n    id\n    status\n    providerName\n  }\n}":
     types.AccountDocument,
   "query Balance {\n  balance {\n    totalValue\n    cashBalance\n    investedValue\n    dayPnl\n    dayPnlPercent\n  }\n}":
@@ -134,6 +137,12 @@ export function gql(
 export function gql(
   source: "mutation UpdateBot($id: ID!, $input: UpdateBotInput!) {\n  updateBot(id: $id, input: $input) {\n    ... on Bot {\n      id\n      name\n      allocationPct\n      dailyMaxLoss\n      dailyMaxGain\n      updatedAt\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n    ... on NotFoundError {\n      message\n    }\n  }\n}",
 ): (typeof documents)["mutation UpdateBot($id: ID!, $input: UpdateBotInput!) {\n  updateBot(id: $id, input: $input) {\n    ... on Bot {\n      id\n      name\n      allocationPct\n      dailyMaxLoss\n      dailyMaxGain\n      updatedAt\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n    ... on NotFoundError {\n      message\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(
+  source: "mutation ValidateBrainKey($provider: String!, $apiKey: String!) {\n  validateBrainKey(provider: $provider, apiKey: $apiKey) {\n    valid\n    error\n  }\n}",
+): (typeof documents)["mutation ValidateBrainKey($provider: String!, $apiKey: String!) {\n  validateBrainKey(provider: $provider, apiKey: $apiKey) {\n    valid\n    error\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -72,7 +72,6 @@ export default function OnboardingSlidesScreen() {
 
   const handleComplete = async () => {
     await markComplete();
-    // TODO: replace with router.replace("/(bot-creation)") once Feature 7 (Bot Creation Wizard) is implemented
     router.replace("/(tabs)");
   };
 

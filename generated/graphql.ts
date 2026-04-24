@@ -67,6 +67,7 @@ export type Bot = {
   __typename?: "Bot";
   activePosition?: Maybe<Position>;
   allocationPct?: Maybe<Scalars["Decimal"]["output"]>;
+  brain?: Maybe<BotBrainConfig>;
   combatPatience?: Maybe<CombatPatience>;
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
   dailyMaxGain?: Maybe<Scalars["Decimal"]["output"]>;
@@ -87,6 +88,14 @@ export type BotProposalsArgs = {
   status?: InputMaybe<ProposalStatus>;
 };
 
+export type BotBrainConfig = {
+  __typename?: "BotBrainConfig";
+  brainType?: Maybe<Scalars["String"]["output"]>;
+  keyPreview?: Maybe<Scalars["String"]["output"]>;
+  modelId?: Maybe<Scalars["String"]["output"]>;
+  provider?: Maybe<Scalars["String"]["output"]>;
+};
+
 export enum BotFrame {
   Berserker = "BERSERKER",
   Brawler = "BRAWLER",
@@ -103,6 +112,37 @@ export enum BotStatus {
   Archived = "ARCHIVED",
   Draft = "DRAFT",
   Paused = "PAUSED",
+}
+
+export type BrainCatalog = {
+  __typename?: "BrainCatalog";
+  byokProviders?: Maybe<Array<BrainProviderOption>>;
+  defaultBrain?: Maybe<DefaultBrainInfo>;
+};
+
+export type BrainConfigInput = {
+  apiKey?: InputMaybe<Scalars["String"]["input"]>;
+  brainType: BrainType;
+  modelId: Scalars["String"]["input"];
+  provider?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type BrainModelOption = {
+  __typename?: "BrainModelOption";
+  displayName?: Maybe<Scalars["String"]["output"]>;
+  modelId?: Maybe<Scalars["String"]["output"]>;
+};
+
+export type BrainProviderOption = {
+  __typename?: "BrainProviderOption";
+  displayName?: Maybe<Scalars["String"]["output"]>;
+  models?: Maybe<Array<BrainModelOption>>;
+  provider?: Maybe<Scalars["String"]["output"]>;
+};
+
+export enum BrainType {
+  Byok = "BYOK",
+  TachyonHosted = "TACHYON_HOSTED",
 }
 
 export enum BrokerConnStatus {
@@ -122,16 +162,57 @@ export type ConnectBrokerResult = Account | ValidationError;
 
 export type CreateBotInput = {
   allocationPct: Scalars["Decimal"]["input"];
+  avatarId: Scalars["ID"]["input"];
+  brain: BrainConfigInput;
+  colorway: Scalars["String"]["input"];
   combatPatience: CombatPatience;
-  dailyMaxGain: Scalars["Decimal"]["input"];
-  dailyMaxLoss: Scalars["Decimal"]["input"];
+  dailyMaxGain?: InputMaybe<Scalars["Decimal"]["input"]>;
+  dailyMaxLossPct: Scalars["Decimal"]["input"];
+  emotionalControls: EmotionalControlsInput;
+  exitPersonality: ExitPersonalityInput;
   frameName: BotFrame;
+  marketAwareness: MarketAwarenessInput;
   name: Scalars["String"]["input"];
   riskAttitude: RiskAttitude;
+  rulesOfEngagement: RulesOfEngagementInput;
+  sectors: Array<SectorFilter>;
+  stopLossStyle: StopLossStyleInput;
   tradeTempo: TradeTempo;
 };
 
 export type CreateBotResult = Bot | ValidationError;
+
+export type DefaultBrainInfo = {
+  __typename?: "DefaultBrainInfo";
+  brainType?: Maybe<Scalars["String"]["output"]>;
+  description?: Maybe<Scalars["String"]["output"]>;
+  displayName?: Maybe<Scalars["String"]["output"]>;
+  modelId?: Maybe<Scalars["String"]["output"]>;
+  provider?: Maybe<Scalars["String"]["output"]>;
+};
+
+export type EmotionalControlsInput = {
+  cooldownAfterVolatility: Scalars["Boolean"]["input"];
+  freezeAfterLosses?: InputMaybe<Scalars["Int"]["input"]>;
+  standDownAfterNoonIfLosing: Scalars["Boolean"]["input"];
+};
+
+export type ExitPersonalityInput = {
+  name: ExitPersonalityName;
+};
+
+export enum ExitPersonalityName {
+  Balanced = "BALANCED",
+  Patient = "PATIENT",
+  QuickFinisher = "QUICK_FINISHER",
+}
+
+export type MarketAwarenessInput = {
+  meanReversion: Scalars["Float"]["input"];
+  momentum: Scalars["Float"]["input"];
+  trendFollowing: Scalars["Float"]["input"];
+  volatility: Scalars["Float"]["input"];
+};
 
 export type Mutation = {
   __typename?: "Mutation";
@@ -145,6 +226,7 @@ export type Mutation = {
   pauseBot?: Maybe<BotResult>;
   skipProposal?: Maybe<SkipProposalResult>;
   updateBot?: Maybe<UpdateBotResult>;
+  validateBrainKey?: Maybe<ValidateBrainKeyResult>;
 };
 
 export type MutationActivateBotArgs = {
@@ -179,6 +261,11 @@ export type MutationSkipProposalArgs = {
 export type MutationUpdateBotArgs = {
   id: Scalars["ID"]["input"];
   input: UpdateBotInput;
+};
+
+export type MutationValidateBrainKeyArgs = {
+  apiKey: Scalars["String"]["input"];
+  provider: Scalars["String"]["input"];
 };
 
 export type NotFoundError = BaseError & {
@@ -249,6 +336,7 @@ export type Query = {
   balance?: Maybe<Balance>;
   bot?: Maybe<Bot>;
   bots?: Maybe<Array<Bot>>;
+  brainProviders?: Maybe<BrainCatalog>;
   me?: Maybe<User>;
   positions?: Maybe<Array<Position>>;
   proposals?: Maybe<Array<Proposal>>;
@@ -268,7 +356,33 @@ export enum RiskAttitude {
   Cautious = "CAUTIOUS",
 }
 
+export type RulesOfEngagementInput = {
+  noSameDayExitUnlessStopLoss: Scalars["Boolean"]["input"];
+  overnightHoldAllowed: Scalars["Boolean"]["input"];
+};
+
+export enum SectorFilter {
+  Any = "ANY",
+  Energy = "ENERGY",
+  EtfsOnly = "ETFS_ONLY",
+  Financials = "FINANCIALS",
+  Healthcare = "HEALTHCARE",
+  LiquidLargeCaps = "LIQUID_LARGE_CAPS",
+  MegaCapsOnly = "MEGA_CAPS_ONLY",
+  Tech = "TECH",
+}
+
 export type SkipProposalResult = AuthError | NotFoundError | Proposal;
+
+export type StopLossStyleInput = {
+  name: StopStyleName;
+};
+
+export enum StopStyleName {
+  Adaptive = "ADAPTIVE",
+  Flexible = "FLEXIBLE",
+  Hard = "HARD",
+}
 
 export type Subscription = {
   __typename?: "Subscription";
@@ -311,6 +425,12 @@ export type User = {
   id?: Maybe<Scalars["ID"]["output"]>;
   /** Whether the user has completed the FTUE onboarding flow. */
   onboardingCompleted: Scalars["Boolean"]["output"];
+};
+
+export type ValidateBrainKeyResult = {
+  __typename?: "ValidateBrainKeyResult";
+  error?: Maybe<Scalars["String"]["output"]>;
+  valid?: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type ValidationError = BaseError & {
@@ -474,6 +594,20 @@ export type UpdateBotMutation = {
         code?: string | null;
       }
     | null;
+};
+
+export type ValidateBrainKeyMutationVariables = Exact<{
+  provider: Scalars["String"]["input"];
+  apiKey: Scalars["String"]["input"];
+}>;
+
+export type ValidateBrainKeyMutation = {
+  __typename?: "Mutation";
+  validateBrainKey?: {
+    __typename?: "ValidateBrainKeyResult";
+    valid?: boolean | null;
+    error?: string | null;
+  } | null;
 };
 
 export type AccountQueryVariables = Exact<{ [key: string]: never }>;
@@ -1407,6 +1541,83 @@ export const UpdateBotDocument = {
     },
   ],
 } as unknown as DocumentNode<UpdateBotMutation, UpdateBotMutationVariables>;
+export const ValidateBrainKeyDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "ValidateBrainKey" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "provider" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "String" },
+            },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "apiKey" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "String" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "validateBrainKey" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "provider" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "provider" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "apiKey" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "apiKey" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "valid" } },
+                { kind: "Field", name: { kind: "Name", value: "error" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ValidateBrainKeyMutation,
+  ValidateBrainKeyMutationVariables
+>;
 export const AccountDocument = {
   kind: "Document",
   definitions: [
