@@ -1,3 +1,4 @@
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import { type WizardState } from "@/context/WizardContext";
@@ -6,8 +7,9 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { botttsNeutral } from "@dicebear/collection";
 import { createAvatar } from "@dicebear/core";
 import LottieView from "lottie-react-native";
-import React, { useMemo } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
+  Animated,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -21,6 +23,7 @@ import { ForgeStatChip } from "./ForgeStatChip";
 const POD_ANIMATION = require("@/assets/animations/pod.json");
 const LEFT_COL_WIDTH = 60;
 const AVATAR_SIZE = 60;
+const HEADER_HEIGHT = 48;
 
 interface ForgeStatPanelProps {
   state: WizardState;
@@ -49,6 +52,21 @@ export function ForgeStatPanel({
   const theme = Colors[useColorScheme()];
   const { width: screenWidth } = useWindowDimensions();
   const frameConfig = state.frameName ? FRAME_CONFIG[state.frameName] : null;
+
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const animatedHeight = useRef(new Animated.Value(height)).current;
+
+  function toggleCollapse() {
+    const toValue = isCollapsed ? height : HEADER_HEIGHT;
+    setIsCollapsed((prev) => !prev);
+    Animated.spring(animatedHeight, {
+      toValue,
+      useNativeDriver: false,
+      bounciness: 3,
+      speed: 16,
+    }).start();
+  }
+
   const avatarSvg = useMemo(
     () => createAvatar(botttsNeutral, { seed: name || "default" }).toString(),
     [name],
@@ -83,29 +101,55 @@ export function ForgeStatPanel({
       : null;
 
   return (
-    <View
+    <Animated.View
       style={[
         styles.panel,
         {
-          height,
+          height: animatedHeight,
           backgroundColor: theme.background,
           borderBottomColor: theme.inputBorder,
         },
       ]}
     >
-      {/* Close button sits outside scroll so it stays fixed */}
-      <Pressable
-        style={styles.closeBtn}
-        onPress={onClose}
-        hitSlop={12}
-        accessibilityRole="button"
-        accessibilityLabel="Close bot builder"
-      >
-        <Text style={[styles.closeBtnText, { color: theme.textSecondary }]}>
-          ✕
-        </Text>
-      </Pressable>
+      {/* ── Compact header — always visible ── */}
+      <View style={[styles.header, { borderBottomColor: theme.inputBorder }]}>
+        <Pressable
+          onPress={onClose}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel="Close bot builder"
+          style={styles.headerBtn}
+        >
+          <Text style={[styles.closeBtnText, { color: theme.textSecondary }]}>
+            ✕
+          </Text>
+        </Pressable>
 
+        <Text
+          style={[styles.headerTitle, { color: theme.textSecondary }]}
+          numberOfLines={1}
+        >
+          {name.trim() || "Bot Forge"}
+        </Text>
+
+        <Pressable
+          onPress={toggleCollapse}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel={
+            isCollapsed ? "Expand stats panel" : "Collapse stats panel"
+          }
+          style={styles.headerBtn}
+        >
+          <IconSymbol
+            name={isCollapsed ? "chevron.down" : "chevron.up"}
+            size={16}
+            color={theme.textSecondary}
+          />
+        </Pressable>
+      </View>
+
+      {/* ── Scrollable content — clipped when collapsed via overflow: hidden ── */}
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -197,25 +241,34 @@ export function ForgeStatPanel({
           </View>
         </View>
       </ScrollView>
-    </View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   panel: {
     borderBottomWidth: 5,
-    paddingHorizontal: 16,
-    paddingTop: 12,
+    overflow: "hidden",
   },
-  closeBtn: {
-    position: "absolute",
-    top: 12,
-    left: 16,
-    width: 28,
-    height: 28,
+  header: {
+    height: HEADER_HEIGHT,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  headerBtn: {
+    width: 32,
+    height: 32,
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 10,
+  },
+  headerTitle: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: 13,
+    fontWeight: "600",
+    letterSpacing: 0.3,
   },
   closeBtnText: {
     fontSize: 16,
@@ -231,6 +284,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     gap: 12,
+    padding: 16,
     paddingBottom: 12,
   },
   topArea: {

@@ -21,6 +21,8 @@ const MATERIAL_MAPPING = {
   "chevron.left.forwardslash.chevron.right": "code",
   "chevron.right": "chevron-right",
   "chevron.left": "chevron-left",
+  "chevron.up": "expand-less",
+  "chevron.down": "expand-more",
   "info.circle": "info-outline",
   "gearshape.fill": "settings",
   xmark: "close",
