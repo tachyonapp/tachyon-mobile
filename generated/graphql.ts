@@ -551,6 +551,18 @@ export type ApproveProposalMutation = {
     | null;
 };
 
+export type CancelSubscriptionMutationVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type CancelSubscriptionMutation = {
+  __typename?: "Mutation";
+  cancelSubscription?: {
+    __typename?: "CancelSubscriptionResult";
+    success?: boolean | null;
+  } | null;
+};
+
 export type CompleteOnboardingMutationVariables = Exact<{
   [key: string]: never;
 }>;
@@ -632,6 +644,21 @@ export type PauseBotMutation = {
     | null;
 };
 
+export type SelectTierMutationVariables = Exact<{
+  tier: SubscriptionTier;
+  stripePaymentMethodId?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type SelectTierMutation = {
+  __typename?: "Mutation";
+  selectTier?: {
+    __typename?: "SelectTierResult";
+    subscriptionTier?: SubscriptionTier | null;
+    subscriptionStatus?: SubscriptionStatus | null;
+    trialExpiresAt?: any | null;
+  } | null;
+};
+
 export type SkipProposalMutationVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -647,6 +674,23 @@ export type SkipProposalMutation = {
         status?: ProposalStatus | null;
       }
     | null;
+};
+
+export type UpdateBotIdentityMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: UpdateBotIdentityInput;
+}>;
+
+export type UpdateBotIdentityMutation = {
+  __typename?: "Mutation";
+  updateBotIdentity?: {
+    __typename?: "UpdateBotIdentityResult";
+    bot?: {
+      __typename?: "Bot";
+      id?: string | null;
+      name?: string | null;
+    } | null;
+  } | null;
 };
 
 export type ValidateBrainKeyMutationVariables = Exact<{
@@ -733,6 +777,38 @@ export type BotQuery = {
   } | null;
 };
 
+export type BotPerformanceQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type BotPerformanceQuery = {
+  __typename?: "Query";
+  botPerformance?: {
+    __typename?: "BotPerformanceResult";
+    totalRealizedPnl?: any | null;
+    returnOnAllocatedCapitalPct?: any | null;
+    winCount?: number | null;
+    lossCount?: number | null;
+    winRatePct?: any | null;
+    avgGainPerWin?: any | null;
+    avgLossPerLoss?: any | null;
+    profitFactor?: any | null;
+    largestSingleWin?: any | null;
+    largestSingleLoss?: any | null;
+    avgHoldDurationHours?: any | null;
+    daysActive?: number | null;
+    totalProposalsGenerated?: number | null;
+    totalProposalsApproved?: number | null;
+    approvalRatePct?: any | null;
+    skipRatePct?: any | null;
+    pnlTimeSeries?: Array<{
+      __typename?: "PnlDataPoint";
+      date?: any | null;
+      cumulativePnl?: any | null;
+    }> | null;
+  } | null;
+};
+
 export type BotsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type BotsQuery = {
@@ -765,6 +841,20 @@ export type MeQuery = {
     auth0Id?: string | null;
     createdAt?: any | null;
     onboardingCompleted: boolean;
+  } | null;
+};
+
+export type MeSubscriptionQueryVariables = Exact<{ [key: string]: never }>;
+
+export type MeSubscriptionQuery = {
+  __typename?: "Query";
+  me?: {
+    __typename?: "User";
+    id?: string | null;
+    subscriptionTier?: SubscriptionTier | null;
+    subscriptionStatus?: SubscriptionStatus | null;
+    trialExpiresAt?: any | null;
+    currentPeriodEnd?: any | null;
   } | null;
 };
 
@@ -986,6 +1076,34 @@ export const ApproveProposalDocument = {
 } as unknown as DocumentNode<
   ApproveProposalMutation,
   ApproveProposalMutationVariables
+>;
+export const CancelSubscriptionDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "CancelSubscription" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "cancelSubscription" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "success" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CancelSubscriptionMutation,
+  CancelSubscriptionMutationVariables
 >;
 export const CompleteOnboardingDocument = {
   kind: "Document",
@@ -1336,6 +1454,81 @@ export const PauseBotDocument = {
     },
   ],
 } as unknown as DocumentNode<PauseBotMutation, PauseBotMutationVariables>;
+export const SelectTierDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "SelectTier" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "tier" } },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "SubscriptionTier" },
+            },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "stripePaymentMethodId" },
+          },
+          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "selectTier" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "tier" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "tier" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "stripePaymentMethodId" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "stripePaymentMethodId" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "subscriptionTier" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "subscriptionStatus" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "trialExpiresAt" },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SelectTierMutation, SelectTierMutationVariables>;
 export const SkipProposalDocument = {
   kind: "Document",
   definitions: [
@@ -1431,6 +1624,86 @@ export const SkipProposalDocument = {
 } as unknown as DocumentNode<
   SkipProposalMutation,
   SkipProposalMutationVariables
+>;
+export const UpdateBotIdentityDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "UpdateBotIdentity" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "UpdateBotIdentityInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "updateBotIdentity" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "id" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "bot" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateBotIdentityMutation,
+  UpdateBotIdentityMutationVariables
 >;
 export const ValidateBrainKeyDocument = {
   kind: "Document",
@@ -1715,6 +1988,113 @@ export const BotDocument = {
     },
   ],
 } as unknown as DocumentNode<BotQuery, BotQueryVariables>;
+export const BotPerformanceDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "BotPerformance" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "botPerformance" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "id" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "totalRealizedPnl" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "returnOnAllocatedCapitalPct" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "winCount" } },
+                { kind: "Field", name: { kind: "Name", value: "lossCount" } },
+                { kind: "Field", name: { kind: "Name", value: "winRatePct" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "avgGainPerWin" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "avgLossPerLoss" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "profitFactor" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "largestSingleWin" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "largestSingleLoss" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "avgHoldDurationHours" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "daysActive" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "totalProposalsGenerated" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "totalProposalsApproved" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "approvalRatePct" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "skipRatePct" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pnlTimeSeries" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "date" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "cumulativePnl" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<BotPerformanceQuery, BotPerformanceQueryVariables>;
 export const BotsDocument = {
   kind: "Document",
   definitions: [
@@ -1798,6 +2178,47 @@ export const MeDocument = {
     },
   ],
 } as unknown as DocumentNode<MeQuery, MeQueryVariables>;
+export const MeSubscriptionDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "MeSubscription" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "me" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "subscriptionTier" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "subscriptionStatus" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "trialExpiresAt" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "currentPeriodEnd" },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<MeSubscriptionQuery, MeSubscriptionQueryVariables>;
 export const PositionsDocument = {
   kind: "Document",
   definitions: [

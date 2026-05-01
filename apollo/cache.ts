@@ -2,8 +2,21 @@ import { InMemoryCache } from '@apollo/client';
 
 export const cache = new InMemoryCache({
   typePolicies: {
-    User: { keyFields: ['id'] },
-    Bot: { keyFields: ['id'] },
+    User: {
+      keyFields: ['id'],
+      fields: {
+        subscriptionTier: { merge: false },
+        subscriptionStatus: { merge: false },
+      },
+    },
+    Bot: {
+      keyFields: ['id'],
+      fields: {
+        status: { merge: false },
+        scanCapUsed: { merge: false },
+        scanCapRemaining: { merge: false },
+      },
+    },
     Proposal: { keyFields: ['id'] },
     Position: { keyFields: ['id'] },
     Account: { keyFields: ['id'] },
