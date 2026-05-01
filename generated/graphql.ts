@@ -1938,13 +1938,6 @@ export const BotDocument = {
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "proposals" },
-                  arguments: [
-                    {
-                      kind: "Argument",
-                      name: { kind: "Name", value: "status" },
-                      value: { kind: "EnumValue", value: "PENDING" },
-                    },
-                  ],
                   selectionSet: {
                     kind: "SelectionSet",
                     selections: [

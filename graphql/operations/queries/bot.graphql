@@ -19,7 +19,7 @@ query Bot($id: ID!) {
       status
       openedAt
     }
-    proposals(status: PENDING) {
+    proposals {
       id
       symbol
       side
