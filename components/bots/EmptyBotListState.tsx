@@ -1,4 +1,6 @@
+import { Colors } from "@/constants/theme";
 import { SubscriptionStatus, SubscriptionTier } from "@/generated/graphql";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -12,9 +14,7 @@ function ctaLabel(
   tier: SubscriptionTier | null | undefined,
   status: SubscriptionStatus | null | undefined,
 ): string {
-  if (tier == null) {
-    return "Get Started";
-  }
+  if (tier == null) return "Get Started";
   if (
     status === SubscriptionStatus.Suspended ||
     status === SubscriptionStatus.Cancelled
@@ -29,17 +29,25 @@ export function EmptyBotListState({
   subscriptionStatus,
   onCreateBot,
 }: Props) {
+  const theme = Colors[useColorScheme()];
+
   return (
     <View style={styles.container}>
-      <Text style={styles.headline}>No bots yet</Text>
-      <Text style={styles.subtext}>
+      <Text style={[styles.headline, { color: theme.textPrimary }]}>
+        No bots yet
+      </Text>
+      <Text style={[styles.subtext, { color: theme.textSecondary }]}>
         Build your first bot to start receiving trade proposals.
       </Text>
       <Pressable
-        style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
+        style={({ pressed }) => [
+          styles.cta,
+          { backgroundColor: theme.electricBlue },
+          pressed && styles.ctaPressed,
+        ]}
         onPress={onCreateBot}
       >
-        <Text style={styles.ctaText}>
+        <Text style={[styles.ctaText, { color: theme.textPrimary }]}>
           {ctaLabel(subscriptionTier, subscriptionStatus)}
         </Text>
       </Pressable>
@@ -58,17 +66,14 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#FFFFFF",
   },
   subtext: {
     fontSize: 14,
-    color: "#A0A7B8",
     textAlign: "center",
     lineHeight: 20,
   },
   cta: {
     marginTop: 8,
-    backgroundColor: "#2C6BED",
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 24,
@@ -77,7 +82,6 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   ctaText: {
-    color: "#FFFFFF",
     fontSize: 15,
     fontWeight: "600",
   },

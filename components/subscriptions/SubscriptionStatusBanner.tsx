@@ -1,5 +1,6 @@
 import { Colors } from "@/constants/theme";
 import { SubscriptionStatus } from "@/generated/graphql";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -8,20 +9,17 @@ interface Props {
 }
 
 export function SubscriptionStatusBanner({ status }: Props) {
+  const theme = Colors[useColorScheme()];
   const isSuspended = status === SubscriptionStatus.Suspended;
 
   return (
     <View
       style={[
         styles.banner,
-        {
-          backgroundColor: isSuspended
-            ? Colors.dark.warning
-            : Colors.dark.danger,
-        },
+        { backgroundColor: isSuspended ? theme.warning : theme.danger },
       ]}
     >
-      <Text style={styles.bannerText}>
+      <Text style={[styles.bannerText, { color: theme.textPrimary }]}>
         {isSuspended
           ? "Your subscription is suspended. Reactivate to resume trading."
           : "Your subscription has been cancelled."}
@@ -38,7 +36,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   bannerText: {
-    color: "#FFFFFF",
     fontSize: 14,
     fontWeight: "600",
   },

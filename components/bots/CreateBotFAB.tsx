@@ -1,3 +1,5 @@
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import React from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 
@@ -6,12 +8,18 @@ interface Props {
 }
 
 export function CreateBotFAB({ onPress }: Props) {
+  const theme = Colors[useColorScheme()];
+
   return (
     <Pressable
-      style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}
+      style={({ pressed }) => [
+        styles.fab,
+        { backgroundColor: theme.electricBlue },
+        pressed && styles.fabPressed,
+      ]}
       onPress={onPress}
     >
-      <Text style={styles.icon}>+</Text>
+      <Text style={[styles.icon, { color: theme.textPrimary }]}>+</Text>
     </Pressable>
   );
 }
@@ -24,7 +32,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#2C6BED",
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000000",
@@ -37,7 +44,6 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   icon: {
-    color: "#FFFFFF",
     fontSize: 28,
     lineHeight: 32,
   },
