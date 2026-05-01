@@ -751,6 +751,8 @@ export type BotQuery = {
     riskAttitude?: RiskAttitude | null;
     tradeTempo?: TradeTempo | null;
     combatPatience?: CombatPatience | null;
+    scanCapUsed?: number | null;
+    scanCapRemaining?: number | null;
     createdAt?: any | null;
     updatedAt?: any | null;
     activePosition?: {
@@ -779,6 +781,7 @@ export type BotQuery = {
       brainType?: string | null;
       modelId?: string | null;
       provider?: string | null;
+      keyPreview?: string | null;
     } | null;
   } | null;
 };
@@ -1977,6 +1980,11 @@ export const BotDocument = {
                     ],
                   },
                 },
+                { kind: "Field", name: { kind: "Name", value: "scanCapUsed" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "scanCapRemaining" },
+                },
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "botBrainConfig" },
@@ -1994,6 +2002,10 @@ export const BotDocument = {
                       {
                         kind: "Field",
                         name: { kind: "Name", value: "provider" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "keyPreview" },
                       },
                     ],
                   },
