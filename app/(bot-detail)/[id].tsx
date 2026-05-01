@@ -1,6 +1,7 @@
 import { ActionBar } from "@/components/bots/ActionBar";
 import { BotDetailHero } from "@/components/bots/BotDetailHero";
 import { BotDetailTabs, type TabName } from "@/components/bots/BotDetailTabs";
+import { DeleteConfirmationDialog } from "@/components/bots/DeleteConfirmationDialog";
 import { EditIdentitySheet } from "@/components/bots/EditIdentitySheet";
 import { BrainTab } from "@/components/bots/tabs/BrainTab";
 import { ConfigurationTab } from "@/components/bots/tabs/ConfigurationTab";
@@ -19,6 +20,7 @@ export default function BotDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<TabName>("Overview");
   const [editSheetVisible, setEditSheetVisible] = useState(false);
+  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
 
   const { data, loading } = useQuery(BotDocument, {
     variables: { id },
@@ -51,13 +53,18 @@ export default function BotDetailScreen() {
         bot={bot}
         onActivate={() => router.push(`/(bot-detail)/${id}/activate` as any)}
         onPause={() => router.push(`/(bot-detail)/${id}/pause` as any)}
-        onDelete={() => router.push(`/(bot-detail)/${id}/delete` as any)}
+        onDelete={() => setDeleteDialogVisible(true)}
         onEditIdentity={() => setEditSheetVisible(true)}
       />
       <EditIdentitySheet
         bot={bot}
         visible={editSheetVisible}
         onDismiss={() => setEditSheetVisible(false)}
+      />
+      <DeleteConfirmationDialog
+        bot={bot}
+        visible={deleteDialogVisible}
+        onDismiss={() => setDeleteDialogVisible(false)}
       />
     </View>
   );
