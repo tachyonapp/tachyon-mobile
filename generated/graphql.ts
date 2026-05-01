@@ -774,6 +774,12 @@ export type BotQuery = {
       expiresAt?: any | null;
       createdAt?: any | null;
     }> | null;
+    botBrainConfig?: {
+      __typename?: "BotBrainConfig";
+      brainType?: string | null;
+      modelId?: string | null;
+      provider?: string | null;
+    } | null;
   } | null;
 };
 
@@ -1967,6 +1973,27 @@ export const BotDocument = {
                       {
                         kind: "Field",
                         name: { kind: "Name", value: "createdAt" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "botBrainConfig" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "brainType" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "modelId" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "provider" },
                       },
                     ],
                   },
