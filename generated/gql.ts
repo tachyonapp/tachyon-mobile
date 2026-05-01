@@ -19,10 +19,9 @@ type Documents = {
   "mutation CompleteOnboarding {\n  completeOnboarding\n}": typeof types.CompleteOnboardingDocument;
   "mutation ConnectBroker($brokerName: String!, $credentials: String!) {\n  connectBroker(brokerName: $brokerName, credentials: $credentials) {\n    ... on Account {\n      id\n      status\n      providerName\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n  }\n}": typeof types.ConnectBrokerDocument;
   "mutation CreateBot($input: CreateBotInput!) {\n  createBot(input: $input) {\n    ... on Bot {\n      id\n      name\n      frame\n      status\n      allocationPct\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n  }\n}": typeof types.CreateBotDocument;
-  "mutation DeleteBot($id: ID!) {\n  deleteBot(id: $id) {\n    ... on Bot {\n      id\n      status\n    }\n    ... on NotFoundError {\n      message\n    }\n  }\n}": typeof types.DeleteBotDocument;
+  "mutation DeleteBot($id: ID!) {\n  deleteBot(id: $id) {\n    success\n  }\n}": typeof types.DeleteBotDocument;
   "mutation PauseBot($id: ID!) {\n  pauseBot(id: $id) {\n    ... on Bot {\n      id\n      status\n    }\n    ... on NotFoundError {\n      message\n    }\n  }\n}": typeof types.PauseBotDocument;
   "mutation SkipProposal($id: ID!) {\n  skipProposal(id: $id) {\n    ... on Proposal {\n      id\n      status\n    }\n    ... on NotFoundError {\n      message\n    }\n    ... on AuthError {\n      message\n    }\n  }\n}": typeof types.SkipProposalDocument;
-  "mutation UpdateBot($id: ID!, $input: UpdateBotInput!) {\n  updateBot(id: $id, input: $input) {\n    ... on Bot {\n      id\n      name\n      allocationPct\n      dailyMaxLoss\n      dailyMaxGain\n      updatedAt\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n    ... on NotFoundError {\n      message\n    }\n  }\n}": typeof types.UpdateBotDocument;
   "mutation ValidateBrainKey($provider: String!, $apiKey: String!) {\n  validateBrainKey(provider: $provider, apiKey: $apiKey) {\n    valid\n    error\n  }\n}": typeof types.ValidateBrainKeyDocument;
   "query Account {\n  account {\n    id\n    status\n    providerName\n  }\n}": typeof types.AccountDocument;
   "query Balance {\n  balance {\n    totalValue\n    cashBalance\n    investedValue\n    dayPnl\n    dayPnlPercent\n  }\n}": typeof types.BalanceDocument;
@@ -43,14 +42,12 @@ const documents: Documents = {
     types.ConnectBrokerDocument,
   "mutation CreateBot($input: CreateBotInput!) {\n  createBot(input: $input) {\n    ... on Bot {\n      id\n      name\n      frame\n      status\n      allocationPct\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n  }\n}":
     types.CreateBotDocument,
-  "mutation DeleteBot($id: ID!) {\n  deleteBot(id: $id) {\n    ... on Bot {\n      id\n      status\n    }\n    ... on NotFoundError {\n      message\n    }\n  }\n}":
+  "mutation DeleteBot($id: ID!) {\n  deleteBot(id: $id) {\n    success\n  }\n}":
     types.DeleteBotDocument,
   "mutation PauseBot($id: ID!) {\n  pauseBot(id: $id) {\n    ... on Bot {\n      id\n      status\n    }\n    ... on NotFoundError {\n      message\n    }\n  }\n}":
     types.PauseBotDocument,
   "mutation SkipProposal($id: ID!) {\n  skipProposal(id: $id) {\n    ... on Proposal {\n      id\n      status\n    }\n    ... on NotFoundError {\n      message\n    }\n    ... on AuthError {\n      message\n    }\n  }\n}":
     types.SkipProposalDocument,
-  "mutation UpdateBot($id: ID!, $input: UpdateBotInput!) {\n  updateBot(id: $id, input: $input) {\n    ... on Bot {\n      id\n      name\n      allocationPct\n      dailyMaxLoss\n      dailyMaxGain\n      updatedAt\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n    ... on NotFoundError {\n      message\n    }\n  }\n}":
-    types.UpdateBotDocument,
   "mutation ValidateBrainKey($provider: String!, $apiKey: String!) {\n  validateBrainKey(provider: $provider, apiKey: $apiKey) {\n    valid\n    error\n  }\n}":
     types.ValidateBrainKeyDocument,
   "query Account {\n  account {\n    id\n    status\n    providerName\n  }\n}":
@@ -117,8 +114,8 @@ export function gql(
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(
-  source: "mutation DeleteBot($id: ID!) {\n  deleteBot(id: $id) {\n    ... on Bot {\n      id\n      status\n    }\n    ... on NotFoundError {\n      message\n    }\n  }\n}",
-): (typeof documents)["mutation DeleteBot($id: ID!) {\n  deleteBot(id: $id) {\n    ... on Bot {\n      id\n      status\n    }\n    ... on NotFoundError {\n      message\n    }\n  }\n}"];
+  source: "mutation DeleteBot($id: ID!) {\n  deleteBot(id: $id) {\n    success\n  }\n}",
+): (typeof documents)["mutation DeleteBot($id: ID!) {\n  deleteBot(id: $id) {\n    success\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -131,12 +128,6 @@ export function gql(
 export function gql(
   source: "mutation SkipProposal($id: ID!) {\n  skipProposal(id: $id) {\n    ... on Proposal {\n      id\n      status\n    }\n    ... on NotFoundError {\n      message\n    }\n    ... on AuthError {\n      message\n    }\n  }\n}",
 ): (typeof documents)["mutation SkipProposal($id: ID!) {\n  skipProposal(id: $id) {\n    ... on Proposal {\n      id\n      status\n    }\n    ... on NotFoundError {\n      message\n    }\n    ... on AuthError {\n      message\n    }\n  }\n}"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(
-  source: "mutation UpdateBot($id: ID!, $input: UpdateBotInput!) {\n  updateBot(id: $id, input: $input) {\n    ... on Bot {\n      id\n      name\n      allocationPct\n      dailyMaxLoss\n      dailyMaxGain\n      updatedAt\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n    ... on NotFoundError {\n      message\n    }\n  }\n}",
-): (typeof documents)["mutation UpdateBot($id: ID!, $input: UpdateBotInput!) {\n  updateBot(id: $id, input: $input) {\n    ... on Bot {\n      id\n      name\n      allocationPct\n      dailyMaxLoss\n      dailyMaxGain\n      updatedAt\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n    ... on NotFoundError {\n      message\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

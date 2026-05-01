@@ -67,6 +67,7 @@ export type Bot = {
   __typename?: "Bot";
   activePosition?: Maybe<Position>;
   allocationPct?: Maybe<Scalars["Decimal"]["output"]>;
+  botBrainConfig?: Maybe<BotBrainConfig>;
   brain?: Maybe<BotBrainConfig>;
   combatPatience?: Maybe<CombatPatience>;
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
@@ -78,6 +79,8 @@ export type Bot = {
   owner?: Maybe<User>;
   proposals?: Maybe<Array<Proposal>>;
   riskAttitude?: Maybe<RiskAttitude>;
+  scanCapRemaining?: Maybe<Scalars["Int"]["output"]>;
+  scanCapUsed?: Maybe<Scalars["Int"]["output"]>;
   status?: Maybe<BotStatus>;
   tradeTempo?: Maybe<TradeTempo>;
   updatedAt?: Maybe<Scalars["DateTime"]["output"]>;
@@ -105,6 +108,27 @@ export enum BotFrame {
   Sniper = "SNIPER",
 }
 
+export type BotPerformanceResult = {
+  __typename?: "BotPerformanceResult";
+  approvalRatePct?: Maybe<Scalars["Decimal"]["output"]>;
+  avgGainPerWin?: Maybe<Scalars["Decimal"]["output"]>;
+  avgHoldDurationHours?: Maybe<Scalars["Decimal"]["output"]>;
+  avgLossPerLoss?: Maybe<Scalars["Decimal"]["output"]>;
+  daysActive?: Maybe<Scalars["Int"]["output"]>;
+  largestSingleLoss?: Maybe<Scalars["Decimal"]["output"]>;
+  largestSingleWin?: Maybe<Scalars["Decimal"]["output"]>;
+  lossCount?: Maybe<Scalars["Int"]["output"]>;
+  pnlTimeSeries?: Maybe<Array<PnlDataPoint>>;
+  profitFactor?: Maybe<Scalars["Decimal"]["output"]>;
+  returnOnAllocatedCapitalPct?: Maybe<Scalars["Decimal"]["output"]>;
+  skipRatePct?: Maybe<Scalars["Decimal"]["output"]>;
+  totalProposalsApproved?: Maybe<Scalars["Int"]["output"]>;
+  totalProposalsGenerated?: Maybe<Scalars["Int"]["output"]>;
+  totalRealizedPnl?: Maybe<Scalars["Decimal"]["output"]>;
+  winCount?: Maybe<Scalars["Int"]["output"]>;
+  winRatePct?: Maybe<Scalars["Decimal"]["output"]>;
+};
+
 export type BotResult = Bot | NotFoundError | ValidationError;
 
 export enum BotStatus {
@@ -112,7 +136,13 @@ export enum BotStatus {
   Archived = "ARCHIVED",
   Draft = "DRAFT",
   Paused = "PAUSED",
+  StoodDown = "STOOD_DOWN",
 }
+
+export type BotStoodDownError = BaseError & {
+  __typename?: "BotStoodDownError";
+  message?: Maybe<Scalars["String"]["output"]>;
+};
 
 export type BrainCatalog = {
   __typename?: "BrainCatalog";
@@ -150,6 +180,11 @@ export enum BrokerConnStatus {
   Error = "ERROR",
   Revoked = "REVOKED",
 }
+
+export type CancelSubscriptionResult = {
+  __typename?: "CancelSubscriptionResult";
+  success?: Maybe<Scalars["Boolean"]["output"]>;
+};
 
 export enum CombatPatience {
   Calculated = "CALCULATED",
@@ -191,6 +226,11 @@ export type DefaultBrainInfo = {
   provider?: Maybe<Scalars["String"]["output"]>;
 };
 
+export type DeleteBotResult = {
+  __typename?: "DeleteBotResult";
+  success?: Maybe<Scalars["Boolean"]["output"]>;
+};
+
 export type EmotionalControlsInput = {
   cooldownAfterVolatility: Scalars["Boolean"]["input"];
   freezeAfterLosses?: InputMaybe<Scalars["Int"]["input"]>;
@@ -218,14 +258,16 @@ export type Mutation = {
   __typename?: "Mutation";
   activateBot?: Maybe<BotResult>;
   approveProposal?: Maybe<ApproveProposalResult>;
+  cancelSubscription?: Maybe<CancelSubscriptionResult>;
   /** Mark the authenticated user's FTUE as complete. Idempotent. */
   completeOnboarding?: Maybe<Scalars["Boolean"]["output"]>;
   connectBroker?: Maybe<ConnectBrokerResult>;
   createBot?: Maybe<CreateBotResult>;
-  deleteBot?: Maybe<BotResult>;
+  deleteBot?: Maybe<DeleteBotResult>;
   pauseBot?: Maybe<BotResult>;
+  selectTier?: Maybe<SelectTierResult>;
   skipProposal?: Maybe<SkipProposalResult>;
-  updateBot?: Maybe<UpdateBotResult>;
+  updateBotIdentity?: Maybe<UpdateBotIdentityResult>;
   validateBrainKey?: Maybe<ValidateBrainKeyResult>;
 };
 
@@ -254,13 +296,18 @@ export type MutationPauseBotArgs = {
   id: Scalars["ID"]["input"];
 };
 
+export type MutationSelectTierArgs = {
+  stripePaymentMethodId?: InputMaybe<Scalars["String"]["input"]>;
+  tier: SubscriptionTier;
+};
+
 export type MutationSkipProposalArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type MutationUpdateBotArgs = {
+export type MutationUpdateBotIdentityArgs = {
   id: Scalars["ID"]["input"];
-  input: UpdateBotInput;
+  input: UpdateBotIdentityInput;
 };
 
 export type MutationValidateBrainKeyArgs = {
@@ -277,6 +324,12 @@ export enum OrderEntryType {
   Limit = "LIMIT",
   Market = "MARKET",
 }
+
+export type PnlDataPoint = {
+  __typename?: "PnlDataPoint";
+  cumulativePnl?: Maybe<Scalars["Decimal"]["output"]>;
+  date?: Maybe<Scalars["DateTime"]["output"]>;
+};
 
 /** An open or closed trading position held by a bot */
 export type Position = {
@@ -335,6 +388,7 @@ export type Query = {
   account?: Maybe<Account>;
   balance?: Maybe<Balance>;
   bot?: Maybe<Bot>;
+  botPerformance?: Maybe<BotPerformanceResult>;
   bots?: Maybe<Array<Bot>>;
   brainProviders?: Maybe<BrainCatalog>;
   me?: Maybe<User>;
@@ -343,6 +397,10 @@ export type Query = {
 };
 
 export type QueryBotArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryBotPerformanceArgs = {
   id: Scalars["ID"]["input"];
 };
 
@@ -372,6 +430,13 @@ export enum SectorFilter {
   Tech = "TECH",
 }
 
+export type SelectTierResult = {
+  __typename?: "SelectTierResult";
+  subscriptionStatus?: Maybe<SubscriptionStatus>;
+  subscriptionTier?: Maybe<SubscriptionTier>;
+  trialExpiresAt?: Maybe<Scalars["DateTime"]["output"]>;
+};
+
 export type SkipProposalResult = AuthError | NotFoundError | Proposal;
 
 export type StopLossStyleInput = {
@@ -398,33 +463,49 @@ export type SubscriptionProposalCreatedArgs = {
   botId: Scalars["ID"]["input"];
 };
 
+export enum SubscriptionStatus {
+  Active = "active",
+  Cancelled = "cancelled",
+  PastDue = "past_due",
+  Suspended = "suspended",
+  Trialing = "trialing",
+}
+
+export enum SubscriptionTier {
+  Byok = "BYOK",
+  FreeTrial = "FREE_TRIAL",
+  TachyonHosted = "TACHYON_HOSTED",
+}
+
 export enum TradeTempo {
   Active = "ACTIVE",
   Opportunistic = "OPPORTUNISTIC",
   Relentless = "RELENTLESS",
 }
 
-export type UpdateBotInput = {
-  allocationPct?: InputMaybe<Scalars["Decimal"]["input"]>;
-  combatPatience?: InputMaybe<CombatPatience>;
-  dailyMaxGain?: InputMaybe<Scalars["Decimal"]["input"]>;
-  dailyMaxLoss?: InputMaybe<Scalars["Decimal"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  riskAttitude?: InputMaybe<RiskAttitude>;
-  tradeTempo?: InputMaybe<TradeTempo>;
+export type UpdateBotIdentityInput = {
+  avatarId: Scalars["ID"]["input"];
+  name: Scalars["String"]["input"];
 };
 
-export type UpdateBotResult = Bot | NotFoundError | ValidationError;
+export type UpdateBotIdentityResult = {
+  __typename?: "UpdateBotIdentityResult";
+  bot?: Maybe<Bot>;
+};
 
 /** An authenticated Tachyon user */
 export type User = {
   __typename?: "User";
   auth0Id?: Maybe<Scalars["String"]["output"]>;
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
+  currentPeriodEnd?: Maybe<Scalars["DateTime"]["output"]>;
   email?: Maybe<Scalars["String"]["output"]>;
   id?: Maybe<Scalars["ID"]["output"]>;
   /** Whether the user has completed the FTUE onboarding flow. */
   onboardingCompleted: Scalars["Boolean"]["output"];
+  subscriptionStatus?: Maybe<SubscriptionStatus>;
+  subscriptionTier?: Maybe<SubscriptionTier>;
+  trialExpiresAt?: Maybe<Scalars["DateTime"]["output"]>;
 };
 
 export type ValidateBrainKeyResult = {
@@ -532,11 +613,10 @@ export type DeleteBotMutationVariables = Exact<{
 
 export type DeleteBotMutation = {
   __typename?: "Mutation";
-  deleteBot?:
-    | { __typename?: "Bot"; id?: string | null; status?: BotStatus | null }
-    | { __typename?: "NotFoundError"; message?: string | null }
-    | { __typename?: "ValidationError" }
-    | null;
+  deleteBot?: {
+    __typename?: "DeleteBotResult";
+    success?: boolean | null;
+  } | null;
 };
 
 export type PauseBotMutationVariables = Exact<{
@@ -565,33 +645,6 @@ export type SkipProposalMutation = {
         __typename?: "Proposal";
         id?: string | null;
         status?: ProposalStatus | null;
-      }
-    | null;
-};
-
-export type UpdateBotMutationVariables = Exact<{
-  id: Scalars["ID"]["input"];
-  input: UpdateBotInput;
-}>;
-
-export type UpdateBotMutation = {
-  __typename?: "Mutation";
-  updateBot?:
-    | {
-        __typename?: "Bot";
-        id?: string | null;
-        name?: string | null;
-        allocationPct?: any | null;
-        dailyMaxLoss?: any | null;
-        dailyMaxGain?: any | null;
-        updatedAt?: any | null;
-      }
-    | { __typename?: "NotFoundError"; message?: string | null }
-    | {
-        __typename?: "ValidationError";
-        message?: string | null;
-        field?: string | null;
-        code?: string | null;
       }
     | null;
 };
@@ -1197,39 +1250,7 @@ export const DeleteBotDocument = {
             selectionSet: {
               kind: "SelectionSet",
               selections: [
-                {
-                  kind: "InlineFragment",
-                  typeCondition: {
-                    kind: "NamedType",
-                    name: { kind: "Name", value: "Bot" },
-                  },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "status" },
-                      },
-                    ],
-                  },
-                },
-                {
-                  kind: "InlineFragment",
-                  typeCondition: {
-                    kind: "NamedType",
-                    name: { kind: "Name", value: "NotFoundError" },
-                  },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "message" },
-                      },
-                    ],
-                  },
-                },
+                { kind: "Field", name: { kind: "Name", value: "success" } },
               ],
             },
           },
@@ -1411,136 +1432,6 @@ export const SkipProposalDocument = {
   SkipProposalMutation,
   SkipProposalMutationVariables
 >;
-export const UpdateBotDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "UpdateBot" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
-          },
-        },
-        {
-          kind: "VariableDefinition",
-          variable: {
-            kind: "Variable",
-            name: { kind: "Name", value: "input" },
-          },
-          type: {
-            kind: "NonNullType",
-            type: {
-              kind: "NamedType",
-              name: { kind: "Name", value: "UpdateBotInput" },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "updateBot" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "id" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "id" },
-                },
-              },
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "input" },
-                value: {
-                  kind: "Variable",
-                  name: { kind: "Name", value: "input" },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                {
-                  kind: "InlineFragment",
-                  typeCondition: {
-                    kind: "NamedType",
-                    name: { kind: "Name", value: "Bot" },
-                  },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "name" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "allocationPct" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "dailyMaxLoss" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "dailyMaxGain" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "updatedAt" },
-                      },
-                    ],
-                  },
-                },
-                {
-                  kind: "InlineFragment",
-                  typeCondition: {
-                    kind: "NamedType",
-                    name: { kind: "Name", value: "ValidationError" },
-                  },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "message" },
-                      },
-                      { kind: "Field", name: { kind: "Name", value: "field" } },
-                      { kind: "Field", name: { kind: "Name", value: "code" } },
-                    ],
-                  },
-                },
-                {
-                  kind: "InlineFragment",
-                  typeCondition: {
-                    kind: "NamedType",
-                    name: { kind: "Name", value: "NotFoundError" },
-                  },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "message" },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<UpdateBotMutation, UpdateBotMutationVariables>;
 export const ValidateBrainKeyDocument = {
   kind: "Document",
   definitions: [
