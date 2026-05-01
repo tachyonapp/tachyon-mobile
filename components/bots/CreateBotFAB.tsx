@@ -1,5 +1,5 @@
-import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
+import React from "react";
+import { Pressable, StyleSheet, Text } from "react-native";
 
 interface Props {
   onPress: () => void;
@@ -18,16 +18,16 @@ export function CreateBotFAB({ onPress }: Props) {
 
 const styles = StyleSheet.create({
   fab: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 24,
     right: 24,
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2C6BED',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000000',
+    backgroundColor: "#2C6BED",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000000",
     shadowOpacity: 0.25,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   icon: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 28,
     lineHeight: 32,
   },

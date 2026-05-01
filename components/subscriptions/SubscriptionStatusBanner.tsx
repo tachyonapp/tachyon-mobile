@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { SubscriptionStatus } from '@/generated/graphql';
-import { Colors } from '@/constants/theme';
+import { Colors } from "@/constants/theme";
+import { SubscriptionStatus } from "@/generated/graphql";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 interface Props {
   status: SubscriptionStatus.Suspended | SubscriptionStatus.Cancelled;
@@ -14,13 +14,17 @@ export function SubscriptionStatusBanner({ status }: Props) {
     <View
       style={[
         styles.banner,
-        { backgroundColor: isSuspended ? Colors.dark.warning : Colors.dark.danger },
+        {
+          backgroundColor: isSuspended
+            ? Colors.dark.warning
+            : Colors.dark.danger,
+        },
       ]}
     >
       <Text style={styles.bannerText}>
         {isSuspended
-          ? 'Your subscription is suspended. Reactivate to resume trading.'
-          : 'Your subscription has been cancelled.'}
+          ? "Your subscription is suspended. Reactivate to resume trading."
+          : "Your subscription has been cancelled."}
       </Text>
     </View>
   );
@@ -31,11 +35,11 @@ const styles = StyleSheet.create({
     minHeight: 44,
     paddingHorizontal: 20,
     paddingVertical: 12,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   bannerText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

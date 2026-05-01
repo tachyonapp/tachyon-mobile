@@ -1,22 +1,38 @@
-import React, { useCallback, useState } from 'react';
-import { View, FlatList, RefreshControl, StyleSheet, SafeAreaView, Text } from 'react-native';
-import { router } from 'expo-router';
-import { useQuery } from '@apollo/client/react';
-import { BotsDocument, MeSubscriptionDocument, BotStatus, SubscriptionStatus } from '@/generated/graphql';
-import { BotCard } from '@/components/bots/BotCard';
-import { EmptyBotListState } from '@/components/bots/EmptyBotListState';
-import { CreateBotFAB } from '@/components/bots/CreateBotFAB';
-import { SubscriptionStatusBanner } from '@/components/subscriptions/SubscriptionStatusBanner';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { BotCard } from "@/components/bots/BotCard";
+import { CreateBotFAB } from "@/components/bots/CreateBotFAB";
+import { EmptyBotListState } from "@/components/bots/EmptyBotListState";
+import { SubscriptionStatusBanner } from "@/components/subscriptions/SubscriptionStatusBanner";
+import { Colors } from "@/constants/theme";
+import {
+  BotsDocument,
+  BotStatus,
+  MeSubscriptionDocument,
+  SubscriptionStatus,
+} from "@/generated/graphql";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useQuery } from "@apollo/client/react";
+import { router } from "expo-router";
+import React, { useCallback, useState } from "react";
+import {
+  FlatList,
+  RefreshControl,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 export default function BotListScreen() {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme];
   const [refreshing, setRefreshing] = useState(false);
 
-  const { data: botsData, loading, refetch } = useQuery(BotsDocument, {
-    fetchPolicy: 'cache-and-network',
+  const {
+    data: botsData,
+    loading,
+    refetch,
+  } = useQuery(BotsDocument, {
+    fetchPolicy: "cache-and-network",
   });
   const { data: meData } = useQuery(MeSubscriptionDocument);
 
@@ -31,28 +47,37 @@ export default function BotListScreen() {
     const status = meData?.me?.subscriptionStatus;
 
     if (!tier) {
-      router.push('/(subscription)/tier-selection');
+      router.push("/(subscription)/tier-selection");
       return;
     }
-    if (status === SubscriptionStatus.Suspended || status === SubscriptionStatus.Cancelled) {
+    if (
+      status === SubscriptionStatus.Suspended ||
+      status === SubscriptionStatus.Cancelled
+    ) {
       return;
     }
-    router.push('/(bot-forge)');
+    router.push("/(bot-forge)");
   }, [meData]);
 
-  const bots = (botsData?.bots ?? []).filter(b => b.status !== BotStatus.Archived);
+  const bots = (botsData?.bots ?? []).filter(
+    (b) => b.status !== BotStatus.Archived,
+  );
   const subscriptionStatus = meData?.me?.subscriptionStatus;
-  const showBanner = subscriptionStatus === SubscriptionStatus.Suspended || subscriptionStatus === SubscriptionStatus.Cancelled;
+  const showBanner =
+    subscriptionStatus === SubscriptionStatus.Suspended ||
+    subscriptionStatus === SubscriptionStatus.Cancelled;
 
   return (
     <SafeAreaView style={[styles.root, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: theme.textPrimary }]}>My Bots</Text>
+        <Text style={[styles.headerTitle, { color: theme.textPrimary }]}>
+          My Bots
+        </Text>
       </View>
       {showBanner && <SubscriptionStatusBanner status={subscriptionStatus!} />}
       <FlatList
         data={bots}
-        keyExtractor={item => item.id ?? ''}
+        keyExtractor={(item) => item.id ?? ""}
         renderItem={({ item }) => (
           <BotCard
             bot={item}
@@ -69,9 +94,15 @@ export default function BotListScreen() {
           ) : null
         }
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.electricBlue} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={theme.electricBlue}
+          />
         }
-        contentContainerStyle={bots.length === 0 ? styles.emptyContainer : styles.listContent}
+        contentContainerStyle={
+          bots.length === 0 ? styles.emptyContainer : styles.listContent
+        }
       />
       <CreateBotFAB onPress={handleCreateBot} />
     </SafeAreaView>
@@ -87,8 +118,13 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 28,
-    fontWeight: '700',
+    fontWeight: "700",
   },
-  listContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 100, gap: 12 },
+  listContent: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 100,
+    gap: 12,
+  },
   emptyContainer: { flex: 1 },
 });
