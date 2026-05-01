@@ -1,11 +1,12 @@
 import { ForgeSection } from "@/components/forge/ForgeSection";
 import { SectorGrid } from "@/components/wizard/SectorGrid";
 import type { WizardState } from "@/context/WizardContext";
+import { SectorFilter } from "@/generated/graphql";
 import { Dispatch, SetStateAction } from "react";
 
 interface SectorsProps {
   combatComplete: boolean;
-  sectors: string[];
+  sectors: SectorFilter[];
   updateField: <K extends keyof WizardState>(
     field: K,
     value: WizardState[K],
