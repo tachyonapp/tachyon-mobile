@@ -30,6 +30,11 @@ query Bot($id: ID!) {
       expiresAt
       createdAt
     }
+    botBrainConfig {
+      brainType
+      modelId
+      provider
+    }
     createdAt
     updatedAt
   }
