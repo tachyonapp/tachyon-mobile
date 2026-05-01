@@ -9,9 +9,16 @@ interface Props {
   onActivate?: () => void;
   onPause?: () => void;
   onDelete?: () => void;
+  onEditIdentity?: () => void;
 }
 
-export function ActionBar({ bot, onActivate, onPause, onDelete }: Props) {
+export function ActionBar({
+  bot,
+  onActivate,
+  onPause,
+  onDelete,
+  onEditIdentity,
+}: Props) {
   const theme = Colors[useColorScheme()];
   const isActive = bot.status === BotStatus.Active;
   const isPaused =
@@ -22,9 +29,29 @@ export function ActionBar({ bot, onActivate, onPause, onDelete }: Props) {
     <View
       style={[
         styles.container,
-        { backgroundColor: theme.background, borderTopColor: theme.inputBorder },
+        {
+          backgroundColor: theme.background,
+          borderTopColor: theme.inputBorder,
+        },
       ]}
     >
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          {
+            backgroundColor: theme.surface,
+            borderWidth: 1,
+            borderColor: theme.inputBorder,
+          },
+          pressed && styles.pressed,
+        ]}
+        onPress={onEditIdentity}
+      >
+        <Text style={[styles.buttonText, { color: theme.textSecondary }]}>
+          Edit
+        </Text>
+      </Pressable>
+
       {isActive && (
         <Pressable
           style={({ pressed }) => [
@@ -70,14 +97,22 @@ export function ActionBar({ bot, onActivate, onPause, onDelete }: Props) {
             },
           ]}
         >
-          <Text style={[styles.buttonText, { color: theme.textDisabled, fontSize: 13 }]}>
+          <Text
+            style={[
+              styles.buttonText,
+              { color: theme.textDisabled, fontSize: 13 },
+            ]}
+          >
             Reactivates next trading day
           </Text>
         </View>
       )}
 
       <Pressable
-        style={({ pressed }) => [styles.deleteButton, pressed && styles.pressed]}
+        style={({ pressed }) => [
+          styles.deleteButton,
+          pressed && styles.pressed,
+        ]}
         onPress={onDelete}
       >
         <Text style={[styles.deleteButtonText, { color: theme.danger }]}>

@@ -1,6 +1,7 @@
 import { ActionBar } from "@/components/bots/ActionBar";
 import { BotDetailHero } from "@/components/bots/BotDetailHero";
 import { BotDetailTabs, type TabName } from "@/components/bots/BotDetailTabs";
+import { EditIdentitySheet } from "@/components/bots/EditIdentitySheet";
 import { BrainTab } from "@/components/bots/tabs/BrainTab";
 import { ConfigurationTab } from "@/components/bots/tabs/ConfigurationTab";
 import { OverviewTab } from "@/components/bots/tabs/OverviewTab";
@@ -17,6 +18,7 @@ export default function BotDetailScreen() {
   const theme = Colors[useColorScheme()];
   const { id } = useLocalSearchParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<TabName>("Overview");
+  const [editSheetVisible, setEditSheetVisible] = useState(false);
 
   const { data, loading } = useQuery(BotDocument, {
     variables: { id },
@@ -50,6 +52,12 @@ export default function BotDetailScreen() {
         onActivate={() => router.push(`/(bot-detail)/${id}/activate` as any)}
         onPause={() => router.push(`/(bot-detail)/${id}/pause` as any)}
         onDelete={() => router.push(`/(bot-detail)/${id}/delete` as any)}
+        onEditIdentity={() => setEditSheetVisible(true)}
+      />
+      <EditIdentitySheet
+        bot={bot}
+        visible={editSheetVisible}
+        onDismiss={() => setEditSheetVisible(false)}
       />
     </View>
   );
