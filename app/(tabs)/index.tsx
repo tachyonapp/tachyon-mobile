@@ -1,6 +1,7 @@
 import { BotCard } from "@/components/bots/BotCard";
 import { CreateBotFAB } from "@/components/bots/CreateBotFAB";
 import { EmptyBotListState } from "@/components/bots/EmptyBotListState";
+import { ReactivationBottomSheet } from "@/components/subscriptions/ReactivationBottomSheet";
 import { SubscriptionStatusBanner } from "@/components/subscriptions/SubscriptionStatusBanner";
 import { Colors } from "@/constants/theme";
 import {
@@ -26,6 +27,7 @@ export default function BotListScreen() {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme];
   const [refreshing, setRefreshing] = useState(false);
+  const [reactivationVisible, setReactivationVisible] = useState(false);
 
   const {
     data: botsData,
@@ -42,30 +44,29 @@ export default function BotListScreen() {
     setRefreshing(false);
   }, [refetch]);
 
+  const subscriptionStatus = meData?.me?.subscriptionStatus;
+  const isBlocked =
+    subscriptionStatus === SubscriptionStatus.Suspended ||
+    subscriptionStatus === SubscriptionStatus.Cancelled;
+
   const handleCreateBot = useCallback(() => {
     const tier = meData?.me?.subscriptionTier;
-    const status = meData?.me?.subscriptionStatus;
 
     if (!tier) {
       router.push("/(subscription)/tier-selection");
       return;
     }
-    if (
-      status === SubscriptionStatus.Suspended ||
-      status === SubscriptionStatus.Cancelled
-    ) {
+    if (isBlocked) {
+      setReactivationVisible(true);
       return;
     }
     router.push("/(bot-forge)");
-  }, [meData]);
+  }, [meData, isBlocked]);
 
   const bots = (botsData?.bots ?? []).filter(
     (b) => b.status !== BotStatus.Archived,
   );
-  const subscriptionStatus = meData?.me?.subscriptionStatus;
-  const showBanner =
-    subscriptionStatus === SubscriptionStatus.Suspended ||
-    subscriptionStatus === SubscriptionStatus.Cancelled;
+  const showBanner = isBlocked;
 
   return (
     <SafeAreaView style={[styles.root, { backgroundColor: theme.background }]}>
@@ -74,7 +75,12 @@ export default function BotListScreen() {
           My Bots
         </Text>
       </View>
-      {showBanner && <SubscriptionStatusBanner status={subscriptionStatus!} />}
+      {showBanner && (
+        <SubscriptionStatusBanner
+          status={subscriptionStatus!}
+          onReactivate={() => setReactivationVisible(true)}
+        />
+      )}
       <FlatList
         data={bots}
         keyExtractor={(item) => item.id ?? ""}
@@ -105,6 +111,13 @@ export default function BotListScreen() {
         }
       />
       <CreateBotFAB onPress={handleCreateBot} />
+      {isBlocked && (
+        <ReactivationBottomSheet
+          visible={reactivationVisible}
+          onDismiss={() => setReactivationVisible(false)}
+          status={subscriptionStatus!}
+        />
+      )}
     </SafeAreaView>
   );
 }

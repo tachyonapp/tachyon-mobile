@@ -4,9 +4,10 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface Props {
   status: SubscriptionStatus.Suspended | SubscriptionStatus.Cancelled;
+  onReactivate?: () => void;
 }
 
-export function SubscriptionStatusBanner({ status }: Props) {
+export function SubscriptionStatusBanner({ status, onReactivate }: Props) {
   const [dismissed, setDismissed] = useState(false);
 
   if (dismissed) return null;
@@ -20,6 +21,11 @@ export function SubscriptionStatusBanner({ status }: Props) {
     <View style={styles.banner}>
       <Text style={styles.copy}>{copy}</Text>
       <View style={styles.actions}>
+        {onReactivate != null && (
+          <TouchableOpacity onPress={onReactivate} style={styles.reactivateBtn}>
+            <Text style={styles.reactivateText}>Reactivate</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           onPress={() => setDismissed(true)}
           style={styles.dismissBtn}
@@ -39,6 +45,8 @@ const styles = StyleSheet.create({
   },
   copy: { color: "#FFFFFF", fontSize: 14 },
   actions: { flexDirection: "row", marginTop: 8, gap: 12 },
+  reactivateBtn: { padding: 4 },
+  reactivateText: { color: "#FFFFFF", fontSize: 13, fontWeight: "600" },
   dismissBtn: { padding: 4 },
   dismissText: { color: "rgba(255,255,255,0.8)", fontSize: 13 },
 });
