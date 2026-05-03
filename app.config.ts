@@ -39,6 +39,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     android: {
       package: "com.marczenn.tachyon",
     },
-    plugins: ["expo-secure-store", "expo-local-authentication"],
+    plugins: [
+      "expo-secure-store",
+      "expo-local-authentication",
+      "@stripe/stripe-react-native",
+    ],
   };
 };
