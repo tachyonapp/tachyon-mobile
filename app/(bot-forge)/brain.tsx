@@ -5,11 +5,15 @@ import {
   BrainCatalog,
   BrainConfigInput,
   BrainType,
+  MeSubscriptionDocument,
+  SubscriptionTier,
   ValidateBrainKeyDocument,
+  type MeSubscriptionQuery,
   type ValidateBrainKeyMutation,
   type ValidateBrainKeyMutationVariables,
 } from "@/generated/graphql";
-import { useMutation } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
+import { useEffect } from "react";
 
 interface BrainProps {
   stopLossSet: boolean;
@@ -28,10 +32,38 @@ export const Brain = ({
   updateBrain,
   setIsKeyValidated,
 }: BrainProps) => {
+  const { data: meData } = useQuery<MeSubscriptionQuery>(
+    MeSubscriptionDocument,
+  );
+  const subscriptionTier = meData?.me?.subscriptionTier ?? null;
+
   const [validateBrainKey] = useMutation<
     ValidateBrainKeyMutation,
     ValidateBrainKeyMutationVariables
   >(ValidateBrainKeyDocument);
+
+  // Auto-correct brain type when tier is incompatible with a draft selection.
+  // FREE_TRIAL and TACHYON_HOSTED can only use the hosted brain; BYOK must use BYOK.
+  useEffect(() => {
+    if (!subscriptionTier) return;
+
+    if (
+      (subscriptionTier === SubscriptionTier.FreeTrial ||
+        subscriptionTier === SubscriptionTier.TachyonHosted) &&
+      brain.brainType === BrainType.Byok
+    ) {
+      updateBrain({ brainType: BrainType.TachyonHosted, apiKey: null });
+      setIsKeyValidated(false);
+      return;
+    }
+
+    if (
+      subscriptionTier === SubscriptionTier.Byok &&
+      brain.brainType === BrainType.TachyonHosted
+    ) {
+      updateBrain({ brainType: BrainType.Byok });
+    }
+  }, [subscriptionTier]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleValidateKey(apiKey: string): Promise<boolean> {
     if (!brain.provider) return false;
@@ -70,6 +102,7 @@ export const Brain = ({
         hasByokDraft={
           brain.brainType === BrainType.Byok && brain.apiKey === null
         }
+        subscriptionTier={subscriptionTier}
         onBrainTypeChange={handleBrainTypeChange}
         onProviderChange={(p) => {
           updateBrain({ provider: p, apiKey: null });
