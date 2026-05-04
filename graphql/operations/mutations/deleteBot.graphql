@@ -1,11 +1,5 @@
 mutation DeleteBot($id: ID!) {
   deleteBot(id: $id) {
-    ... on Bot {
-      id
-      status
-    }
-    ... on NotFoundError {
-      message
-    }
+    success
   }
 }

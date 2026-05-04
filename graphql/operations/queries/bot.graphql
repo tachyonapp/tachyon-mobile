@@ -19,7 +19,7 @@ query Bot($id: ID!) {
       status
       openedAt
     }
-    proposals(status: PENDING) {
+    proposals {
       id
       symbol
       side
@@ -29,6 +29,14 @@ query Bot($id: ID!) {
       status
       expiresAt
       createdAt
+    }
+    scanCapUsed
+    scanCapRemaining
+    botBrainConfig {
+      brainType
+      modelId
+      provider
+      keyPreview
     }
     createdAt
     updatedAt

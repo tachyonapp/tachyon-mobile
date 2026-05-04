@@ -1,0 +1,7 @@
+mutation SelectTier($tier: SubscriptionTier!, $stripePaymentMethodId: String) {
+  selectTier(tier: $tier, stripePaymentMethodId: $stripePaymentMethodId) {
+    subscriptionTier
+    subscriptionStatus
+    trialExpiresAt
+  }
+}

@@ -1,0 +1,8 @@
+mutation UpdateBotIdentity($id: ID!, $input: UpdateBotIdentityInput!) {
+  updateBotIdentity(id: $id, input: $input) {
+    bot {
+      id
+      name
+    }
+  }
+}

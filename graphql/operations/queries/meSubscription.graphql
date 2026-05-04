@@ -1,0 +1,9 @@
+query MeSubscription {
+  me {
+    id
+    subscriptionTier
+    subscriptionStatus
+    trialExpiresAt
+    currentPeriodEnd
+  }
+}

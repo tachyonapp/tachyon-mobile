@@ -1,9 +1,11 @@
 import { Colors } from "@/constants/theme";
 import {
   BrainType,
+  SubscriptionTier,
   type BrainProviderOption,
 } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -21,6 +23,7 @@ interface BrainSelectorProps {
   byokProviders: BrainProviderOption[];
   isKeyValidated: boolean;
   hasByokDraft: boolean;
+  subscriptionTier?: SubscriptionTier | null;
   onBrainTypeChange: (type: BrainType) => void;
   onProviderChange: (provider: string) => void;
   onModelChange: (modelId: string) => void;
@@ -36,16 +39,24 @@ export function BrainSelector({
   byokProviders,
   isKeyValidated,
   hasByokDraft,
+  subscriptionTier,
   onBrainTypeChange,
   onProviderChange,
   onModelChange,
   onValidateKey,
 }: BrainSelectorProps) {
   const theme = Colors[useColorScheme()];
+  const router = useRouter();
   const [apiKeyInput, setApiKeyInput] = useState("");
-  const [validationState, setValidationState] = useState<ValidationState>("idle");
+  const [validationState, setValidationState] =
+    useState<ValidationState>("idle");
   const loadingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedAsByok = useRef(brainType === BrainType.Byok);
+
+  const isByokTier = subscriptionTier === SubscriptionTier.Byok;
+  const isTachyonHostedTier =
+    subscriptionTier === SubscriptionTier.TachyonHosted;
+  const isFreeTrial = subscriptionTier === SubscriptionTier.FreeTrial;
 
   const selectedProvider = byokProviders.find((p) => p.provider === provider);
   const availableModels = selectedProvider?.models ?? [];
@@ -83,58 +94,53 @@ export function BrainSelector({
 
   return (
     <View style={styles.container}>
-      {/* Tachyon Default card */}
-      <Pressable
-        onPress={() => onBrainTypeChange(BrainType.TachyonHosted)}
-        style={[
-          styles.card,
-          { backgroundColor: theme.surface, borderColor: theme.textDisabled },
-          brainType === BrainType.TachyonHosted && {
-            borderWidth: 2,
-            borderColor: theme.electricBlue,
-          },
-        ]}
-      >
-        <View style={styles.cardHeader}>
-          <Text style={[styles.cardTitle, { color: theme.textPrimary }]}>
-            Tachyon Default
-          </Text>
-          <View style={styles.badge}>
-            <Text style={[styles.badgeText, { color: theme.electricBlue }]}>
-              Usage-capped · No setup required
+      {/* Tachyon Hosted card — FREE_TRIAL (or loading) and TACHYON_HOSTED */}
+      {!isByokTier && (
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.surface },
+            { borderWidth: 2, borderColor: theme.electricBlue },
+          ]}
+        >
+          <View style={styles.cardHeader}>
+            <Text style={[styles.cardTitle, { color: theme.textPrimary }]}>
+              {isFreeTrial || !subscriptionTier
+                ? "Tachyon Haiku (Free Trial)"
+                : "Tachyon Haiku"}
             </Text>
+            <View style={styles.badge}>
+              <Text style={[styles.badgeText, { color: theme.electricBlue }]}>
+                {isFreeTrial || !subscriptionTier
+                  ? "40 scans/day"
+                  : "78 scans/day"}
+              </Text>
+            </View>
           </View>
+          <Text style={[styles.cardBody, { color: theme.textSecondary }]}>
+            Powered by Claude Haiku. Built-in, no setup required.
+          </Text>
         </View>
-        <Text style={[styles.cardBody, { color: theme.textSecondary }]}>
-          Powered by Claude Haiku. Free, built-in, usage-capped.
-        </Text>
-      </Pressable>
+      )}
 
-      {/* BYOK card */}
-      <Pressable
-        onPress={() => onBrainTypeChange(BrainType.Byok)}
-        style={[
-          styles.card,
-          { backgroundColor: theme.surface, borderColor: theme.textDisabled },
-          brainType === BrainType.Byok && {
-            borderWidth: 2,
-            borderColor: theme.electricBlue,
-          },
-        ]}
-      >
-        <Text style={[styles.cardTitle, { color: theme.textPrimary }]}>
-          Bring Your Own Key
-        </Text>
-        <Text style={[styles.cardBody, { color: theme.textSecondary }]}>
-          Use your own API key for the best experience.
-        </Text>
+      {/* BYOK card — BYOK subscription tier only, always expanded */}
+      {isByokTier && (
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: theme.surface },
+            { borderWidth: 2, borderColor: theme.electricBlue },
+          ]}
+        >
+          <Text style={[styles.cardTitle, { color: theme.textPrimary }]}>
+            Bring Your Own Key
+          </Text>
+          <Text style={[styles.cardBody, { color: theme.textSecondary }]}>
+            Use your own API key for the best experience.
+          </Text>
 
-        {brainType === BrainType.Byok && (
           <View
-            style={[
-              styles.byokExpanded,
-              { borderTopColor: theme.inputBorder },
-            ]}
+            style={[styles.byokExpanded, { borderTopColor: theme.inputBorder }]}
           >
             {hasByokDraft && !isKeyValidated && mountedAsByok.current && (
               <Text style={[styles.draftWarning, { color: theme.warning }]}>
@@ -145,7 +151,9 @@ export function BrainSelector({
             {/* Provider selector */}
             {byokProviders.length > 0 && (
               <View style={styles.fieldGroup}>
-                <Text style={[styles.fieldLabel, { color: theme.textSecondary }]}>
+                <Text
+                  style={[styles.fieldLabel, { color: theme.textSecondary }]}
+                >
                   Provider
                 </Text>
                 <View style={styles.segmentRow}>
@@ -186,7 +194,9 @@ export function BrainSelector({
             {/* Model selector */}
             {availableModels.length > 0 && (
               <View style={styles.fieldGroup}>
-                <Text style={[styles.fieldLabel, { color: theme.textSecondary }]}>
+                <Text
+                  style={[styles.fieldLabel, { color: theme.textSecondary }]}
+                >
                   Model
                 </Text>
                 <View style={styles.segmentRow}>
@@ -283,8 +293,52 @@ export function BrainSelector({
               </Text>
             )}
           </View>
-        )}
-      </Pressable>
+        </View>
+      )}
+
+      {/* Switch to BYOK — TACHYON_HOSTED only */}
+      {isTachyonHostedTier && (
+        <Pressable
+          onPress={() => router.push("/(subscription)/tier-selection")}
+          style={[
+            styles.card,
+            { backgroundColor: theme.surface, borderColor: theme.textDisabled },
+          ]}
+        >
+          <Text style={[styles.cardTitle, { color: theme.textPrimary }]}>
+            Switch to BYOK
+          </Text>
+          <Text style={[styles.cardBody, { color: theme.textSecondary }]}>
+            Use your own API key for unlimited daily market scans.
+          </Text>
+        </Pressable>
+      )}
+
+      {/* Upgrade banner — FREE_TRIAL only */}
+      {isFreeTrial && (
+        <View
+          style={[
+            styles.upgradeBanner,
+            {
+              backgroundColor: "rgba(44, 107, 237, 0.08)",
+              borderColor: "rgba(44, 107, 237, 0.25)",
+            },
+          ]}
+        >
+          <Text
+            style={[styles.upgradeBannerText, { color: theme.textSecondary }]}
+          >
+            Running on Free Trial — 40 scans/day. Upgrade for 78 scans/day.
+          </Text>
+          <Pressable
+            onPress={() => router.push("/(subscription)/tier-selection")}
+          >
+            <Text style={[styles.upgradeLink, { color: theme.electricBlue }]}>
+              Upgrade
+            </Text>
+          </Pressable>
+        </View>
+      )}
     </View>
   );
 }
@@ -378,5 +432,18 @@ const styles = StyleSheet.create({
   },
   validationMsg: {
     fontSize: 13,
+  },
+  upgradeBanner: {
+    borderRadius: 8,
+    borderWidth: 1,
+    padding: 12,
+    gap: 8,
+  },
+  upgradeBannerText: {
+    fontSize: 13,
+  },
+  upgradeLink: {
+    fontSize: 13,
+    fontWeight: "600",
   },
 });
