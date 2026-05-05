@@ -1,49 +1,64 @@
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useEffect } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
 
-interface AuthLoadingStateProps {
-  message?: string;
-}
+const DOT_DURATION = 500;
+const DOT_STAGGER = 160;
 
-export function AuthLoadingState({ message }: AuthLoadingStateProps) {
+export function AuthLoadingState() {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? "dark"];
 
-  const opacity = useSharedValue(0.4);
+  const dot0 = useSharedValue(0.25);
+  const dot1 = useSharedValue(0.25);
+  const dot2 = useSharedValue(0.25);
 
   useEffect(() => {
-    opacity.value = withRepeat(withTiming(1, { duration: 900 }), -1, true);
-  }, [opacity]);
+    dot0.value = withRepeat(
+      withTiming(1, { duration: DOT_DURATION }),
+      -1,
+      true,
+    );
+    dot1.value = withDelay(
+      DOT_STAGGER,
+      withRepeat(withTiming(1, { duration: DOT_DURATION }), -1, true),
+    );
+    dot2.value = withDelay(
+      DOT_STAGGER * 2,
+      withRepeat(withTiming(1, { duration: DOT_DURATION }), -1, true),
+    );
+  }, []);
 
-  const pulseStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  const dot0Style = useAnimatedStyle(() => ({ opacity: dot0.value }));
+  const dot1Style = useAnimatedStyle(() => ({ opacity: dot1.value }));
+  const dot2Style = useAnimatedStyle(() => ({ opacity: dot2.value }));
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Animated.View
-        style={[
-          styles.logoPlaceholder,
-          { backgroundColor: theme.electricBlue },
-          pulseStyle,
-        ]}
-      />
-      <ActivityIndicator
-        size="small"
-        color={theme.electricBlue}
-        style={styles.spinner}
-      />
-      {message ? (
-        <Text style={[styles.message, { color: theme.textSecondary }]}>
-          {message}
-        </Text>
-      ) : null}
+    <View
+      style={[styles.container, { backgroundColor: theme.background }]}
+    >
+      <Text style={[styles.wordmark, { color: theme.textPrimary }]}>
+        TACHYON
+      </Text>
+      <View style={styles.dotsRow}>
+        <Animated.View
+          style={[styles.dot, { backgroundColor: theme.electricBlue }, dot0Style]}
+        />
+        <Animated.View
+          style={[styles.dot, { backgroundColor: theme.electricBlue }, dot1Style]}
+        />
+        <Animated.View
+          style={[styles.dot, { backgroundColor: theme.electricBlue }, dot2Style]}
+        />
+      </View>
     </View>
   );
 }
@@ -53,17 +68,20 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    gap: 32,
   },
-  logoPlaceholder: {
-    width: 64,
-    height: 64,
-    borderRadius: 16,
-    marginBottom: 32,
+  wordmark: {
+    fontSize: 24,
+    fontWeight: "700",
+    letterSpacing: 4,
   },
-  spinner: {
-    marginBottom: 16,
+  dotsRow: {
+    flexDirection: "row",
+    gap: 8,
   },
-  message: {
-    fontSize: 14,
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
 });

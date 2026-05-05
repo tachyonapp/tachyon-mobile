@@ -1,6 +1,6 @@
-import { ForgeSection } from "@/components/forge/ForgeSection";
-import { WizardOptionCard } from "@/components/wizard/WizardOptionCard";
 import type { WizardState } from "@/context/WizardContext";
+import { ForgeOptionCard } from "@/forge/components/ForgeOptionCard";
+import { ForgeSection } from "@/forge/components/ForgeSection";
 import { ExitPersonalityInput, ExitPersonalityName } from "@/generated/graphql";
 import { StyleSheet, View } from "react-native";
 
@@ -51,7 +51,7 @@ export const Exit = ({ sectors, updateField, exitPersonality }: ExitProps) => {
     >
       <View style={styles.optionList}>
         {EXIT_OPTIONS.map((opt) => (
-          <WizardOptionCard
+          <ForgeOptionCard
             key={opt.value}
             label={opt.label}
             description={opt.description}

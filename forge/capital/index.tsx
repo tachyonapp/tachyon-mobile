@@ -1,7 +1,7 @@
-import { ForgeSection } from "@/components/forge/ForgeSection";
-import { AllocationControl } from "@/components/wizard/AllocationControl";
 import { Colors } from "@/constants/theme";
 import type { WizardState } from "@/context/WizardContext";
+import { AllocationControl } from "@/forge/capital/AllocationControl";
+import { ForgeSection } from "@/forge/components/ForgeSection";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Text } from "react-native";
 

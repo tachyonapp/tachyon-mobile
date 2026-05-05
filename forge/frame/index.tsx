@@ -1,6 +1,6 @@
-import { ForgeSection } from "@/components/forge/ForgeSection";
-import { FrameCard } from "@/components/wizard/FrameCard";
 import { FRAME_CONFIG } from "@/constants/frameConfig";
+import { ForgeSection } from "@/forge/components/ForgeSection";
+import { FrameCard } from "@/forge/frame/FrameCard";
 import { BotFrame } from "@/generated/graphql";
 import { StyleSheet, View } from "react-native";
 

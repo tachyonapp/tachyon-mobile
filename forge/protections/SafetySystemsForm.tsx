@@ -15,8 +15,8 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { PillSlider } from "./PillSlider";
-import { WizardOptionCard } from "./WizardOptionCard";
+import { PillSlider } from "../../components/PillSlider";
+import { ForgeOptionCard } from "../components/ForgeOptionCard";
 
 interface SafetySystemsFormProps {
   frameName: string;
@@ -167,7 +167,7 @@ export function SafetySystemsForm({
         </Text>
         <View style={styles.optionCards}>
           {STOP_LOSS_OPTIONS.map((opt) => (
-            <WizardOptionCard
+            <ForgeOptionCard
               key={opt.name}
               label={opt.label}
               description={opt.description}

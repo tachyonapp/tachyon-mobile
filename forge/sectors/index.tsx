@@ -1,6 +1,6 @@
-import { ForgeSection } from "@/components/forge/ForgeSection";
-import { SectorGrid } from "@/components/wizard/SectorGrid";
 import type { WizardState } from "@/context/WizardContext";
+import { ForgeSection } from "@/forge/components/ForgeSection";
+import { SectorGrid } from "@/forge/sectors/SectorGrid";
 import { SectorFilter } from "@/generated/graphql";
 import { Dispatch, SetStateAction } from "react";
 

@@ -1,10 +1,10 @@
-import { EducationalTooltip } from "@/components/wizard/EducationalTooltip";
+import { EducationalTooltip } from "@/components/EducationalTooltip";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-interface WizardOptionCardProps {
+interface ForgeOptionCardProps {
   label: string;
   description: string;
   selected: boolean;
@@ -14,7 +14,7 @@ interface WizardOptionCardProps {
   icon?: React.ReactNode;
 }
 
-export function WizardOptionCard({
+export function ForgeOptionCard({
   label,
   description,
   selected,
@@ -22,7 +22,7 @@ export function WizardOptionCard({
   disabled = false,
   disabledReason,
   icon,
-}: WizardOptionCardProps) {
+}: ForgeOptionCardProps) {
   const theme = Colors[useColorScheme()];
 
   const cardContent = (

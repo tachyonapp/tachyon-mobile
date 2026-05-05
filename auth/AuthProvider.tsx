@@ -53,6 +53,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setSessionExpiredHandler(async () => {
+      // An UNAUTHENTICATED response with no active session just means the user
+      // isn't logged in — not that a session expired. Only signal expiry when
+      // a real session existed so the login screen doesn't show a false error.
+      if (!isSignedIn) return;
       try {
         await signOut();
       } catch {
@@ -66,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       clearSessionExpiredHandler();
     };
-  }, [signOut]);
+  }, [signOut, isSignedIn]);
 
   const login = async (email: string, password: string): Promise<void> => {
     setError(null);

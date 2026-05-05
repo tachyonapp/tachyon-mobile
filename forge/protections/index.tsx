@@ -1,7 +1,7 @@
-import { ForgeSection } from "@/components/forge/ForgeSection";
-import { SafetySystemsForm } from "@/components/wizard/SafetySystemsForm";
 import { FrameConfig } from "@/constants/frameConfig";
 import type { WizardState } from "@/context/WizardContext";
+import { ForgeSection } from "@/forge/components/ForgeSection";
+import { SafetySystemsForm } from "@/forge/protections/SafetySystemsForm";
 import {
   EmotionalControlsInput,
   ExitPersonalityInput,

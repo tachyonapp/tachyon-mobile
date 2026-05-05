@@ -1,7 +1,7 @@
-import { ForgeSection } from "@/components/forge/ForgeSection";
-import { MarketAwarenessSliders } from "@/components/wizard/MarketAwarenessSliders";
 import { FrameConfig } from "@/constants/frameConfig";
 import type { WizardState } from "@/context/WizardContext";
+import { ForgeSection } from "@/forge/components/ForgeSection";
+import { MarketAwarenessSliders } from "@/forge/market/MarketAwarenessSliders";
 import type { MarketAwarenessInput } from "@/generated/graphql";
 
 interface MarketIntelligenceProps {

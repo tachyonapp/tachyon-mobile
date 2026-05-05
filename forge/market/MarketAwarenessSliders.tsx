@@ -4,8 +4,8 @@ import { type MarketAwarenessInput } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React, { useState } from "react";
 import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
-import { EducationalTooltip } from "./EducationalTooltip";
-import { PillSlider } from "./PillSlider";
+import { EducationalTooltip } from "../../components/EducationalTooltip";
+import { PillSlider } from "../../components/PillSlider";
 
 interface MarketAwarenessSlidersProps {
   value: MarketAwarenessInput;

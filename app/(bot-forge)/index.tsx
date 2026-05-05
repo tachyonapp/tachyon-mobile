@@ -1,8 +1,8 @@
-import { ForgeSection } from "@/components/forge/ForgeSection";
-import { ForgeStatPanel } from "@/components/forge/ForgeStatPanel";
 import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import { useWizard } from "@/context/WizardContext";
+import { ForgeSection } from "@/forge/components/ForgeSection";
+import { ForgeStatPanel } from "@/forge/components/ForgeStatPanel";
 import {
   BalanceDocument,
   BrainType,
@@ -27,20 +27,20 @@ import {
   type AppStateStatus,
 } from "react-native";
 
-import { Brain } from "./brain";
-import { Capital } from "./capital";
-import { Deploy, DeployError } from "./deploy";
-import { Draft } from "./draft";
-import { Engagement } from "./engagement";
-import { Exit } from "./exit";
-import { Frame } from "./frame";
-import { Identity } from "./identity";
-import { MarketIntelligence } from "./market";
-import { Patience } from "./patience";
-import { Protections } from "./protections";
-import { Risk } from "./risk";
-import { Sectors } from "./sectors";
-import { Tempo } from "./tempo";
+import { Brain } from "../../forge/brain";
+import { Capital } from "../../forge/capital";
+import { Deploy, DeployError } from "../../forge/deploy";
+import { Draft } from "../../forge/draft";
+import { Engagement } from "../../forge/engagement";
+import { Exit } from "../../forge/exit";
+import { Frame } from "../../forge/frame";
+import { Identity } from "../../forge/identity";
+import { MarketIntelligence } from "../../forge/market";
+import { Patience } from "../../forge/patience";
+import { Protections } from "../../forge/protections";
+import { Risk } from "../../forge/risk";
+import { Sectors } from "../../forge/sectors";
+import { Tempo } from "../../forge/tempo";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

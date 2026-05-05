@@ -1,6 +1,6 @@
-import { ForgeSection } from "@/components/forge/ForgeSection";
 import { Colors } from "@/constants/theme";
 import type { WizardState } from "@/context/WizardContext";
+import { ForgeSection } from "@/forge/components/ForgeSection";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 

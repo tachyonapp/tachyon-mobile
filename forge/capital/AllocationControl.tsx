@@ -2,7 +2,7 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React, { useState } from "react";
 import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
-import { PillSlider } from "./PillSlider";
+import { PillSlider } from "../../components/PillSlider";
 
 interface AllocationControlProps {
   value: number;

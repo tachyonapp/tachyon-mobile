@@ -1,6 +1,6 @@
-import { ForgeSection } from "@/components/forge/ForgeSection";
-import { BrainSelector } from "@/components/wizard/BrainSelector";
 import type { BrainState } from "@/context/WizardContext";
+import { BrainSelector } from "@/forge/brain/BrainSelector";
+import { ForgeSection } from "@/forge/components/ForgeSection";
 import {
   BrainCatalog,
   BrainConfigInput,
