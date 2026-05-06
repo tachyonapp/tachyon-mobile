@@ -34,10 +34,10 @@ export function EmptyBotListState({
   return (
     <View style={styles.container}>
       <Text style={[styles.headline, { color: theme.textPrimary }]}>
-        No bots yet
+        No agents yet
       </Text>
       <Text style={[styles.subtext, { color: theme.textSecondary }]}>
-        Build your first bot to start receiving trade proposals.
+        Build your first agent to start receiving trade proposals.
       </Text>
       <Pressable
         style={({ pressed }) => [

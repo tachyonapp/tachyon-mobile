@@ -3,6 +3,7 @@ import { SlideIllustration1 } from "@/components/ftue/SlideIllustration1";
 import { SlideIllustration2 } from "@/components/ftue/SlideIllustration2";
 import { SlideIllustration3 } from "@/components/ftue/SlideIllustration3";
 import { SlideIllustration4 } from "@/components/ftue/SlideIllustration4";
+import { SlideIllustration5 } from "@/components/ftue/SlideIllustration5";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useOnboardingState } from "@/hooks/use-onboarding-state";
@@ -18,7 +19,7 @@ import Animated, {
 import { scheduleOnRN } from "react-native-worklets";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const SLIDE_COUNT = 4;
+const SLIDE_COUNT = 5;
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
 
 // Cubic ease-out as a worklet — replaces Easing.out(Easing.ease) which isn't
@@ -35,7 +36,7 @@ const TIMING_CONFIG = {
 
 const SLIDES = [
   {
-    headline: "Build your bots",
+    headline: "Build AI trading agents",
     Illustration: SlideIllustration1,
   },
   {
@@ -44,8 +45,12 @@ const SLIDES = [
   },
   {
     // COMPLIANCE CRITICAL: This copy must not be altered without compliance review.
-    headline: "You approve every trade.",
+    headline: "You approve every trade",
     Illustration: SlideIllustration3,
+  },
+  {
+    headline: "Discover agents built by others",
+    Illustration: SlideIllustration5,
   },
   {
     headline: "Keep the winners.\n Delete the losers.",

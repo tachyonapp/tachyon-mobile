@@ -3,12 +3,16 @@ import {
   setSessionExpiredHandler,
 } from "@/auth/authEventEmitter";
 import { useClerk, useSignIn, useSignUp, useUser } from "@clerk/clerk-expo";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import * as SecureStore from "expo-secure-store";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 
 export type PendingVerification =
   | "signin_second_factor"
   | "signup_email"
   | null;
+
+const PENDING_VERIFICATION_KEY = "tachyon.pending_verification";
+const PENDING_EMAIL_KEY = "tachyon.pending_email";
 
 interface AuthContextValue {
   isAuthenticated: boolean;
@@ -49,7 +53,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useState<PendingVerification>(null);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
-  const isLoading = !signInLoaded || !signUpLoaded || !userLoaded;
+  // Tracks whether the SecureStore restore has completed. Included in isLoading
+  // so AppInitProvider waits before making routing decisions.
+  const [verificationRestored, setVerificationRestored] = useState(false);
+  // Prevents the persistence effect from writing during the restore itself.
+  const restoringRef = useRef(true);
+
+  // Restore pending verification across app restarts.
+  useEffect(() => {
+    async function restore() {
+      try {
+        const [verification, email] = await Promise.all([
+          SecureStore.getItemAsync(PENDING_VERIFICATION_KEY),
+          SecureStore.getItemAsync(PENDING_EMAIL_KEY),
+        ]);
+        if (
+          verification === "signup_email" ||
+          verification === "signin_second_factor"
+        ) {
+          setPendingVerification(verification);
+          setPendingEmail(email ?? null);
+        }
+      } catch {
+        // Non-fatal — fall back to login
+      } finally {
+        restoringRef.current = false;
+        setVerificationRestored(true);
+      }
+    }
+    restore();
+  }, []);
+
+  // Persist pending verification state so the verify screen survives app restarts.
+  useEffect(() => {
+    if (restoringRef.current) return;
+    if (pendingVerification) {
+      SecureStore.setItemAsync(PENDING_VERIFICATION_KEY, pendingVerification).catch(() => {});
+      SecureStore.setItemAsync(PENDING_EMAIL_KEY, pendingEmail ?? "").catch(() => {});
+    } else {
+      SecureStore.deleteItemAsync(PENDING_VERIFICATION_KEY).catch(() => {});
+      SecureStore.deleteItemAsync(PENDING_EMAIL_KEY).catch(() => {});
+    }
+  }, [pendingVerification, pendingEmail]);
+
+  const isLoading =
+    !signInLoaded || !signUpLoaded || !userLoaded || !verificationRestored;
 
   useEffect(() => {
     setSessionExpiredHandler(async () => {

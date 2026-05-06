@@ -77,7 +77,7 @@ export default function ForgeScreen() {
 
   // When the app is backgrounded while the forge is open, persist the draft so
   // data isn't lost. When it returns to the foreground, navigate back to the
-  // bots list — the forge is a transient creation flow, not a persistent destination.
+  // agents list — the forge is a transient creation flow, not a persistent destination.
   const prevAppState = useRef<AppStateStatus>(AppState.currentState);
   useEffect(() => {
     const sub = AppState.addEventListener("change", (nextState) => {

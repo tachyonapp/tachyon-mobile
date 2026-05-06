@@ -18,7 +18,8 @@ const AppInitContext = createContext<AppInitContextValue>({ isReady: false });
 
 /**
  * Owns all app initialization logic: auth resolution, onboarding state,
- * initial route selection, and splash screen dismissal.
+ * pending verification restoration, initial route selection, and splash
+ * screen dismissal.
  *
  * Exposes a single `isReady` flag. The root layout gates the Stack on this
  * value — when false, the branded loading screen is shown; when true, the
@@ -27,26 +28,33 @@ const AppInitContext = createContext<AppInitContextValue>({ isReady: false });
  * Must be mounted inside AuthProvider and ApolloProvider.
  */
 export function AppInitProvider({ children }: { children: React.ReactNode }) {
-  const { isLoading, isAuthenticated } = useAuth();
+  const { isLoading, isAuthenticated, pendingVerification } = useAuth();
   const { isComplete } = useOnboardingState();
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
   const initRef = useRef(false);
 
   useEffect(() => {
+    // isLoading includes Clerk readiness + SecureStore verification restore.
     if (isLoading || isComplete === null) return;
     if (initRef.current) return;
     initRef.current = true;
 
-    if (!isAuthenticated) {
+    if (!isAuthenticated && pendingVerification) {
+      // Verification was in progress when the app was last closed — return
+      // the user directly to the verify screen so they can complete it.
+      router.replace("/(auth)/verify");
+    } else if (!isAuthenticated) {
       router.replace("/(auth)/login");
     } else if (!isComplete) {
       router.replace("/(onboarding)");
     }
+    // authenticated + complete: no replace needed — nav state restoration
+    // handles returning the user to wherever they were (e.g. tabs).
 
     SplashScreen.hideAsync();
     setIsReady(true);
-  }, [isLoading, isComplete, isAuthenticated]);
+  }, [isLoading, isComplete, isAuthenticated, pendingVerification]);
 
   return (
     <AppInitContext.Provider value={{ isReady }}>

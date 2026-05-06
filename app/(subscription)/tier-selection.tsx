@@ -37,14 +37,18 @@ const TIER_OPTIONS: TierOption[] = [
   {
     tier: SubscriptionTier.Byok,
     label: "BYOK",
-    price: "$9.99/mo",
-    features: ["Unlimited bots", "Use your own API key", "No scan cap"],
+    price: "$11.99/mo",
+    features: ["Unlimited agents", "Use your own API key", "No scan cap"],
   },
   {
     tier: SubscriptionTier.TachyonHosted,
     label: "Tachyon-Hosted",
-    price: "$45/mo",
-    features: ["Fully managed", "78 scans/day", "No API key needed"],
+    price: "$24.99/mo",
+    features: [
+      "10 agent maximum",
+      "45 scans/day across all agents",
+      "No API key needed",
+    ],
   },
 ];
 
@@ -100,6 +104,17 @@ export default function TierSelectionScreen() {
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: theme.background }]}
     >
+      <Pressable
+        style={styles.closeBtn}
+        onPress={() => router.replace("/(tabs)")}
+        accessibilityRole="button"
+        accessibilityLabel="Close"
+        hitSlop={12}
+      >
+        <Text style={[styles.closeIcon, { color: theme.textSecondary }]}>
+          ✕
+        </Text>
+      </Pressable>
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
@@ -108,7 +123,7 @@ export default function TierSelectionScreen() {
           Choose Your Plan
         </Text>
         <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-          Select a subscription to start building bots.
+          Select a subscription to start building agents.
         </Text>
 
         <View style={styles.cards}>
@@ -175,6 +190,15 @@ export default function TierSelectionScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
+  closeBtn: {
+    alignSelf: "flex-end",
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 4,
+  },
+  closeIcon: {
+    fontSize: 20,
+  },
   container: {
     paddingHorizontal: 20,
     paddingTop: 32,

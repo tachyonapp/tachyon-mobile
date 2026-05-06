@@ -59,7 +59,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Bots",
+          title: "Agents",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="robot-outline" color={color} />
           ),

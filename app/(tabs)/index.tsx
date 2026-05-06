@@ -72,7 +72,7 @@ export default function BotListScreen() {
     <SafeAreaView style={[styles.root, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
         <Text style={[styles.headerTitle, { color: theme.textPrimary }]}>
-          My Bots
+          Agents
         </Text>
       </View>
       {showBanner && (
