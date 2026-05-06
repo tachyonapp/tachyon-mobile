@@ -40,7 +40,7 @@ const SLIDES = [
     Illustration: SlideIllustration1,
   },
   {
-    headline: "Set how, what and when they interact with markets",
+    headline: "Customize how they interact with markets",
     Illustration: SlideIllustration2,
   },
   {
@@ -53,7 +53,7 @@ const SLIDES = [
     Illustration: SlideIllustration5,
   },
   {
-    headline: "Keep the winners.\n Delete the losers.",
+    headline: "Keep the winners",
     Illustration: SlideIllustration4,
   },
 ];

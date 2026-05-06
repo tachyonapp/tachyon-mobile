@@ -28,7 +28,7 @@ const HEADER_HEIGHT = 30;
 
 interface ForgeStatPanelProps {
   state: WizardState;
-  height: number;
+  height?: number;
   onClose: () => void;
   name: string;
 }
@@ -54,11 +54,13 @@ export function ForgeStatPanel({
   const { width: screenWidth } = useWindowDimensions();
   const frameConfig = state.frameName ? FRAME_CONFIG[state.frameName] : null;
 
+  const collapsible = height !== undefined;
+
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const animatedHeight = useRef(new Animated.Value(height)).current;
+  const animatedHeight = useRef(new Animated.Value(height ?? 0)).current;
 
   function toggleCollapse() {
-    const toValue = isCollapsed ? height : HEADER_HEIGHT;
+    const toValue = isCollapsed ? height! : HEADER_HEIGHT;
     setIsCollapsed((prev) => !prev);
     Animated.spring(animatedHeight, {
       toValue,
@@ -81,7 +83,9 @@ export function ForgeStatPanel({
         : "BYOK";
 
   const animAreaWidth = screenWidth - 32 - LEFT_COL_WIDTH - 12;
-  const lottieSize = Math.min(animAreaWidth, height - 230);
+  const lottieSize = collapsible
+    ? Math.min(animAreaWidth, height! - 230)
+    : Math.min(animAreaWidth, 180);
 
   const exitLabel = state.exitPersonality?.name
     ? formatEnumLabel(state.exitPersonality.name)
@@ -101,38 +105,28 @@ export function ForgeStatPanel({
       ? `${Math.round(state.dailyMaxGain * 100)}%`
       : null;
 
-  return (
-    <Animated.View
-      style={[
-        styles.panel,
-        {
-          height: animatedHeight,
-          backgroundColor: theme.background,
-          borderBottomColor: theme.inputBorder,
-        },
-      ]}
-    >
-      {/* ── Compact header — always visible ── */}
-      <View style={[styles.header, { borderBottomColor: theme.inputBorder }]}>
-        <Pressable
-          onPress={onClose}
-          hitSlop={12}
-          accessibilityRole="button"
-          accessibilityLabel="Close bot builder"
-          style={styles.headerBtn}
-        >
-          <Text style={[styles.closeBtnText, { color: theme.textSecondary }]}>
-            ✕
-          </Text>
-        </Pressable>
-
-        <Text
-          style={[styles.headerTitle, { color: theme.textSecondary }]}
-          numberOfLines={1}
-        >
-          {name.trim() || "Bot Forge"}
+  const header = (
+    <View style={[styles.header, { borderBottomColor: theme.inputBorder }]}>
+      <Pressable
+        onPress={onClose}
+        hitSlop={12}
+        accessibilityRole="button"
+        accessibilityLabel="Close bot builder"
+        style={styles.headerBtn}
+      >
+        <Text style={[styles.closeBtnText, { color: theme.textSecondary }]}>
+          ✕
         </Text>
+      </Pressable>
 
+      <Text
+        style={[styles.headerTitle, { color: theme.textSecondary }]}
+        numberOfLines={1}
+      >
+        {name.trim() || "Bot Forge"}
+      </Text>
+
+      {collapsible ? (
         <Pressable
           onPress={toggleCollapse}
           hitSlop={12}
@@ -148,100 +142,128 @@ export function ForgeStatPanel({
             color={theme.textSecondary}
           />
         </Pressable>
+      ) : (
+        <View style={styles.headerBtn} />
+      )}
+    </View>
+  );
+
+  const scrollContent = (
+    <ScrollView
+      style={styles.scrollView}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Top area: animation left, market awareness chips + avatar right */}
+      <View style={styles.topArea}>
+        <View style={styles.animationArea}>
+          <LottieView
+            source={POD_ANIMATION}
+            autoPlay
+            loop
+            style={{ width: lottieSize, height: lottieSize }}
+          />
+        </View>
+        <View style={styles.leftChipsCol}>
+          <View style={styles.chipsRow}>
+            <View
+              style={[
+                styles.previewAvatar,
+                { backgroundColor: theme.background },
+              ]}
+            >
+              <SvgXml
+                xml={avatarSvg}
+                width={AVATAR_SIZE}
+                height={AVATAR_SIZE}
+              />
+            </View>
+          </View>
+          <ForgeStatChip
+            label="MOM"
+            value={`${Math.round(state.marketAwareness.momentum * 100)}%`}
+          />
+          <ForgeStatChip
+            label="M/R"
+            value={`${Math.round(state.marketAwareness.meanReversion * 100)}%`}
+          />
+          <ForgeStatChip
+            label="VOL"
+            value={`${Math.round(state.marketAwareness.volatility * 100)}%`}
+          />
+          <ForgeStatChip
+            label="TRND"
+            value={`${Math.round(state.marketAwareness.trendFollowing * 100)}%`}
+          />
+        </View>
       </View>
 
-      {/* ── Scrollable content — clipped when collapsed via overflow: hidden ── */}
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Top area: animation left, market awareness chips + avatar right */}
-        <View style={styles.topArea}>
-          <View style={styles.animationArea}>
-            <LottieView
-              source={POD_ANIMATION}
-              autoPlay
-              loop
-              style={{ width: lottieSize, height: lottieSize }}
-            />
-          </View>
-          <View style={styles.leftChipsCol}>
-            <View style={styles.chipsRow}>
-              <View
-                style={[
-                  styles.previewAvatar,
-                  { backgroundColor: theme.background },
-                ]}
-              >
-                <SvgXml
-                  xml={avatarSvg}
-                  width={AVATAR_SIZE}
-                  height={AVATAR_SIZE}
-                />
-              </View>
-            </View>
-            <ForgeStatChip
-              label="MOM"
-              value={`${Math.round(state.marketAwareness.momentum * 100)}%`}
-            />
-            <ForgeStatChip
-              label="M/R"
-              value={`${Math.round(state.marketAwareness.meanReversion * 100)}%`}
-            />
-            <ForgeStatChip
-              label="VOL"
-              value={`${Math.round(state.marketAwareness.volatility * 100)}%`}
-            />
-            <ForgeStatChip
-              label="TRND"
-              value={`${Math.round(state.marketAwareness.trendFollowing * 100)}%`}
-            />
-          </View>
+      {/* Stat chip rows */}
+      <View style={styles.chipsGrid}>
+        <View style={styles.chipsRow}>
+          <ForgeStatChip label="NAME" value={state.name.trim() || null} />
+          <ForgeStatChip
+            label="FRAME"
+            value={frameConfig?.gamifiedName ?? null}
+            colorway={frameConfig?.colorway ?? null}
+          />
+          <ForgeStatChip label="BRAIN" value={brainLabel} />
         </View>
+        <View style={styles.chipsRow}>
+          <ForgeStatChip
+            label="RISK"
+            value={state.riskAttitude ? capitalize(state.riskAttitude) : null}
+          />
+          <ForgeStatChip
+            label="TEMPO"
+            value={state.tradeTempo ? capitalize(state.tradeTempo) : null}
+          />
+          <ForgeStatChip
+            label="ALLOC"
+            value={`${Math.round(state.allocationPct * 100)}%`}
+          />
+        </View>
+        <View style={styles.chipsRow}>
+          <ForgeStatChip
+            label="PATIENCE"
+            value={
+              state.combatPatience ? capitalize(state.combatPatience) : null
+            }
+          />
+          <ForgeStatChip label="EXIT" value={exitLabel} />
+          <ForgeStatChip label="STOP" value={stopLabel} />
+        </View>
+        <View style={styles.chipsRow}>
+          <ForgeStatChip label="SECTORS" value={sectorsLabel} />
+          <ForgeStatChip label="MAX LOSS" value={maxLossLabel} />
+          <ForgeStatChip label="MAX GAIN" value={maxGainLabel} />
+        </View>
+      </View>
+    </ScrollView>
+  );
 
-        {/* Stat chip rows */}
-        <View style={styles.chipsGrid}>
-          <View style={styles.chipsRow}>
-            <ForgeStatChip label="NAME" value={state.name.trim() || null} />
-            <ForgeStatChip
-              label="FRAME"
-              value={frameConfig?.gamifiedName ?? null}
-              colorway={frameConfig?.colorway ?? null}
-            />
-            <ForgeStatChip label="BRAIN" value={brainLabel} />
-          </View>
-          <View style={styles.chipsRow}>
-            <ForgeStatChip
-              label="RISK"
-              value={state.riskAttitude ? capitalize(state.riskAttitude) : null}
-            />
-            <ForgeStatChip
-              label="TEMPO"
-              value={state.tradeTempo ? capitalize(state.tradeTempo) : null}
-            />
-            <ForgeStatChip
-              label="ALLOC"
-              value={`${Math.round(state.allocationPct * 100)}%`}
-            />
-          </View>
-          <View style={styles.chipsRow}>
-            <ForgeStatChip
-              label="PATIENCE"
-              value={
-                state.combatPatience ? capitalize(state.combatPatience) : null
-              }
-            />
-            <ForgeStatChip label="EXIT" value={exitLabel} />
-            <ForgeStatChip label="STOP" value={stopLabel} />
-          </View>
-          <View style={styles.chipsRow}>
-            <ForgeStatChip label="SECTORS" value={sectorsLabel} />
-            <ForgeStatChip label="MAX LOSS" value={maxLossLabel} />
-            <ForgeStatChip label="MAX GAIN" value={maxGainLabel} />
-          </View>
-        </View>
-      </ScrollView>
+  if (!collapsible) {
+    return (
+      <View style={[styles.panelFlex, { backgroundColor: theme.background }]}>
+        {header}
+        {scrollContent}
+      </View>
+    );
+  }
+
+  return (
+    <Animated.View
+      style={[
+        styles.panel,
+        {
+          height: animatedHeight,
+          backgroundColor: theme.background,
+          borderBottomColor: theme.inputBorder,
+        },
+      ]}
+    >
+      {header}
+      {scrollContent}
     </Animated.View>
   );
 }
@@ -249,6 +271,10 @@ export function ForgeStatPanel({
 const styles = StyleSheet.create({
   panel: {
     borderBottomWidth: 5,
+    overflow: "hidden",
+  },
+  panelFlex: {
+    flex: 1,
     overflow: "hidden",
   },
   header: {

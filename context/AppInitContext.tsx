@@ -53,7 +53,9 @@ export function AppInitProvider({ children }: { children: React.ReactNode }) {
     // 1) signed out + pending verification -> /(auth)/verify
     // 2) signed out + no pending verification -> /(auth)/login
     // 3) signed in + onboarding incomplete -> /(onboarding)
-    // 4) signed in + onboarding complete -> keep restored route (no replace)
+    // 4) signed in + onboarding complete -> /(tabs)
+    // We intentionally do not rely on nav state restoration here because it can
+    // revive transient flows (e.g. bot-forge) after app relaunch.
     if (!isAuthenticated && pendingVerification) {
       // Verification was in progress when the app was last closed — return
       // the user directly to the verify screen so they can complete it.
@@ -62,9 +64,9 @@ export function AppInitProvider({ children }: { children: React.ReactNode }) {
       router.replace("/(auth)/login");
     } else if (!isComplete) {
       router.replace("/(onboarding)");
+    } else {
+      router.replace("/(tabs)");
     }
-    // authenticated + complete: no replace needed — nav state restoration
-    // handles returning the user to wherever they were (e.g. tabs).
 
     // Persist readiness across provider remounts (which can happen during
     // route tree transitions) so the loading gate does not re-appear forever.

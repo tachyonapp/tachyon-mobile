@@ -38,7 +38,7 @@ const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 function RootNavigator() {
   const { isReady } = useAppInit();
   const { isAuthenticated, logout } = useAuth();
-  const { isLocked, prompt, disable } = useBiometricAuth();
+  const { isInitialized, isLocked, prompt, disable } = useBiometricAuth();
   const segments = useSegments();
   const router = useRouter();
   const inAuthGroup = segments[0] === "(auth)";
@@ -49,9 +49,15 @@ function RootNavigator() {
     if (!isAuthenticated && !inAuthGroup) {
       router.replace("/(auth)/login");
     }
-  }, [isAuthenticated, isReady]);
+  }, [inAuthGroup, isAuthenticated, isReady, router]);
 
   if (!isReady) {
+    return <AuthLoadingState />;
+  }
+
+  // Prevent route-group content from rendering before biometric preference
+  // hydration completes. Otherwise protected routes can flash before lock.
+  if (isAuthenticated && !isInitialized) {
     return <AuthLoadingState />;
   }
 
