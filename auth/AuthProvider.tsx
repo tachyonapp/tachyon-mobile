@@ -28,6 +28,7 @@ interface AuthContextValue {
   confirmPasswordReset: (code: string, newPassword: string) => Promise<void>;
   verifySignIn: (code: string) => Promise<void>;
   verifySignUp: (code: string) => Promise<void>;
+  abandonVerification: () => void;
   resendVerificationCode: () => Promise<void>;
   error: Error | null;
 }
@@ -83,6 +84,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     restore();
   }, []);
+
+  // Clear pending state whenever a session is established (covers any auth path).
+  useEffect(() => {
+    if (isSignedIn && verificationRestored) {
+      setPendingVerification(null);
+      setPendingEmail(null);
+    }
+  }, [isSignedIn, verificationRestored]);
 
   // Persist pending verification state so the verify screen survives app restarts.
   useEffect(() => {
@@ -156,10 +165,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (result.status === "complete") {
         await setSignUpActive!({ session: result.createdSessionId });
       } else {
-        // Email verification required
-        await signUp!.prepareEmailAddressVerification({
-          strategy: "email_code",
-        });
+        await signUp!.prepareEmailAddressVerification();
         setPendingEmail(email);
         setPendingVerification("signup_email");
       }
@@ -222,6 +228,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const verifySignUp = async (code: string): Promise<void> => {
     setError(null);
+    // signUp.id is absent when the in-memory sign-up was lost (e.g. app killed
+    // between signup and verification). Surface a clear restart message rather
+    // than letting Clerk throw a generic resource_not_found error.
+    if (!signUp?.id) {
+      setPendingVerification(null);
+      setPendingEmail(null);
+      setError(new Error("signup_session_expired"));
+      return;
+    }
     try {
       const result = await signUp!.attemptEmailAddressVerification({ code });
       if (result.status === "complete") {
@@ -235,13 +250,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const abandonVerification = (): void => {
+    setPendingVerification(null);
+    setPendingEmail(null);
+    setError(null);
+  };
+
   const resendVerificationCode = async (): Promise<void> => {
     setError(null);
+    if (pendingVerification === "signup_email" && !signUp?.id) {
+      setPendingVerification(null);
+      setPendingEmail(null);
+      setError(new Error("signup_session_expired"));
+      return;
+    }
     try {
       if (pendingVerification === "signin_second_factor") {
         await signIn!.prepareSecondFactor({ strategy: "email_code" });
       } else if (pendingVerification === "signup_email") {
-        await signUp!.prepareEmailAddressVerification({ strategy: "email_code" });
+        await signUp!.prepareEmailAddressVerification();
       }
     } catch (err) {
       setError(err instanceof Error ? err : new Error("Failed to resend code"));
@@ -265,6 +292,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     confirmPasswordReset,
     verifySignIn,
     verifySignUp,
+    abandonVerification,
     resendVerificationCode,
     error,
   };
