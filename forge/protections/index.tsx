@@ -1,16 +1,14 @@
 import { FrameConfig } from "@/constants/frameConfig";
 import type { WizardState } from "@/context/WizardContext";
-import { ForgeSection } from "@/forge/components/ForgeSection";
 import { SafetySystemsForm } from "@/forge/protections/SafetySystemsForm";
 import {
   EmotionalControlsInput,
-  ExitPersonalityInput,
   StopLossStyleInput,
 } from "@/generated/graphql";
+import { View } from "react-native";
 
 interface ProtectionsProps {
   frameConfig: FrameConfig | null;
-  exitPersonality: ExitPersonalityInput | null;
   dailyMaxLoss: number;
   allocationPct: number;
   userCashBalance: number;
@@ -26,7 +24,6 @@ interface ProtectionsProps {
 
 export const Protections = ({
   frameConfig,
-  exitPersonality,
   dailyMaxLoss,
   dailyMaxLossBounds,
   allocationPct,
@@ -36,15 +33,8 @@ export const Protections = ({
   emotionalControls,
   updateField,
 }: ProtectionsProps) => {
-  const exitSet = exitPersonality !== null;
-
   return (
-    <ForgeSection
-      title="Protections"
-      subtitle="Configure safety limits to protect your capital."
-      locked={!exitSet}
-      lockedMessage="Choose an exit strategy first."
-    >
+    <View>
       <SafetySystemsForm
         frameName={frameConfig?.gamifiedName ?? "your frame"}
         dailyMaxLossPct={dailyMaxLoss}
@@ -59,6 +49,6 @@ export const Protections = ({
         emotionalControls={emotionalControls}
         onEmotionalControlsChange={(v) => updateField("emotionalControls", v)}
       />
-    </ForgeSection>
+    </View>
   );
 };

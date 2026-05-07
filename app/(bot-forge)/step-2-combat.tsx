@@ -1,8 +1,8 @@
 import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { useWizard } from "@/context/WizardContext";
-import { WizardNavBar } from "@/forge/components/WizardNavBar";
-import { ForgeSection } from "@/forge/components/ForgeSection";
 import { Capital } from "@/forge/capital";
+import { ForgeNavBar } from "@/forge/components/ForgeNavBar";
+import { ForgeSection } from "@/forge/components/ForgeSection";
 import { Patience } from "@/forge/patience";
 import { Risk } from "@/forge/risk";
 import { Tempo } from "@/forge/tempo";
@@ -52,7 +52,18 @@ export default function Step2Combat() {
         <Pressable onPress={() => Keyboard.dismiss()}>
           <ForgeSection
             title="Trade Profile"
-            subtitle="How your bot sizes and times its trades."
+            subtitle="How your agent sizes and times its trades."
+          >
+            <></>
+          </ForgeSection>
+
+          <ForgeSection
+            title="Risk Attitude"
+            subtitle="Set risk tolerance"
+            tooltip={{
+              title: "Risk Attitude",
+              body: "Controls how large each position is relative to your agents's allocated capital.",
+            }}
           >
             <Risk
               frameConfig={frameConfig}
@@ -60,12 +71,32 @@ export default function Step2Combat() {
               updateField={updateField}
               disabledReasonFor={disabledReasonFor}
             />
+          </ForgeSection>
+
+          <ForgeSection
+            title="Trade Tempo"
+            subtitle="Set trading frequency"
+            tooltip={{
+              title: "Trading Tempo",
+              body: "Controls how often your agent looks for new opportunities.",
+            }}
+          >
             <Tempo
               frameConfig={frameConfig}
               tradeTempo={state.tradeTempo}
               updateField={updateField}
               disabledReasonFor={disabledReasonFor}
             />
+          </ForgeSection>
+
+          <ForgeSection
+            title="Trading Patience"
+            subtitle="Set position hold time"
+            tooltip={{
+              title: "Trading Patience",
+              body: "Sets how long your agent must hold a position before exiting. Longer holds reduce Pattern Day Trading risk as defined by FINRA. For more information on Pattern Day Trading rules see: https://www.finra.org/investors/investing/investment-products/stocks/day-trading",
+            }}
+          >
             <Patience
               frameConfig={frameConfig}
               combatPatience={state.combatPatience}
@@ -74,19 +105,30 @@ export default function Step2Combat() {
             />
           </ForgeSection>
 
-          <Capital
-            allocationPct={state.allocationPct}
-            updateField={updateField}
-            allocationBounds={allocationBounds}
-            combatComplete={combatComplete}
-            existingAllocationTotal={state.existingAllocationTotal}
-            userCashBalance={userCashBalance}
-            frameName={frameConfig?.gamifiedName ?? null}
-          />
+          <ForgeSection
+            title="Capital Allocation"
+            subtitle="How much of your total account funds will this agent use?"
+            tooltip={{
+              title: "Capital Allocation",
+              body: "This is the percentage of your total account balance that this agent can use. Multiple agents share your capital — allocated total cannot exceed 100%.",
+            }}
+            locked={!combatComplete}
+            lockedMessage="Set Trade Tempo first."
+          >
+            <Capital
+              allocationPct={state.allocationPct}
+              updateField={updateField}
+              allocationBounds={allocationBounds}
+              combatComplete={combatComplete}
+              existingAllocationTotal={state.existingAllocationTotal}
+              userCashBalance={userCashBalance}
+              frameName={frameConfig?.gamifiedName ?? null}
+            />
+          </ForgeSection>
         </Pressable>
       </ScrollView>
 
-      <WizardNavBar
+      <ForgeNavBar
         onBack={handleBack}
         onNext={handleNext}
         nextDisabled={!combatComplete}

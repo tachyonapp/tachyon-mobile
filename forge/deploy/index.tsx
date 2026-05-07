@@ -40,8 +40,8 @@ export const Deploy = ({
         ]}
       >
         <Text style={[styles.complianceText, { color: theme.textSecondary }]}>
-          Your bot will propose trades, but every trade requires your approval
-          before it executes. Nothing trades without your say-so.
+          Your agent will propose trades, but every trade requires your approval
+          before it executes.
         </Text>
       </View>
 
@@ -85,7 +85,7 @@ export const Deploy = ({
           <ActivityIndicator size="small" color={theme.textPrimary} />
         ) : (
           <Text style={[styles.deployBtnLabel, { color: theme.textPrimary }]}>
-            Deploy Bot
+            Deploy Agent
           </Text>
         )}
       </Pressable>

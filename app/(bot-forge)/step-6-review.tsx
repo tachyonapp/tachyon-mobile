@@ -1,6 +1,7 @@
 import { useWizard } from "@/context/WizardContext";
+import { ForgeNavBar } from "@/forge/components/ForgeNavBar";
+import { ForgeSection } from "@/forge/components/ForgeSection";
 import { ForgeStatPanel } from "@/forge/components/ForgeStatPanel";
-import { WizardNavBar } from "@/forge/components/WizardNavBar";
 import { Deploy, DeployError } from "@/forge/deploy";
 import {
   BrainType,
@@ -11,7 +12,7 @@ import {
 import { useMutation } from "@apollo/client/react";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 export default function Step6Review() {
   const { state, clearDraft } = useWizard();
@@ -37,14 +38,6 @@ export default function Step6Review() {
     state.stopLossStyle !== null &&
     (state.brain.brainType === BrainType.TachyonHosted ||
       state.brain.apiKey !== null);
-
-  function handleClose() {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace("/(tabs)");
-    }
-  }
 
   async function handleDeploy() {
     if (deploying) return;
@@ -112,22 +105,37 @@ export default function Step6Review() {
 
   return (
     <>
-      <ForgeStatPanel state={state} name={state.name} onClose={handleClose} />
-      <View style={styles.deployContainer}>
-        <Deploy
-          deploying={deploying}
-          canDeploy={canDeploy}
-          deployError={deployError}
-          handleDeploy={handleDeploy}
-        />
-      </View>
-      <WizardNavBar onBack={() => router.back()} />
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        contentContainerStyle={styles.scrollContent}
+      >
+        <ForgeSection
+          title="Review"
+          subtitle="This is your final agent configuration"
+        >
+          <></>
+        </ForgeSection>
+        <ForgeStatPanel state={state} name={state.name} />
+        <View>
+          <Deploy
+            deploying={deploying}
+            canDeploy={canDeploy}
+            deployError={deployError}
+            handleDeploy={handleDeploy}
+          />
+        </View>
+      </ScrollView>
+
+      <ForgeNavBar onBack={() => router.back()} />
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  deployContainer: {
+  scrollContent: {
     padding: 16,
+    gap: 28,
+    paddingBottom: 16,
   },
 });

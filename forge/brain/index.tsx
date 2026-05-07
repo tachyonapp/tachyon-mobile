@@ -1,6 +1,5 @@
 import type { BrainState } from "@/context/WizardContext";
 import { BrainSelector } from "@/forge/brain/BrainSelector";
-import { ForgeSection } from "@/forge/components/ForgeSection";
 import {
   BrainCatalog,
   BrainConfigInput,
@@ -14,9 +13,9 @@ import {
 } from "@/generated/graphql";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { useEffect } from "react";
+import { View } from "react-native";
 
 interface BrainProps {
-  stopLossSet: boolean;
   brain: BrainConfigInput;
   brainCatalog: BrainCatalog | null;
   isKeyValidated: boolean;
@@ -25,7 +24,6 @@ interface BrainProps {
 }
 
 export const Brain = ({
-  stopLossSet,
   brain,
   brainCatalog,
   isKeyValidated,
@@ -87,12 +85,7 @@ export const Brain = ({
   }
 
   return (
-    <ForgeSection
-      title="AI Model"
-      subtitle="Your bot uses AI to analyze and interact with markets as well as explain and propose trades — YOU approve every trade before it executes."
-      locked={!stopLossSet}
-      lockedMessage="Configure your protections first."
-    >
+    <View>
       <BrainSelector
         brainType={brain.brainType}
         provider={brain.provider ?? ""}
@@ -111,6 +104,6 @@ export const Brain = ({
         onModelChange={(m) => updateBrain({ modelId: m })}
         onValidateKey={handleValidateKey}
       />
-    </ForgeSection>
+    </View>
   );
 };

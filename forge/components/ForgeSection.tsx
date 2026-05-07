@@ -24,6 +24,7 @@ export function ForgeSection({
   const theme = Colors[useColorScheme()];
   return (
     <View style={styles.section}>
+      <View style={[styles.divider, { backgroundColor: theme.inputBorder }]} />
       <View style={[styles.header, locked && styles.headerLocked]}>
         <View style={styles.titleRow}>
           <Text
@@ -66,18 +67,17 @@ export function ForgeSection({
       ) : (
         children
       )}
-      <View style={[styles.divider, { backgroundColor: theme.inputBorder }]} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   section: {
+    paddingVertical: 15,
     gap: 14,
   },
   divider: {
     height: StyleSheet.hairlineWidth,
-    marginTop: 15,
     marginHorizontal: -16,
   },
   header: {
@@ -87,6 +87,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   titleRow: {
+    marginTop: 10,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,

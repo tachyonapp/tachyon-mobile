@@ -1,11 +1,9 @@
 import type { WizardState } from "@/context/WizardContext";
 import { ForgeOptionCard } from "@/forge/components/ForgeOptionCard";
-import { ForgeSection } from "@/forge/components/ForgeSection";
 import { ExitPersonalityInput, ExitPersonalityName } from "@/generated/graphql";
 import { StyleSheet, View } from "react-native";
 
 interface ExitProps {
-  sectors: string[];
   updateField: <K extends keyof WizardState>(
     field: K,
     value: WizardState[K],
@@ -35,20 +33,9 @@ const EXIT_OPTIONS: {
   },
 ];
 
-export const Exit = ({ sectors, updateField, exitPersonality }: ExitProps) => {
-  const sectorsSet = sectors.length > 0;
-
+export const Exit = ({ updateField, exitPersonality }: ExitProps) => {
   return (
-    <ForgeSection
-      title="Exit Strategy"
-      subtitle="How should your bot take profits?"
-      tooltip={{
-        title: "Exit Personality",
-        body: "Exit personality controls when your bot closes a winning position.",
-      }}
-      locked={!sectorsSet}
-      lockedMessage="Select at least one sector first."
-    >
+    <View>
       <View style={styles.optionList}>
         {EXIT_OPTIONS.map((opt) => (
           <ForgeOptionCard
@@ -60,7 +47,7 @@ export const Exit = ({ sectors, updateField, exitPersonality }: ExitProps) => {
           />
         ))}
       </View>
-    </ForgeSection>
+    </View>
   );
 };
 

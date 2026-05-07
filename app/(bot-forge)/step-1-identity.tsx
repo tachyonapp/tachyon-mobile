@@ -1,6 +1,7 @@
 import { useWizard } from "@/context/WizardContext";
+import { ForgeNavBar } from "@/forge/components/ForgeNavBar";
+import { ForgeSection } from "@/forge/components/ForgeSection";
 import { Draft } from "@/forge/draft";
-import { WizardNavBar } from "@/forge/components/WizardNavBar";
 import { Frame } from "@/forge/frame";
 import { Identity } from "@/forge/identity";
 import { useRouter } from "expo-router";
@@ -18,12 +19,10 @@ export default function Step1Identity() {
     startFresh,
   } = useWizard();
   const router = useRouter();
-
   const [nameFocused, setNameFocused] = useState(false);
   const [nameError, setNameError] = useState(false);
-
-  const canAdvance =
-    state.name.trim().length > 0 && state.frameName !== null;
+  const nameSet = state.name.trim().length > 0;
+  const canAdvance = state.name.trim().length > 0 && state.frameName !== null;
 
   async function handleNext() {
     if (!state.name.trim()) {
@@ -45,28 +44,40 @@ export default function Step1Identity() {
           {draftPrompt === "resume-or-fresh" && (
             <Draft resumeDraft={resumeDraft} startFresh={startFresh} />
           )}
+          <ForgeSection
+            title="Identity"
+            subtitle="Your agents trading personality and strategy"
+          >
+            <></>
+          </ForgeSection>
 
-          <Identity
-            name={state.name}
-            nameFocused={nameFocused}
-            nameError={nameError}
-            updateField={updateField}
-            setNameError={setNameError}
-            setNameFocused={setNameFocused}
-          />
+          <ForgeSection title="Agent Name" subtitle="Name your agent.">
+            <Identity
+              name={state.name}
+              nameFocused={nameFocused}
+              nameError={nameError}
+              updateField={updateField}
+              setNameError={setNameError}
+              setNameFocused={setNameFocused}
+            />
+          </ForgeSection>
 
-          <Frame
-            name={state.name}
-            frameName={state.frameName}
-            selectFrame={selectFrame}
-          />
+          <ForgeSection
+            title="Core Strategy"
+            subtitle="Your agent's core strategy type"
+            tooltip={{
+              title: "Personality Frame",
+              body: "The strategy type defines your agent's core trading strategy archetype. It sets bounds on all other settings and pre-fills sensible default configurations.",
+            }}
+            locked={!nameSet}
+            lockedMessage="Name your agent first."
+          >
+            <Frame frameName={state.frameName} selectFrame={selectFrame} />
+          </ForgeSection>
         </Pressable>
       </ScrollView>
 
-      <WizardNavBar
-        onNext={handleNext}
-        nextDisabled={!canAdvance}
-      />
+      <ForgeNavBar onNext={handleNext} nextDisabled={!canAdvance} />
     </>
   );
 }

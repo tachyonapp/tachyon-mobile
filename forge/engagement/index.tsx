@@ -1,12 +1,10 @@
 import { Colors } from "@/constants/theme";
 import type { WizardState } from "@/context/WizardContext";
-import { ForgeSection } from "@/forge/components/ForgeSection";
 import { RulesOfEngagementInput } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { StyleSheet, Switch, Text, View } from "react-native";
 
 interface EngagementProps {
-  stopLossSet: boolean;
   rulesOfEngagement: RulesOfEngagementInput;
   updateField: <K extends keyof WizardState>(
     field: K,
@@ -15,19 +13,13 @@ interface EngagementProps {
 }
 
 export const Engagement = ({
-  stopLossSet,
   rulesOfEngagement,
   updateField,
 }: EngagementProps) => {
   const theme = Colors[useColorScheme()];
 
   return (
-    <ForgeSection
-      title="Rules of Engagement"
-      subtitle="Set the operating rules your bot must follow."
-      locked={!stopLossSet}
-      lockedMessage="Configure your stop-loss style first."
-    >
+    <View>
       <View style={[styles.toggleGroup, { borderColor: theme.inputBorder }]}>
         <View
           style={[styles.toggleRow, { borderBottomColor: theme.inputBorder }]}
@@ -73,12 +65,12 @@ export const Engagement = ({
           ]}
         >
           <View style={styles.lockedLabelGroup}>
+            <Text style={styles.lockIcon}>🔒</Text>
             <Text style={[styles.toggleLabel, { color: theme.textPrimary }]}>
               One trade at a time
             </Text>
-            <Text style={styles.lockIcon}>🔒</Text>
             <Text style={[styles.lockedHint, { color: theme.textSecondary }]}>
-              Required in MVP. Your bot will only hold one position at a time.
+              Required in MVP. Your agent will only hold one position at a time.
             </Text>
           </View>
           <Switch
@@ -89,12 +81,12 @@ export const Engagement = ({
           />
         </View>
       </View>
-    </ForgeSection>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  toggleGroup: { gap: 0 },
+  toggleGroup: { gap: 10 },
   toggleRow: {
     flexDirection: "row",
     justifyContent: "space-between",

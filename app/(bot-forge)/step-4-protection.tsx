@@ -1,6 +1,7 @@
 import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { useWizard } from "@/context/WizardContext";
-import { WizardNavBar } from "@/forge/components/WizardNavBar";
+import { ForgeNavBar } from "@/forge/components/ForgeNavBar";
+import { ForgeSection } from "@/forge/components/ForgeSection";
 import { Engagement } from "@/forge/engagement";
 import { Exit } from "@/forge/exit";
 import { Protections } from "@/forge/protections";
@@ -12,6 +13,7 @@ import { Keyboard, Pressable, ScrollView, StyleSheet } from "react-native";
 export default function Step4Protection() {
   const { state, updateField, persistDraft } = useWizard();
   const router = useRouter();
+  const sectorsSet = state.sectors.length > 0;
 
   const { data: balanceData } = useQuery<BalanceQuery>(BalanceDocument, {
     fetchPolicy: "cache-first",
@@ -31,11 +33,10 @@ export default function Step4Protection() {
     state.dailyMaxLoss <= dailyMaxLossBounds.maxPct;
 
   const stopLossSet = state.stopLossStyle !== null;
+  const exitSet = state.exitPersonality !== null;
 
   const canAdvance =
-    state.exitPersonality !== null &&
-    stopLossSet &&
-    isDailyMaxLossValid;
+    state.exitPersonality !== null && stopLossSet && isDailyMaxLossValid;
 
   async function handleNext() {
     await persistDraft();
@@ -55,34 +56,63 @@ export default function Step4Protection() {
         contentContainerStyle={styles.scrollContent}
       >
         <Pressable onPress={() => Keyboard.dismiss()}>
-          <Exit
-            sectors={state.sectors}
-            exitPersonality={state.exitPersonality}
-            updateField={updateField}
-          />
+          <ForgeSection
+            title="Protections"
+            subtitle="Trading safety limits for your agent"
+          >
+            <></>
+          </ForgeSection>
 
-          <Protections
-            frameConfig={frameConfig}
-            exitPersonality={state.exitPersonality}
-            dailyMaxLoss={state.dailyMaxLoss}
-            allocationPct={state.allocationPct}
-            userCashBalance={userCashBalance}
-            dailyMaxLossBounds={dailyMaxLossBounds}
-            dailyMaxGain={state.dailyMaxGain}
-            stopLossStyle={state.stopLossStyle}
-            emotionalControls={state.emotionalControls}
-            updateField={updateField}
-          />
+          <ForgeSection
+            title="Exit Strategy"
+            subtitle="Set how your agent exits positions?"
+            tooltip={{
+              title: "Exit Personality",
+              body: "Exit personality controls when your agent closes a winning position.",
+            }}
+            locked={!sectorsSet}
+            lockedMessage="Select at least one sector first."
+          >
+            <Exit
+              exitPersonality={state.exitPersonality}
+              updateField={updateField}
+            />
+          </ForgeSection>
 
-          <Engagement
-            stopLossSet={stopLossSet}
-            rulesOfEngagement={state.rulesOfEngagement}
-            updateField={updateField}
-          />
+          <ForgeSection
+            title="Daily Loss Limit"
+            subtitle="Configure safety limits to protect your allocated capital."
+            locked={!exitSet}
+            lockedMessage="Choose an exit strategy first."
+          >
+            <Protections
+              frameConfig={frameConfig}
+              dailyMaxLoss={state.dailyMaxLoss}
+              allocationPct={state.allocationPct}
+              userCashBalance={userCashBalance}
+              dailyMaxLossBounds={dailyMaxLossBounds}
+              dailyMaxGain={state.dailyMaxGain}
+              stopLossStyle={state.stopLossStyle}
+              emotionalControls={state.emotionalControls}
+              updateField={updateField}
+            />
+          </ForgeSection>
+
+          <ForgeSection
+            title="Rules of Engagement"
+            subtitle="Set the operating rules your agent must follow."
+            locked={!stopLossSet}
+            lockedMessage="Configure your stop-loss style first."
+          >
+            <Engagement
+              rulesOfEngagement={state.rulesOfEngagement}
+              updateField={updateField}
+            />
+          </ForgeSection>
         </Pressable>
       </ScrollView>
 
-      <WizardNavBar
+      <ForgeNavBar
         onBack={handleBack}
         onNext={handleNext}
         nextDisabled={!canAdvance}

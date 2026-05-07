@@ -21,7 +21,7 @@ function ctaLabel(
   ) {
     return "Reactivate Subscription";
   }
-  return "Create Bot";
+  return "Create Agent";
 }
 
 export function EmptyBotListState({

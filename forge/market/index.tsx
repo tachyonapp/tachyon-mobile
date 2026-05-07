@@ -1,11 +1,10 @@
 import { FrameConfig } from "@/constants/frameConfig";
 import type { WizardState } from "@/context/WizardContext";
-import { ForgeSection } from "@/forge/components/ForgeSection";
 import { MarketAwarenessSliders } from "@/forge/market/MarketAwarenessSliders";
 import type { MarketAwarenessInput } from "@/generated/graphql";
+import { View } from "react-native";
 
 interface MarketIntelligenceProps {
-  combatComplete: boolean;
   marketAwareness: MarketAwarenessInput;
   frameConfig: FrameConfig | null;
   updateField: <K extends keyof WizardState>(
@@ -15,7 +14,6 @@ interface MarketIntelligenceProps {
 }
 
 export const MarketIntelligence = ({
-  combatComplete,
   marketAwareness,
   frameConfig,
   updateField,
@@ -28,21 +26,12 @@ export const MarketIntelligence = ({
   };
 
   return (
-    <ForgeSection
-      title="Market Intelligence"
-      subtitle="Tune your bot's market perception signals."
-      tooltip={{
-        title: "Market Awareness",
-        body: "These weights tune how your bot weighs different market signals. They are independent — they do not need to add up to anything.",
-      }}
-      locked={!combatComplete}
-      lockedMessage="Complete your Combat Profile first."
-    >
+    <View>
       <MarketAwarenessSliders
         value={marketAwareness}
         onChange={(v) => updateField("marketAwareness", v)}
         bounds={marketAwarenessBounds}
       />
-    </ForgeSection>
+    </View>
   );
 };

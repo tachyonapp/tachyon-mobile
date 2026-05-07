@@ -1,6 +1,7 @@
 import { useWizard } from "@/context/WizardContext";
-import { WizardNavBar } from "@/forge/components/WizardNavBar";
 import { Brain } from "@/forge/brain";
+import { ForgeNavBar } from "@/forge/components/ForgeNavBar";
+import { ForgeSection } from "@/forge/components/ForgeSection";
 import { BrainType } from "@/generated/graphql";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -35,18 +36,24 @@ export default function Step5Brain() {
         contentContainerStyle={styles.scrollContent}
       >
         <Pressable onPress={() => Keyboard.dismiss()}>
-          <Brain
-            stopLossSet={stopLossSet}
-            brain={state.brain}
-            brainCatalog={brainCatalog}
-            isKeyValidated={isKeyValidated}
-            updateBrain={updateBrain}
-            setIsKeyValidated={setIsKeyValidated}
-          />
+          <ForgeSection
+            title="AI Model"
+            subtitle="Your agent uses AI to analyze and interact with markets, reason about its trading as well as explain and propose trades to you — No trade execute without your explicit approval."
+            locked={!stopLossSet}
+            lockedMessage="Set your protections first."
+          >
+            <Brain
+              brain={state.brain}
+              brainCatalog={brainCatalog}
+              isKeyValidated={isKeyValidated}
+              updateBrain={updateBrain}
+              setIsKeyValidated={setIsKeyValidated}
+            />
+          </ForgeSection>
         </Pressable>
       </ScrollView>
 
-      <WizardNavBar
+      <ForgeNavBar
         onBack={handleBack}
         onNext={handleNext}
         nextDisabled={!canAdvance}

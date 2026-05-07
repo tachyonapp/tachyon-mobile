@@ -1,6 +1,6 @@
+import { BotAvatar } from "@/components/bots/BotAvatar";
 import { Colors } from "@/constants/theme";
 import type { WizardState } from "@/context/WizardContext";
-import { ForgeSection } from "@/forge/components/ForgeSection";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
@@ -35,47 +35,51 @@ export const Identity = ({
   }
 
   return (
-    <ForgeSection title="Bot Name" subtitle="Name and customize your bot.">
-      <View style={styles.fieldGroup}>
-        <View style={styles.fieldLabelRow}>
-          <Text style={[styles.charCount, { color: theme.textSecondary }]}>
-            {name.length}/{MAX_NAME_LENGTH}
-          </Text>
-        </View>
-        <TextInput
-          style={[
-            styles.textInput,
-            {
-              borderColor: theme.inputBorder,
-              color: theme.textPrimary,
-              backgroundColor: theme.inputBackground,
-            },
-            nameFocused && { borderColor: theme.electricBlue },
-            nameError && { borderColor: theme.danger },
-          ]}
-          value={name}
-          onChangeText={handleNameChange}
-          onFocus={() => setNameFocused(true)}
-          onBlur={() => setNameFocused(false)}
-          maxLength={MAX_NAME_LENGTH}
-          placeholder="e.g. Iron Scout"
-          placeholderTextColor={theme.textDisabled}
-          returnKeyType="done"
-          selectTextOnFocus={false}
-          autoCorrect={false}
-          spellCheck={false}
-        />
-        {nameError && (
-          <Text style={[styles.errorInline, { color: theme.danger }]}>
-            Bot name is required.
-          </Text>
-        )}
+    <View style={styles.fieldGroup}>
+      <View style={styles.avatar}>
+        <BotAvatar seed={name} backgroundColor={theme.background} />
       </View>
-    </ForgeSection>
+      <TextInput
+        style={[
+          styles.textInput,
+          {
+            borderColor: theme.inputBorder,
+            color: theme.textPrimary,
+            backgroundColor: theme.inputBackground,
+          },
+          nameFocused && { borderColor: theme.electricBlue },
+          nameError && { borderColor: theme.danger },
+        ]}
+        value={name}
+        onChangeText={handleNameChange}
+        onFocus={() => setNameFocused(true)}
+        onBlur={() => setNameFocused(false)}
+        maxLength={MAX_NAME_LENGTH}
+        placeholder="e.g. Iron Scout"
+        placeholderTextColor={theme.textDisabled}
+        returnKeyType="done"
+        selectTextOnFocus={false}
+        autoCorrect={false}
+        spellCheck={false}
+      />
+      {nameError && (
+        <Text style={[styles.errorInline, { color: theme.danger }]}>
+          Agent name is required.
+        </Text>
+      )}
+      <View style={styles.fieldLabelRow}>
+        <Text style={[styles.charCount, { color: theme.textSecondary }]}>
+          {name.length}/{MAX_NAME_LENGTH}
+        </Text>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  avatar: {
+    alignItems: "flex-end",
+  },
   fieldGroup: { gap: 8 },
   fieldLabelRow: {
     flexDirection: "row",

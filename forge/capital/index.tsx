@@ -1,9 +1,8 @@
 import { Colors } from "@/constants/theme";
 import type { WizardState } from "@/context/WizardContext";
 import { AllocationControl } from "@/forge/capital/AllocationControl";
-import { ForgeSection } from "@/forge/components/ForgeSection";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 
 interface CapitalProps {
   allocationPct: number;
@@ -35,25 +34,17 @@ export const Capital = ({
   const fullyAllocated = allocationMax < allocationBounds.min;
 
   return (
-    <ForgeSection
-      title="Capital Allocation"
-      subtitle="How much of your account funds does this bot control?"
-      tooltip={{
-        title: "Capital Allocation",
-        body: "This is the percentage of your total account balance this bot can use. Multiple bots share your capital — allocations cannot exceed 100%.",
-      }}
-      locked={!combatComplete}
-      lockedMessage="Complete your Combat Profile first."
-    >
+    <View>
       {frameName && (
-        <Text style={{ color: theme.textSecondary, fontSize: 13 }}>
-          {`${frameName} requires a minimum ${Math.round(allocationBounds.min * 100)}% allocation.`}
+        <Text style={{ color: theme.textDisabled, fontSize: 15 }}>
+          {`${frameName} agent type requires a minimum ${Math.round(allocationBounds.min * 100)}% and a ${Math.round(allocationBounds.max * 100)}% maximum allocation.`}
         </Text>
       )}
       {fullyAllocated ? (
         <Text style={{ color: theme.warning, fontSize: 13 }}>
-          Your other bots are using 100% of your capital. Free up allocation by
-          editing or removing an existing bot before adding a new one.
+          Your other agents are using 100% of your capital. Free up allocation
+          by editing or removing an existing bot before adding a new one or
+          adding more funds to your account.
         </Text>
       ) : (
         <AllocationControl
@@ -67,6 +58,6 @@ export const Capital = ({
           userCashBalance={userCashBalance}
         />
       )}
-    </ForgeSection>
+    </View>
   );
 };

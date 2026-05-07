@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 
-interface WizardNavBarProps {
+interface ForgeNavBarProps {
   onBack?: () => void;
   onNext?: () => void;
   nextDisabled?: boolean;
@@ -16,27 +16,32 @@ interface WizardNavBarProps {
   loading?: boolean;
 }
 
-export function WizardNavBar({
+export function ForgeNavBar({
   onBack,
   onNext,
   nextDisabled = false,
   nextLabel = "Next",
   loading = false,
-}: WizardNavBarProps) {
+}: ForgeNavBarProps) {
   const theme = Colors[useColorScheme()];
 
   return (
-    <View
-      style={[styles.container, { borderTopColor: theme.inputBorder }]}
-    >
+    <View style={[styles.container, { borderTopColor: theme.inputBorder }]}>
       {onBack ? (
         <Pressable
           onPress={onBack}
-          style={styles.backBtn}
+          style={[styles.backBtn, { backgroundColor: theme.electricBlue }]}
           accessibilityRole="button"
           accessibilityLabel="Go back"
         >
-          <Text style={[styles.backText, { color: theme.textSecondary }]}>
+          <Text
+            style={[
+              styles.backText,
+              {
+                color: theme.textPrimary,
+              },
+            ]}
+          >
             Back
           </Text>
         </Pressable>
@@ -88,19 +93,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingVertical: 15,
+    borderTopWidth: 1,
     gap: 12,
   },
   backBtn: {
     minWidth: 64,
     height: 44,
     justifyContent: "center",
-    alignItems: "flex-start",
+    alignItems: "center",
+    borderRadius: 10,
   },
   backText: {
     fontSize: 15,
     fontWeight: "500",
+    textAlign: "center",
   },
   nextBtn: {
     flex: 1,
@@ -108,6 +115,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
+    minWidth: 64,
+    maxWidth: 120,
   },
   nextText: {
     fontSize: 16,

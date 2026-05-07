@@ -15,11 +15,10 @@ import { useQuery } from "@apollo/client/react";
 import { router } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   RefreshControl,
-  SafeAreaView,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 
@@ -69,12 +68,7 @@ export default function BotListScreen() {
   const showBanner = isBlocked;
 
   return (
-    <SafeAreaView style={[styles.root, { backgroundColor: theme.background }]}>
-      <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: theme.textPrimary }]}>
-          Agents
-        </Text>
-      </View>
+    <View style={[styles.root, { backgroundColor: theme.background }]}>
       {showBanner && (
         <SubscriptionStatusBanner
           status={subscriptionStatus!}
@@ -103,13 +97,22 @@ export default function BotListScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={theme.electricBlue}
+            // Keep pull-to-refresh gesture/state, but hide the native spinner
+            // so only the centered overlay indicator is visible.
+            tintColor="transparent"
+            colors={["transparent"]}
+            progressBackgroundColor="transparent"
           />
         }
         contentContainerStyle={
           bots.length === 0 ? styles.emptyContainer : styles.listContent
         }
       />
+      {refreshing && (
+        <View pointerEvents="none" style={styles.refreshOverlay}>
+          <ActivityIndicator size="large" color={theme.electricBlue} />
+        </View>
+      )}
       <CreateBotFAB onPress={handleCreateBot} />
       {isBlocked && (
         <ReactivationBottomSheet
@@ -118,21 +121,12 @@ export default function BotListScreen() {
           status={subscriptionStatus!}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 12,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: "700",
-  },
   listContent: {
     paddingHorizontal: 16,
     paddingTop: 8,
@@ -140,4 +134,9 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   emptyContainer: { flex: 1 },
+  refreshOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });

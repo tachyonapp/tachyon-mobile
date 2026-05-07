@@ -1,4 +1,3 @@
-import { EducationalTooltip } from "@/components/EducationalTooltip";
 import { FrameConfig } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import type { WizardState } from "@/context/WizardContext";
@@ -77,15 +76,6 @@ export const Patience = ({
 
   return (
     <View style={styles.subSection}>
-      <View style={styles.subSectionHeader}>
-        <Text style={[styles.subSectionTitle, { color: theme.textPrimary }]}>
-          Trade Patience
-        </Text>
-        <EducationalTooltip
-          title="Combat Patience"
-          body="Combat patience sets how long your bot must hold a position before exiting. Longer holds reduce PDT risk."
-        />
-      </View>
       {combatPatience && (
         <Text style={[styles.hint, { color: theme.electricBlue }]}>
           {PATIENCE_HINTS[combatPatience]}
@@ -114,12 +104,6 @@ export const Patience = ({
 
 const styles = StyleSheet.create({
   subSection: { gap: 10, marginBottom: 20, marginTop: 20 },
-  subSectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  subSectionTitle: { fontSize: 15, fontWeight: "600", flex: 1 },
   optionList: { gap: 10 },
-  hint: { fontSize: 13, fontWeight: "500" },
+  hint: { fontSize: 15, fontWeight: "500", textAlign: "left", marginLeft: 5 },
 });

@@ -1,4 +1,3 @@
-import { EducationalTooltip } from "@/components/EducationalTooltip";
 import { FrameConfig } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import type { WizardState } from "@/context/WizardContext";
@@ -70,15 +69,6 @@ export const Tempo = ({
 
   return (
     <View style={styles.subSection}>
-      <View style={styles.subSectionHeader}>
-        <Text style={[styles.subSectionTitle, { color: theme.textPrimary }]}>
-          Trade Tempo
-        </Text>
-        <EducationalTooltip
-          title="Trade Tempo"
-          body="Trade tempo controls how often your bot looks for new opportunities."
-        />
-      </View>
       {tradeTempo && (
         <Text style={[styles.hint, { color: theme.electricBlue }]}>
           {TEMPO_HINTS[tradeTempo]}
@@ -105,12 +95,6 @@ export const Tempo = ({
 
 const styles = StyleSheet.create({
   subSection: { gap: 10, marginBottom: 20, marginTop: 20 },
-  subSectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  subSectionTitle: { fontSize: 15, fontWeight: "600", flex: 1 },
   optionList: { gap: 10 },
-  hint: { fontSize: 13, fontWeight: "500" },
+  hint: { fontSize: 15, fontWeight: "500", textAlign: "left", marginLeft: 5 },
 });

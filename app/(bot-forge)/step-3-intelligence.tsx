@@ -1,6 +1,7 @@
 import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { useWizard } from "@/context/WizardContext";
-import { WizardNavBar } from "@/forge/components/WizardNavBar";
+import { ForgeNavBar } from "@/forge/components/ForgeNavBar";
+import { ForgeSection } from "@/forge/components/ForgeSection";
 import { MarketIntelligence } from "@/forge/market";
 import { Sectors } from "@/forge/sectors";
 import { useRouter } from "expo-router";
@@ -39,24 +40,47 @@ export default function Step3Intelligence() {
         contentContainerStyle={styles.scrollContent}
       >
         <Pressable onPress={() => Keyboard.dismiss()}>
-          <MarketIntelligence
-            combatComplete={combatComplete}
-            marketAwareness={state.marketAwareness}
-            frameConfig={frameConfig}
-            updateField={updateField}
-          />
+          <ForgeSection
+            title="Market Behavior"
+            subtitle="How your agent interacts with markets"
+          >
+            <></>
+          </ForgeSection>
 
-          <Sectors
-            combatComplete={combatComplete}
-            sectors={state.sectors}
-            updateField={updateField}
-            sectorAttempted={sectorAttempted}
-            setSectorAttempted={setSectorAttempted}
-          />
+          <ForgeSection
+            title="Intelligence"
+            subtitle="Tune your agent's market perception signals."
+            tooltip={{
+              title: "Market Awareness",
+              body: "These weights tune how your agent weighs different market signals. They are independent — they do not need to add up to anything.",
+            }}
+            locked={!combatComplete}
+            lockedMessage="Complete your Trading Profile first."
+          >
+            <MarketIntelligence
+              marketAwareness={state.marketAwareness}
+              frameConfig={frameConfig}
+              updateField={updateField}
+            />
+          </ForgeSection>
+
+          <ForgeSection
+            title="Sectors"
+            subtitle="Select one or more market sectors your agent can trade in."
+            locked={!combatComplete}
+            lockedMessage="Complete your Trading Profile first."
+          >
+            <Sectors
+              sectors={state.sectors}
+              updateField={updateField}
+              sectorAttempted={sectorAttempted}
+              setSectorAttempted={setSectorAttempted}
+            />
+          </ForgeSection>
         </Pressable>
       </ScrollView>
 
-      <WizardNavBar
+      <ForgeNavBar
         onBack={handleBack}
         onNext={handleNext}
         nextDisabled={state.sectors.length === 0}

@@ -95,7 +95,7 @@ export function SectorGrid({
                   { color: theme.textSecondary },
                   isSelected && {
                     color: theme.electricBlue,
-                    fontWeight: "600",
+                    fontWeight: "300",
                   },
                 ]}
               >

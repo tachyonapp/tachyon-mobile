@@ -1,35 +1,18 @@
-import { IconSymbol } from "@/components/ui/icon-symbol";
+import { BotAvatar } from "@/components/bots/BotAvatar";
 import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import { type WizardState } from "@/context/WizardContext";
 import { BrainType } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { botttsNeutral } from "@dicebear/collection";
-import { createAvatar } from "@dicebear/core";
 import LottieView from "lottie-react-native";
-import React, { useMemo, useRef, useState } from "react";
-import {
-  Animated,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  useWindowDimensions,
-} from "react-native";
-import { SvgXml } from "react-native-svg";
+import React from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { ForgeStatChip } from "./ForgeStatChip";
 
-// TODO:: Make this an interactive animation - changes in bot settings produces changes in the animated bot character.
 const POD_ANIMATION = require("@/assets/animations/pod.json");
-const LEFT_COL_WIDTH = 60;
-const AVATAR_SIZE = 60;
-const HEADER_HEIGHT = 30;
-
 interface ForgeStatPanelProps {
   state: WizardState;
   height?: number;
-  onClose: () => void;
   name: string;
 }
 
@@ -44,36 +27,9 @@ function formatEnumLabel(s: string): string {
     .join(" ");
 }
 
-export function ForgeStatPanel({
-  state,
-  height,
-  onClose,
-  name,
-}: ForgeStatPanelProps) {
+export function ForgeStatPanel({ state, height, name }: ForgeStatPanelProps) {
   const theme = Colors[useColorScheme()];
-  const { width: screenWidth } = useWindowDimensions();
   const frameConfig = state.frameName ? FRAME_CONFIG[state.frameName] : null;
-
-  const collapsible = height !== undefined;
-
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const animatedHeight = useRef(new Animated.Value(height ?? 0)).current;
-
-  function toggleCollapse() {
-    const toValue = isCollapsed ? height! : HEADER_HEIGHT;
-    setIsCollapsed((prev) => !prev);
-    Animated.spring(animatedHeight, {
-      toValue,
-      useNativeDriver: false,
-      bounciness: 3,
-      speed: 16,
-    }).start();
-  }
-
-  const avatarSvg = useMemo(
-    () => createAvatar(botttsNeutral, { seed: name || "default" }).toString(),
-    [name],
-  );
 
   const brainLabel =
     state.brain.brainType === BrainType.TachyonHosted
@@ -81,11 +37,6 @@ export function ForgeStatPanel({
       : state.brain.provider
         ? capitalize(state.brain.provider)
         : "BYOK";
-
-  const animAreaWidth = screenWidth - 32 - LEFT_COL_WIDTH - 12;
-  const lottieSize = collapsible
-    ? Math.min(animAreaWidth, height! - 230)
-    : Math.min(animAreaWidth, 180);
 
   const exitLabel = state.exitPersonality?.name
     ? formatEnumLabel(state.exitPersonality.name)
@@ -105,80 +56,37 @@ export function ForgeStatPanel({
       ? `${Math.round(state.dailyMaxGain * 100)}%`
       : null;
 
-  const header = (
-    <View style={[styles.header, { borderBottomColor: theme.inputBorder }]}>
-      <Pressable
-        onPress={onClose}
-        hitSlop={12}
-        accessibilityRole="button"
-        accessibilityLabel="Close bot builder"
-        style={styles.headerBtn}
-      >
-        <Text style={[styles.closeBtnText, { color: theme.textSecondary }]}>
-          ✕
-        </Text>
-      </Pressable>
-
-      <Text
-        style={[styles.headerTitle, { color: theme.textSecondary }]}
-        numberOfLines={1}
-      >
-        {name.trim() || "Bot Forge"}
-      </Text>
-
-      {collapsible ? (
-        <Pressable
-          onPress={toggleCollapse}
-          hitSlop={12}
-          accessibilityRole="button"
-          accessibilityLabel={
-            isCollapsed ? "Expand stats panel" : "Collapse stats panel"
-          }
-          style={styles.headerBtn}
-        >
-          <IconSymbol
-            name={isCollapsed ? "chevron.down" : "chevron.up"}
-            size={16}
-            color={theme.textSecondary}
-          />
-        </Pressable>
-      ) : (
-        <View style={styles.headerBtn} />
-      )}
-    </View>
-  );
-
-  const scrollContent = (
+  return (
     <ScrollView
-      style={styles.scrollView}
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
     >
-      {/* Top area: animation left, market awareness chips + avatar right */}
       <View style={styles.topArea}>
         <View style={styles.animationArea}>
           <LottieView
             source={POD_ANIMATION}
             autoPlay
             loop
-            style={{ width: lottieSize, height: lottieSize }}
+            style={{ width: 200, height: 200 }}
           />
         </View>
-        <View style={styles.leftChipsCol}>
-          <View style={styles.chipsRow}>
-            <View
-              style={[
-                styles.previewAvatar,
-                { backgroundColor: theme.background },
-              ]}
-            >
-              <SvgXml
-                xml={avatarSvg}
-                width={AVATAR_SIZE}
-                height={AVATAR_SIZE}
-              />
-            </View>
-          </View>
+      </View>
+
+      {/* Stat chip rows */}
+      <View style={styles.chipsGrid}>
+        <View style={styles.chipsRow}>
+          <BotAvatar seed={name} backgroundColor={theme.background} />
+        </View>
+        <View style={styles.chipsRow}>
+          <ForgeStatChip label="NAME" value={state.name.trim() || null} />
+          <ForgeStatChip
+            label="FRAME"
+            value={frameConfig?.gamifiedName ?? null}
+            colorway={frameConfig?.colorway ?? null}
+          />
+        </View>
+        <View style={styles.chipsRow}>
+          <ForgeStatChip label="BRAIN" value={brainLabel} />
           <ForgeStatChip
             label="MOM"
             value={`${Math.round(state.marketAwareness.momentum * 100)}%`}
@@ -187,6 +95,9 @@ export function ForgeStatPanel({
             label="M/R"
             value={`${Math.round(state.marketAwareness.meanReversion * 100)}%`}
           />
+        </View>
+
+        <View style={styles.chipsRow}>
           <ForgeStatChip
             label="VOL"
             value={`${Math.round(state.marketAwareness.volatility * 100)}%`}
@@ -195,19 +106,6 @@ export function ForgeStatPanel({
             label="TRND"
             value={`${Math.round(state.marketAwareness.trendFollowing * 100)}%`}
           />
-        </View>
-      </View>
-
-      {/* Stat chip rows */}
-      <View style={styles.chipsGrid}>
-        <View style={styles.chipsRow}>
-          <ForgeStatChip label="NAME" value={state.name.trim() || null} />
-          <ForgeStatChip
-            label="FRAME"
-            value={frameConfig?.gamifiedName ?? null}
-            colorway={frameConfig?.colorway ?? null}
-          />
-          <ForgeStatChip label="BRAIN" value={brainLabel} />
         </View>
         <View style={styles.chipsRow}>
           <ForgeStatChip
@@ -241,92 +139,28 @@ export function ForgeStatPanel({
       </View>
     </ScrollView>
   );
-
-  if (!collapsible) {
-    return (
-      <View style={[styles.panelFlex, { backgroundColor: theme.background }]}>
-        {header}
-        {scrollContent}
-      </View>
-    );
-  }
-
-  return (
-    <Animated.View
-      style={[
-        styles.panel,
-        {
-          height: animatedHeight,
-          backgroundColor: theme.background,
-          borderBottomColor: theme.inputBorder,
-        },
-      ]}
-    >
-      {header}
-      {scrollContent}
-    </Animated.View>
-  );
 }
 
 const styles = StyleSheet.create({
   panel: {
     borderBottomWidth: 5,
     overflow: "hidden",
-  },
-  panelFlex: {
-    flex: 1,
-    overflow: "hidden",
-  },
-  header: {
-    height: HEADER_HEIGHT,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  headerBtn: {
-    width: 32,
-    height: 32,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 13,
-    fontWeight: "600",
-    letterSpacing: 0.3,
+    gap: 5,
   },
   closeBtnText: {
     fontSize: 16,
   },
-  previewAvatar: {
-    width: AVATAR_SIZE,
-    height: AVATAR_SIZE,
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-  scrollView: {
-    flex: 1,
-  },
   scrollContent: {
     gap: 12,
-    padding: 16,
     paddingBottom: 12,
   },
   topArea: {
-    flexDirection: "row",
     gap: 12,
-    minHeight: 120,
   },
   animationArea: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-  },
-  leftChipsCol: {
-    width: LEFT_COL_WIDTH,
-    gap: 6,
   },
   chipsGrid: {
     gap: 6,

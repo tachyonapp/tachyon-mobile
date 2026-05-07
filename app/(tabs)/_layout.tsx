@@ -1,5 +1,6 @@
 import { useAuth } from "@/auth/AuthProvider";
-import { HapticTab } from "@/components/haptic-tab";
+import { HapticTab } from "@/components/layout/haptic-tab";
+import { HeaderNav } from "@/components/layout/header-nav";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { CompleteOnboardingDocument, MeDocument } from "@/generated/graphql";
@@ -9,10 +10,12 @@ import { useMutation, useQuery } from "@apollo/client/react";
 import { Redirect, Tabs } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useEffect } from "react";
+import { SafeAreaView, StyleSheet } from "react-native";
 
 export default function TabLayout() {
   const { isAuthenticated, isLoading } = useAuth();
   const colorScheme = useColorScheme();
+  const theme = Colors[colorScheme];
   const tabColor = Colors[colorScheme].electricBlue;
   const [completeOnboarding] = useMutation(CompleteOnboardingDocument);
 
@@ -42,38 +45,66 @@ export default function TabLayout() {
     }
 
     syncPendingOnboarding();
-  }, [meData?.me?.id]);
+  }, [completeOnboarding, meData?.me?.id]);
 
   if (!isLoading && !isAuthenticated) {
     return <Redirect href="/(auth)/login" />;
   }
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: tabColor,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Agents",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="robot-outline" color={color} />
-          ),
+    <SafeAreaView style={[styles.root, { backgroundColor: theme.background }]}>
+      <HeaderNav />
+      <Tabs
+        screenOptions={{
+          tabBarActiveTintColor: tabColor,
+          tabBarStyle: {
+            backgroundColor: theme.background,
+            paddingTop: 0,
+            paddingBottom: 0,
+            height: 40,
+          },
+          tabBarItemStyle: {
+            justifyContent: "center",
+            alignItems: "center",
+          },
+          tabBarIconStyle: {
+            marginTop: 10,
+          },
+          tabBarLabelStyle: {
+            marginBottom: 0,
+          },
+          headerShown: false,
+          tabBarButton: HapticTab,
         }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: "Settings",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="gearshape.fill" color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: "",
+            tabBarIcon: ({ color }) => (
+              <IconSymbol size={22} name="robot-outline" color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="settings"
+          options={{
+            title: "",
+            tabBarIcon: ({ color }) => (
+              <IconSymbol size={22} name="gearshape.fill" color={color} />
+            ),
+          }}
+        />
+      </Tabs>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  topForgeLogoContainer: { padding: 10 },
+  logo: {
+    width: 50,
+    height: 50,
+  },
+  root: { flex: 1 },
+});

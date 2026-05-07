@@ -101,14 +101,7 @@ export function SafetySystemsForm({
 
   return (
     <View style={styles.container}>
-      {/* 1. Daily Max Loss */}
       <View style={styles.section}>
-        <Text style={[styles.sectionLabel, { color: theme.textPrimary }]}>
-          Daily Loss Limit
-        </Text>
-        <Text style={[styles.boundsHint, { color: theme.textSecondary }]}>
-          {lossMinPct}%–{lossMaxPct}% for {frameName}
-        </Text>
         <View style={styles.lossValueRow}>
           <Text style={[styles.lossValue, { color: theme.textPrimary }]}>
             {Math.round(dailyMaxLossPct * 100)}%
@@ -133,6 +126,9 @@ export function SafetySystemsForm({
             trackWidth={trackWidth}
           />
         </View>
+        <Text style={[styles.boundsHint, { color: theme.textSecondary }]}>
+          {lossMinPct}%–{lossMaxPct}% for {frameName}
+        </Text>
       </View>
 
       {/* 2. Daily Max Gain */}
@@ -284,6 +280,7 @@ const styles = StyleSheet.create({
   },
   section: {
     gap: 10,
+    marginTop: 15,
   },
   sectionLabel: {
     fontSize: 15,
@@ -291,6 +288,8 @@ const styles = StyleSheet.create({
   },
   boundsHint: {
     fontSize: 12,
+    marginRight: 5,
+    textAlign: "right",
   },
   lossValueRow: {
     flexDirection: "row",

@@ -2,15 +2,15 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { StyleSheet, View } from "react-native";
 
-interface WizardProgressBarProps {
+interface ForgeProgressBarProps {
   currentStep: number; // 1-based: currentStep=2 means step 2 is active (segments 1 filled, 1 active)
   totalSteps: number;
 }
 
-export function WizardProgressBar({
+export function ForgeProgressBar({
   currentStep,
   totalSteps,
-}: WizardProgressBarProps) {
+}: ForgeProgressBarProps) {
   const theme = Colors[useColorScheme()];
 
   return (
@@ -39,8 +39,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     gap: 4,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 15,
   },
   segment: {
     flex: 1,

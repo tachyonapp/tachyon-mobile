@@ -1,3 +1,4 @@
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React, { useState } from "react";
@@ -79,7 +80,7 @@ export function AllocationControl({
               style={[styles.legendDot, { backgroundColor: theme.warning }]}
             />
             <Text style={[styles.legendText, { color: theme.textSecondary }]}>
-              Other bots {existingPct}%
+              Other agents {existingPct}%
             </Text>
           </View>
         )}
@@ -88,7 +89,7 @@ export function AllocationControl({
             style={[styles.legendDot, { backgroundColor: theme.electricBlue }]}
           />
           <Text style={[styles.legendText, { color: theme.textSecondary }]}>
-            This bot {currentPct}%
+            This agent {currentPct}%
           </Text>
         </View>
         <View style={styles.legendItem}>
@@ -109,19 +110,30 @@ export function AllocationControl({
           onChange={onChange}
           trackWidth={trackWidth}
         />
+        <View style={styles.rangeLabelsRow}>
+          <Text style={[styles.rangeLabel, { color: theme.textSecondary }]}>
+            Min {Math.round(min * 100)}%
+          </Text>
+          <Text style={[styles.rangeLabel, { color: theme.textSecondary }]}>
+            Max {Math.round(max * 100)}%
+          </Text>
+        </View>
       </View>
 
       {userCashBalance === 0 && (
-        <Text style={[styles.fundingPrompt, { color: theme.warning }]}>
-          Fund your account to activate this bot.
-        </Text>
+        <View style={styles.fundingPromptContainer}>
+          <IconSymbol size={22} name="warning" color={theme.warning} />
+          <Text style={[styles.fundingPrompt, { color: theme.warning }]}>
+            Fund your account to activate this agent!
+          </Text>
+        </View>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 12 },
+  container: { gap: 12, marginTop: 15 },
   labelRow: { flexDirection: "row", alignItems: "center" },
   label: { fontSize: 16, fontWeight: "600" },
   energyBar: {
@@ -136,5 +148,22 @@ const styles = StyleSheet.create({
   legendDot: { width: 8, height: 8, borderRadius: 4 },
   legendText: { fontSize: 12 },
   sliderContainer: { width: "100%" },
-  fundingPrompt: { fontSize: 13, marginTop: 30 },
+  rangeLabelsRow: {
+    marginTop: 6,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  rangeLabel: {
+    fontSize: 12,
+    fontWeight: "500",
+  },
+  fundingPromptContainer: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 15,
+  },
+  fundingPrompt: { fontSize: 15 },
 });
