@@ -89,7 +89,7 @@ export interface BrainState {
 export interface WizardState {
   frameName: BotFrame | null;
   name: string;
-  avatarId: string;
+  avatarSeed: string;
   colorway: string;
   allocationPct: number;
   riskAttitude: RiskAttitude | null;
@@ -124,7 +124,7 @@ const DEFAULT_BRAIN: BrainState = {
 const EMPTY_STATE: WizardState = {
   frameName: null,
   name: "",
-  avatarId: "",
+  avatarSeed: "",
   colorway: "",
   allocationPct: 0.1,
   riskAttitude: null,

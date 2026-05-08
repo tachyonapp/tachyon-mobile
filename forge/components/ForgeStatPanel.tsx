@@ -12,8 +12,6 @@ import { ForgeStatChip } from "./ForgeStatChip";
 const POD_ANIMATION = require("@/assets/animations/pod.json");
 interface ForgeStatPanelProps {
   state: WizardState;
-  height?: number;
-  name: string;
 }
 
 function capitalize(s: string): string {
@@ -27,7 +25,7 @@ function formatEnumLabel(s: string): string {
     .join(" ");
 }
 
-export function ForgeStatPanel({ state, height, name }: ForgeStatPanelProps) {
+export function ForgeStatPanel({ state }: ForgeStatPanelProps) {
   const theme = Colors[useColorScheme()];
   const frameConfig = state.frameName ? FRAME_CONFIG[state.frameName] : null;
 
@@ -75,7 +73,10 @@ export function ForgeStatPanel({ state, height, name }: ForgeStatPanelProps) {
       {/* Stat chip rows */}
       <View style={styles.chipsGrid}>
         <View style={styles.chipsRow}>
-          <BotAvatar seed={name} backgroundColor={theme.background} />
+          <BotAvatar
+            seed={state.avatarSeed}
+            backgroundColor={theme.background}
+          />
         </View>
         <View style={styles.chipsRow}>
           <ForgeStatChip label="NAME" value={state.name.trim() || null} />

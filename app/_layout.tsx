@@ -81,9 +81,14 @@ function RootNavigator() {
         <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
         <Stack.Screen name="(bot-forge)" options={{ headerShown: false }} />
         <Stack.Screen name="(subscription)" options={{ headerShown: false }} />
+        <Stack.Screen name="(bot-detail)" options={{ headerShown: false }} />
         <Stack.Screen
           name="modal"
-          options={{ presentation: "modal", title: "Modal" }}
+          options={{
+            presentation: "modal",
+            title: "Modal",
+            headerShown: false,
+          }}
         />
       </Stack>
       <StatusBar style="auto" />

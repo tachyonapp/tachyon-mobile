@@ -54,6 +54,7 @@ export default function Step1Identity() {
           <ForgeSection title="Agent Name" subtitle="Name your agent.">
             <Identity
               name={state.name}
+              avatarSeed={state.avatarSeed}
               nameFocused={nameFocused}
               nameError={nameError}
               updateField={updateField}

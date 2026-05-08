@@ -52,8 +52,8 @@ export default function TabLayout() {
   }
 
   return (
-    <SafeAreaView style={[styles.root, { backgroundColor: theme.background }]}>
-      <HeaderNav />
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
+      <HeaderNav navPath="/(tabs)" iconName="add" />
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: tabColor,
@@ -106,5 +106,5 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
   },
-  root: { flex: 1 },
+  safe: { flex: 1 },
 });

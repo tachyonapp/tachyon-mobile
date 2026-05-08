@@ -6,6 +6,7 @@ import { StyleSheet, Text, TextInput, View } from "react-native";
 
 interface IdentityProps {
   name: string;
+  avatarSeed: string;
   nameFocused: boolean;
   nameError: boolean;
   updateField: <K extends keyof WizardState>(
@@ -20,6 +21,7 @@ const MAX_NAME_LENGTH = 24;
 
 export const Identity = ({
   name,
+  avatarSeed,
   nameFocused,
   nameError,
   updateField,
@@ -30,14 +32,14 @@ export const Identity = ({
 
   function handleNameChange(text: string) {
     updateField("name", text);
-    updateField("avatarId", text);
+    updateField("avatarSeed", text + Date.now().toString());
     if (text.trim().length > 0) setNameError(false);
   }
 
   return (
     <View style={styles.fieldGroup}>
       <View style={styles.avatar}>
-        <BotAvatar seed={name} backgroundColor={theme.background} />
+        <BotAvatar seed={avatarSeed} backgroundColor={theme.background} />
       </View>
       <TextInput
         style={[

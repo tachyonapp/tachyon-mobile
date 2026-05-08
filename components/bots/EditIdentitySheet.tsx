@@ -122,7 +122,7 @@ export function EditIdentitySheet({ bot, visible, onDismiss }: Props) {
       await updateBotIdentity({
         variables: {
           id: bot.id!,
-          input: { name, avatarId: selectedSeed },
+          input: { name, avatarSeed: `${name + Date.now().toString()}` },
         },
       });
       onDismiss();

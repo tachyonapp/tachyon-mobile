@@ -4,6 +4,7 @@ import { BotStatus, type BotQuery } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { BotAvatar } from "./BotAvatar";
 
 const STATUS_LABELS: Record<BotStatus, string> = {
   [BotStatus.Active]: "Active",
@@ -48,18 +49,21 @@ export function BotDetailHero({ bot }: Props) {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.surface }]}>
-      <View style={[styles.avatarRing, { borderColor: colorway }]}>
-        <View
-          style={[styles.avatarInner, { backgroundColor: colorway + "33" }]}
-        >
+      <View style={[styles.avatarInner]}>
+        {bot.avatarSeed ? (
+          <BotAvatar seed={bot.avatarSeed} backgroundColor={theme.background} />
+        ) : (
           <Text style={[styles.avatarInitials, { color: theme.textPrimary }]}>
             {initials}
           </Text>
-        </View>
+        )}
       </View>
 
       <View style={styles.info}>
-        <Text style={[styles.botName, { color: theme.textPrimary }]} numberOfLines={1}>
+        <Text
+          style={[styles.botName, { color: theme.textPrimary }]}
+          numberOfLines={1}
+        >
           {bot.name ?? "Unnamed Bot"}
         </Text>
         <View style={[styles.statusPill, { borderColor: statusColor }]}>
@@ -73,7 +77,10 @@ export function BotDetailHero({ bot }: Props) {
         <View
           style={[
             styles.stoodDownCallout,
-            { borderLeftColor: theme.danger, backgroundColor: theme.danger + "20" },
+            {
+              borderLeftColor: theme.danger,
+              backgroundColor: theme.danger + "20",
+            },
           ]}
         >
           <Text style={[styles.stoodDownText, { color: theme.danger }]}>
@@ -92,14 +99,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     alignItems: "center",
     gap: 12,
-  },
-  avatarRing: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 3,
-    alignItems: "center",
-    justifyContent: "center",
   },
   avatarInner: {
     width: 70,

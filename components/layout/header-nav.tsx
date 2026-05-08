@@ -4,22 +4,27 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { router } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
 
-export const HeaderNav = () => {
+interface HeaderNavProps {
+  iconName: "close" | "add";
+  navPath: string;
+}
+
+export const HeaderNav = ({ iconName, navPath }: HeaderNavProps) => {
   const theme = Colors[useColorScheme()];
-  const routeToForge = () => {
-    router.replace("/(tabs)");
+  const routeToPath = () => {
+    router.replace(navPath);
   };
 
   return (
     <View>
       <Pressable
-        onPress={routeToForge}
+        onPress={routeToPath}
         hitSlop={12}
         accessibilityRole="button"
-        accessibilityLabel="Navigate Home"
+        accessibilityLabel="Navigate To Agent Forge"
       >
-        <View style={styles.logoContainer}>
-          <IconSymbol size={20} name="add" color={theme.textPrimary} />
+        <View style={styles.container}>
+          <IconSymbol size={20} name={iconName} color={theme.textPrimary} />
         </View>
       </Pressable>
     </View>
@@ -27,7 +32,7 @@ export const HeaderNav = () => {
 };
 
 const styles = StyleSheet.create({
-  logoContainer: { paddingHorizontal: 15, paddingVertical: 15 },
+  container: { paddingHorizontal: 15, paddingVertical: 15 },
   logo: {
     width: 50,
     height: 50,

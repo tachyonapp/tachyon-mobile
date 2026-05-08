@@ -1,4 +1,4 @@
-import { IconSymbol } from "@/components/ui/icon-symbol";
+import { HeaderNav } from "@/components/layout/header-nav";
 import { Colors } from "@/constants/theme";
 import { WizardProvider, useWizard } from "@/context/WizardContext";
 import { ForgeProgressBar } from "@/forge/components/ForgeProgressBar";
@@ -10,10 +10,8 @@ import { useEffect, useRef } from "react";
 import {
   ActivityIndicator,
   AppState,
-  Pressable,
   SafeAreaView,
   StyleSheet,
-  Text,
   View,
   type AppStateStatus,
 } from "react-native";
@@ -65,28 +63,9 @@ function ForgeLayoutContent() {
     return () => sub.remove();
   }, [persistDraft, router]);
 
-  function handleClose() {
-    router.replace("/(tabs)");
-  }
-
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
-      <Pressable
-        onPress={handleClose}
-        hitSlop={12}
-        accessibilityRole="button"
-        accessibilityLabel="Close bot builder"
-      >
-        <View style={styles.closeButton}>
-          <IconSymbol size={20} name="close" color={theme.textPrimary} />
-        </View>
-      </Pressable>
-
-      <View>
-        <Text style={[styles.forgeTitle, { color: theme.textPrimary }]}>
-          Agent Creator
-        </Text>
-      </View>
+      <HeaderNav navPath="/(tabs)" iconName="close" />
 
       {showProgress && (
         <ForgeProgressBar currentStep={currentStep} totalSteps={TOTAL_STEPS} />
@@ -139,15 +118,6 @@ export default function BotForgeLayout() {
 }
 
 const styles = StyleSheet.create({
-  closeButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-  },
-  forgeTitle: {
-    fontSize: 25,
-    textAlign: "center",
-    marginBottom: 20,
-  },
   safe: { flex: 1 },
   stackContainer: { flex: 1 },
   loadingIndicator: { flex: 1 },

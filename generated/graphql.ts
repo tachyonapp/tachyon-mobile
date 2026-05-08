@@ -67,21 +67,26 @@ export type Bot = {
   __typename?: "Bot";
   activePosition?: Maybe<Position>;
   allocationPct?: Maybe<Scalars["Decimal"]["output"]>;
+  avatarSeed?: Maybe<Scalars["String"]["output"]>;
   botBrainConfig?: Maybe<BotBrainConfig>;
   brain?: Maybe<BotBrainConfig>;
   combatPatience?: Maybe<CombatPatience>;
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
   dailyMaxGain?: Maybe<Scalars["Decimal"]["output"]>;
   dailyMaxLoss?: Maybe<Scalars["Decimal"]["output"]>;
+  exitStyle?: Maybe<Scalars["String"]["output"]>;
   frame?: Maybe<BotFrame>;
   id?: Maybe<Scalars["ID"]["output"]>;
+  marketAwareness?: Maybe<MarketAwareness>;
   name?: Maybe<Scalars["String"]["output"]>;
   owner?: Maybe<User>;
   proposals?: Maybe<Array<Proposal>>;
   riskAttitude?: Maybe<RiskAttitude>;
   scanCapRemaining?: Maybe<Scalars["Int"]["output"]>;
   scanCapUsed?: Maybe<Scalars["Int"]["output"]>;
+  sectors?: Maybe<Array<SectorFilter>>;
   status?: Maybe<BotStatus>;
+  stopStyle?: Maybe<Scalars["String"]["output"]>;
   tradeTempo?: Maybe<TradeTempo>;
   updatedAt?: Maybe<Scalars["DateTime"]["output"]>;
 };
@@ -197,7 +202,7 @@ export type ConnectBrokerResult = Account | ValidationError;
 
 export type CreateBotInput = {
   allocationPct: Scalars["Decimal"]["input"];
-  avatarId: Scalars["ID"]["input"];
+  avatarSeed: Scalars["String"]["input"];
   brain: BrainConfigInput;
   colorway: Scalars["String"]["input"];
   combatPatience: CombatPatience;
@@ -246,6 +251,14 @@ export enum ExitPersonalityName {
   Patient = "PATIENT",
   QuickFinisher = "QUICK_FINISHER",
 }
+
+export type MarketAwareness = {
+  __typename?: "MarketAwareness";
+  meanReversion?: Maybe<Scalars["Float"]["output"]>;
+  momentum?: Maybe<Scalars["Float"]["output"]>;
+  trendFollowing?: Maybe<Scalars["Float"]["output"]>;
+  volatility?: Maybe<Scalars["Float"]["output"]>;
+};
 
 export type MarketAwarenessInput = {
   meanReversion: Scalars["Float"]["input"];
@@ -484,7 +497,7 @@ export enum TradeTempo {
 }
 
 export type UpdateBotIdentityInput = {
-  avatarId: Scalars["ID"]["input"];
+  avatarSeed: Scalars["String"]["input"];
   name: Scalars["String"]["input"];
 };
 
@@ -743,6 +756,7 @@ export type BotQuery = {
     __typename?: "Bot";
     id?: string | null;
     name?: string | null;
+    avatarSeed?: string | null;
     frame?: BotFrame | null;
     status?: BotStatus | null;
     allocationPct?: any | null;
@@ -751,10 +765,20 @@ export type BotQuery = {
     riskAttitude?: RiskAttitude | null;
     tradeTempo?: TradeTempo | null;
     combatPatience?: CombatPatience | null;
+    sectors?: Array<SectorFilter> | null;
+    exitStyle?: string | null;
+    stopStyle?: string | null;
     scanCapUsed?: number | null;
     scanCapRemaining?: number | null;
     createdAt?: any | null;
     updatedAt?: any | null;
+    marketAwareness?: {
+      __typename?: "MarketAwareness";
+      momentum?: number | null;
+      meanReversion?: number | null;
+      volatility?: number | null;
+      trendFollowing?: number | null;
+    } | null;
     activePosition?: {
       __typename?: "Position";
       id?: string | null;
@@ -1894,6 +1918,7 @@ export const BotDocument = {
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "avatarSeed" } },
                 { kind: "Field", name: { kind: "Name", value: "frame" } },
                 { kind: "Field", name: { kind: "Name", value: "status" } },
                 {
@@ -1917,6 +1942,34 @@ export const BotDocument = {
                   kind: "Field",
                   name: { kind: "Name", value: "combatPatience" },
                 },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "marketAwareness" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "momentum" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "meanReversion" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "volatility" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "trendFollowing" },
+                      },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "sectors" } },
+                { kind: "Field", name: { kind: "Name", value: "exitStyle" } },
+                { kind: "Field", name: { kind: "Name", value: "stopStyle" } },
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "activePosition" },

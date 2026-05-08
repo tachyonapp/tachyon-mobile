@@ -50,7 +50,7 @@ export default function Step6Review() {
           input: {
             name: state.name,
             frameName: state.frameName!,
-            avatarId: state.avatarId || state.name,
+            avatarSeed: state.avatarSeed,
             colorway: state.colorway,
             allocationPct: String(state.allocationPct),
             riskAttitude: state.riskAttitude!,
@@ -89,7 +89,7 @@ export default function Step6Review() {
       }
 
       await clearDraft();
-      router.replace("/(tabs)/index");
+      router.replace("/(tabs)");
     } catch (err) {
       const gqlErrors: { extensions?: { code?: string } }[] =
         (err as any)?.graphQLErrors ?? [];
@@ -116,7 +116,7 @@ export default function Step6Review() {
         >
           <></>
         </ForgeSection>
-        <ForgeStatPanel state={state} name={state.name} />
+        <ForgeStatPanel state={state} />
         <View>
           <Deploy
             deploying={deploying}
