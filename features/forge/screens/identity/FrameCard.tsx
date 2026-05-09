@@ -24,7 +24,6 @@ export function FrameCard({ frame, selected, onSelect }: FrameCardProps) {
   const translateY = useRef(new Animated.Value(400)).current;
   const [modalVisible, setModalVisible] = useState(false);
 
-
   function handlePress() {
     Animated.sequence([
       Animated.spring(scale, {

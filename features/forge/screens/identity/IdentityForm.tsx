@@ -19,7 +19,7 @@ interface IdentityProps {
 
 const MAX_NAME_LENGTH = 24;
 
-export const Identity = ({
+export const IdentityForm = ({
   name,
   avatarSeed,
   nameFocused,

@@ -1,5 +1,4 @@
 import type { BrainState } from "@/context/WizardContext";
-import { BrainSelector } from "@/forge/brain/BrainSelector";
 import {
   BrainCatalog,
   BrainConfigInput,
@@ -14,8 +13,9 @@ import {
 import { useMutation, useQuery } from "@apollo/client/react";
 import { useEffect } from "react";
 import { View } from "react-native";
+import { BrainSelector } from "./Selector";
 
-interface BrainProps {
+interface SubscriptionProps {
   brain: BrainConfigInput;
   brainCatalog: BrainCatalog | null;
   isKeyValidated: boolean;
@@ -23,13 +23,13 @@ interface BrainProps {
   setIsKeyValidated: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const Brain = ({
+export const Subscription = ({
   brain,
   brainCatalog,
   isKeyValidated,
   updateBrain,
   setIsKeyValidated,
-}: BrainProps) => {
+}: SubscriptionProps) => {
   const { data: meData } = useQuery<MeSubscriptionQuery>(
     MeSubscriptionDocument,
   );

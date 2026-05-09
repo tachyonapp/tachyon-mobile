@@ -1,7 +1,7 @@
 import { FrameConfig } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import type { WizardState } from "@/context/WizardContext";
-import { ForgeOptionCard } from "@/forge/components/ForgeOptionCard";
+import { ForgeOptionCard } from "@/features/forge/components/ForgeOptionCard";
 import { TradeTempo } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { capitalize } from "@/utils/capitalize";

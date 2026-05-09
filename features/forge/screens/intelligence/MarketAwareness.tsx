@@ -1,11 +1,11 @@
+import { EducationalTooltip } from "@/components/EducationalTooltip";
+import { PillSlider } from "@/components/PillSlider";
 import { type FrameConfig } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import { type MarketAwarenessInput } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React, { useState } from "react";
 import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
-import { EducationalTooltip } from "../../components/EducationalTooltip";
-import { PillSlider } from "../../components/PillSlider";
 
 interface MarketAwarenessSlidersProps {
   value: MarketAwarenessInput;
@@ -49,7 +49,7 @@ const FIELDS: (keyof MarketAwarenessInput)[] = [
   "trendFollowing",
 ];
 
-export function MarketAwarenessSliders({
+export function MarketAwareness({
   value,
   onChange,
   bounds,

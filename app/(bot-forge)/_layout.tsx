@@ -1,7 +1,7 @@
 import { HeaderNav } from "@/components/layout/header-nav";
 import { Colors } from "@/constants/theme";
 import { WizardProvider, useWizard } from "@/context/WizardContext";
-import { ForgeProgressBar } from "@/forge/components/ForgeProgressBar";
+import { ForgeProgressBar } from "@/features/forge/components/ForgeProgressBar";
 import { MeSubscriptionDocument } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useQuery } from "@apollo/client/react";

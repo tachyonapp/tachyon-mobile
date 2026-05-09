@@ -1,5 +1,5 @@
 import type { WizardState } from "@/context/WizardContext";
-import { ForgeOptionCard } from "@/forge/components/ForgeOptionCard";
+import { ForgeOptionCard } from "@/features/forge/components/ForgeOptionCard";
 import { ExitPersonalityInput, ExitPersonalityName } from "@/generated/graphql";
 import { StyleSheet, View } from "react-native";
 

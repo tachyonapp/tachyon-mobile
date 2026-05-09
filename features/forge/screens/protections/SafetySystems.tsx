@@ -1,5 +1,7 @@
+import { PillSlider } from "@/components/PillSlider";
 import { type FrameConfig } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
+import { ForgeOptionCard } from "@/features/forge/components/ForgeOptionCard";
 import {
   StopStyleName,
   type EmotionalControlsInput,
@@ -15,10 +17,8 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { PillSlider } from "../../components/PillSlider";
-import { ForgeOptionCard } from "../components/ForgeOptionCard";
 
-interface SafetySystemsFormProps {
+interface SafetySystemsProps {
   frameName: string;
   dailyMaxLossPct: number;
   onDailyMaxLossChange: (v: number) => void;
@@ -62,7 +62,7 @@ function formatUsd(amount: number): string {
   return amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
 }
 
-export function SafetySystemsForm({
+export function SafetySystems({
   frameName,
   dailyMaxLossPct,
   onDailyMaxLossChange,
@@ -75,7 +75,7 @@ export function SafetySystemsForm({
   onStopLossStyleChange,
   emotionalControls,
   onEmotionalControlsChange,
-}: SafetySystemsFormProps) {
+}: SafetySystemsProps) {
   const theme = Colors[useColorScheme()];
   const [trackWidth, setTrackWidth] = useState(0);
   const [gainInput, setGainInput] = useState(

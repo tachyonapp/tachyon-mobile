@@ -1,11 +1,11 @@
 import { FrameConfig } from "@/constants/frameConfig";
 import type { WizardState } from "@/context/WizardContext";
-import { ForgeOptionCard } from "@/forge/components/ForgeOptionCard";
+import { ForgeOptionCard } from "@/features/forge/components/ForgeOptionCard";
 import { RiskAttitude } from "@/generated/graphql";
 import { capitalize } from "@/utils/capitalize";
 import { StyleSheet, View } from "react-native";
 
-interface RiskProps {
+interface RiskProfileProps {
   frameConfig: FrameConfig | null;
   updateField: <K extends keyof WizardState>(
     field: K,
@@ -42,12 +42,12 @@ const RISK_OPTIONS: {
   },
 ];
 
-export const Risk = ({
+export const RiskProfile = ({
   frameConfig,
   updateField,
   disabledReasonFor,
   riskAttitude,
-}: RiskProps) => {
+}: RiskProfileProps) => {
   const riskBounds =
     frameConfig?.bounds.riskAttitude ?? Object.values(RiskAttitude);
   const riskDisabledReason = frameConfig

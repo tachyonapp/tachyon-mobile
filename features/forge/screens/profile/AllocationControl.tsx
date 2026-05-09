@@ -1,9 +1,9 @@
+import { PillSlider } from "@/components/PillSlider";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React, { useState } from "react";
 import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
-import { PillSlider } from "../../components/PillSlider";
 
 interface AllocationControlProps {
   value: number;

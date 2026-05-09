@@ -1,4 +1,3 @@
-import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { Colors, type ThemeColors } from "@/constants/theme";
 import { BotStatus, type BotQuery } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -40,9 +39,6 @@ interface Props {
 
 export function BotDetailHero({ bot }: Props) {
   const theme = Colors[useColorScheme()];
-  const colorway = bot.frame
-    ? (FRAME_CONFIG[bot.frame]?.colorway ?? theme.electricBlue)
-    : theme.electricBlue;
   const statusColor = getStatusColor(bot.status, theme);
   const statusLabel = bot.status ? STATUS_LABELS[bot.status] : "";
   const initials = (bot.name ?? "?").slice(0, 2).toUpperCase();

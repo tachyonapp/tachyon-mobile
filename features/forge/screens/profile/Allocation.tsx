@@ -1,10 +1,10 @@
 import { Colors } from "@/constants/theme";
 import type { WizardState } from "@/context/WizardContext";
-import { AllocationControl } from "@/forge/capital/AllocationControl";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Text, View } from "react-native";
+import { AllocationControl } from "./AllocationControl";
 
-interface CapitalProps {
+interface AllocationProps {
   allocationPct: number;
   allocationBounds: { min: number; max: number };
   updateField: <K extends keyof WizardState>(
@@ -17,7 +17,7 @@ interface CapitalProps {
   frameName: string | null;
 }
 
-export const Capital = ({
+export const Allocation = ({
   allocationPct,
   updateField,
   allocationBounds,
@@ -25,7 +25,7 @@ export const Capital = ({
   existingAllocationTotal,
   userCashBalance,
   frameName,
-}: CapitalProps) => {
+}: AllocationProps) => {
   const theme = Colors[useColorScheme()];
   const allocationMax = Math.min(
     allocationBounds.max,
