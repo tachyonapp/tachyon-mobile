@@ -6,18 +6,17 @@ import { ScanCapBar } from "../../components/ScanCapBar";
 import { SecondaryButton } from "../../components/SecondaryButton";
 import { StatRow } from "../../components/StatRow";
 
+type Agent = NonNullable<BotQuery["bot"]>;
 interface TachyonHostedProps {
-  bot: Bot;
+  agent: Agent;
   theme: ThemeColors;
 }
-
-type Bot = NonNullable<BotQuery["bot"]>;
 const SCAN_CAP_TACHYON_HOSTED = 78;
 
-export const TachyonHosted = ({ bot, theme }: TachyonHostedProps) => {
+export const TachyonHosted = ({ agent, theme }: TachyonHostedProps) => {
   const router = useRouter();
-  const used = bot.scanCapUsed ?? 0;
-  const remaining = bot.scanCapRemaining ?? SCAN_CAP_TACHYON_HOSTED;
+  const used = agent.scanCapUsed ?? 0;
+  const remaining = agent.scanCapRemaining ?? SCAN_CAP_TACHYON_HOSTED;
 
   return (
     <>

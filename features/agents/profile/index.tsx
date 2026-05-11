@@ -35,7 +35,7 @@ export default function AgentProfile() {
 
   const { data: meData } = useQuery(MeSubscriptionDocument);
 
-  const bot = data?.bot;
+  const agent = data?.bot;
   const subscriptionStatus = meData?.me?.subscriptionStatus;
   const isBlocked =
     subscriptionStatus === SubscriptionStatus.Suspended ||
@@ -49,7 +49,7 @@ export default function AgentProfile() {
     router.push(`/(bot-detail)/${id}/activate` as any);
   };
 
-  if (loading && !bot) {
+  if (loading && !agent) {
     return (
       <View style={[styles.loading, { backgroundColor: theme.background }]}>
         <ActivityIndicator color={theme.electricBlue} />
@@ -57,32 +57,32 @@ export default function AgentProfile() {
     );
   }
 
-  if (!bot) return null;
+  if (!agent) return null;
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Hero bot={bot} />
+      <Hero agent={agent} />
       <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
       <View style={styles.tabContent}>
-        {activeTab === "Overview" && <Overview bot={bot} />}
-        {activeTab === "Performance" && <Performance botId={id} />}
-        {activeTab === "Configuration" && <Configuration bot={bot} />}
-        {activeTab === "Brain" && <Subscription bot={bot} />}
+        {activeTab === "Overview" && <Overview agent={agent} />}
+        {activeTab === "Performance" && <Performance agentId={id} />}
+        {activeTab === "Configuration" && <Configuration agent={agent} />}
+        {activeTab === "Brain" && <Subscription agent={agent} />}
       </View>
       <ActionBar
-        bot={bot}
+        agent={agent}
         onActivate={handleActivate}
         onPause={() => router.push(`/(bot-detail)/${id}/pause` as any)}
         onDelete={() => setDeleteDialogVisible(true)}
         onEditIdentity={() => setEditSheetVisible(true)}
       />
       <EditIdentitySheet
-        bot={bot}
+        agent={agent}
         visible={editSheetVisible}
         onDismiss={() => setEditSheetVisible(false)}
       />
       <DeleteConfirmationDialog
-        bot={bot}
+        agent={agent}
         visible={deleteDialogVisible}
         onDismiss={() => setDeleteDialogVisible(false)}
       />

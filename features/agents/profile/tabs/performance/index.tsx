@@ -8,14 +8,14 @@ import { PLChart } from "./Chart";
 import { PerformanceStatsGrid } from "./PerformanceStatsGrid";
 
 interface Props {
-  botId: string;
+  agentId: string;
 }
 
-export function Performance({ botId }: Props) {
+export function Performance({ agentId }: Props) {
   const theme = Colors[useColorScheme()];
 
   const { data, loading } = useQuery(BotPerformanceDocument, {
-    variables: { id: botId },
+    variables: { id: agentId },
     fetchPolicy: "network-only",
   });
 

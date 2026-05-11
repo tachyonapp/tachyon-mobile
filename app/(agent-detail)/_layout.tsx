@@ -4,7 +4,7 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Stack } from "expo-router";
 import { SafeAreaView, StyleSheet, View } from "react-native";
 
-export default function BotDetailLayout() {
+export default function Layout() {
   const theme = Colors[useColorScheme()];
 
   return (

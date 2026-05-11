@@ -7,18 +7,18 @@ import { OpenPositionSummary } from "./OpenPositionSummary";
 import { RecentProposalsFeed } from "./RecentProposalsFeed";
 import { StoodDownPanel } from "./StoodDownPanel";
 
-type Bot = NonNullable<BotQuery["bot"]>;
+type Agent = NonNullable<BotQuery["bot"]>;
 
 interface OverviewProps {
-  bot: Bot;
+  agent: Agent;
 }
 
-export function Overview({ bot }: OverviewProps) {
+export function Overview({ agent }: OverviewProps) {
   const theme = Colors[useColorScheme()];
-  const proposals = bot.proposals ?? [];
-  const hasPosition = bot.activePosition != null;
+  const proposals = agent.proposals ?? [];
+  const hasPosition = agent.activePosition != null;
   const hasProposals = proposals.length > 0;
-  const isStoodDown = bot.status === BotStatus.StoodDown;
+  const isStoodDown = agent.status === BotStatus.StoodDown;
 
   return (
     <ScrollView
@@ -26,7 +26,7 @@ export function Overview({ bot }: OverviewProps) {
       contentContainerStyle={styles.content}
     >
       {hasPosition && (
-        <OpenPositionSummary position={bot.activePosition!} theme={theme} />
+        <OpenPositionSummary position={agent.activePosition!} theme={theme} />
       )}
       {hasProposals && (
         <RecentProposalsFeed proposals={proposals} theme={theme} />

@@ -6,26 +6,26 @@ import { Section } from "../../components/Section";
 import { StatRow } from "../../components/StatRow";
 
 interface BrainProps {
-  botBrainConfig: BotBrainConfig | undefined | null;
+  agentBrainConfig: BotBrainConfig | undefined | null;
 }
 
-export const Brain = ({ botBrainConfig }: BrainProps) => {
+export const Brain = ({ agentBrainConfig }: BrainProps) => {
   const theme = Colors[useColorScheme()];
   return (
     <Section title="BRAIN" theme={theme}>
       <StatRow
         label="Brain Type"
-        value={botBrainConfig?.brainType ?? "—"}
+        value={agentBrainConfig?.brainType ?? "—"}
         theme={theme}
       />
       <StatRow
         label="Model"
-        value={botBrainConfig?.modelId ?? "—"}
+        value={agentBrainConfig?.modelId ?? "—"}
         theme={theme}
       />
       <StatRow
         label="Provider"
-        value={botBrainConfig?.provider ?? "—"}
+        value={agentBrainConfig?.provider ?? "—"}
         theme={theme}
       />
     </Section>

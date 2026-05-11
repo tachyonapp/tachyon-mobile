@@ -6,12 +6,12 @@ import { SvgXml } from "react-native-svg";
 
 const AVATAR_SIZE = 60;
 
-interface BotAvatarProps {
+interface AgentAvatarProps {
   seed: string | null;
   backgroundColor: string;
 }
 
-export const AgentAvatar = ({ seed, backgroundColor }: BotAvatarProps) => {
+export const AgentAvatar = ({ seed, backgroundColor }: AgentAvatarProps) => {
   const avatarSvg = useMemo(
     () => createAvatar(rings, { seed: seed || "default" }).toString(),
     [seed],

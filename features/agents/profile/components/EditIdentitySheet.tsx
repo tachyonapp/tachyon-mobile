@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 
-type Bot = NonNullable<BotQuery["bot"]>;
+type Agent = NonNullable<BotQuery["bot"]>;
 
 const PRESET_SEEDS = [
   "Phoenix",
@@ -78,26 +78,26 @@ function AvatarPickerGrid({
 }
 
 interface Props {
-  bot: Bot;
+  agent: Agent;
   visible: boolean;
   onDismiss: () => void;
 }
 
-export function EditIdentitySheet({ bot, visible, onDismiss }: Props) {
+export function EditIdentitySheet({ agent, visible, onDismiss }: Props) {
   const theme = Colors[useColorScheme()];
   const client = useApolloClient();
 
-  const [name, setName] = useState(bot.name ?? "");
-  const [selectedSeed, setSelectedSeed] = useState(bot.name ?? "");
+  const [name, setName] = useState(agent.name ?? "");
+  const [selectedSeed, setSelectedSeed] = useState(agent.name ?? "");
   const [isSaving, setIsSaving] = useState(false);
 
   // Reset state each time the sheet opens
   useEffect(() => {
     if (visible) {
-      setName(bot.name ?? "");
-      setSelectedSeed(bot.name ?? "");
+      setName(agent.name ?? "");
+      setSelectedSeed(agent.name ?? "");
     }
-  }, [visible, bot.name]);
+  }, [visible, agent.name]);
 
   const [updateBotIdentity] = useMutation(UpdateBotIdentityDocument);
 
@@ -107,8 +107,8 @@ export function EditIdentitySheet({ bot, visible, onDismiss }: Props) {
     if (!canSave) return;
     setIsSaving(true);
 
-    const previousName = bot.name ?? "";
-    const cacheId = client.cache.identify({ __typename: "Bot", id: bot.id });
+    const previousName = agent.name ?? "";
+    const cacheId = client.cache.identify({ __typename: "Bot", id: agent.id });
 
     // Optimistic name update
     if (cacheId) {
@@ -121,7 +121,7 @@ export function EditIdentitySheet({ bot, visible, onDismiss }: Props) {
     try {
       await updateBotIdentity({
         variables: {
-          id: bot.id!,
+          id: agent.id!,
           input: { name, avatarSeed: `${name + Date.now().toString()}` },
         },
       });
@@ -149,7 +149,7 @@ export function EditIdentitySheet({ bot, visible, onDismiss }: Props) {
       <Pressable style={styles.overlay} onPress={onDismiss}>
         <Pressable style={[styles.sheet, { backgroundColor: theme.surface }]}>
           <Text style={[styles.title, { color: theme.textPrimary }]}>
-            Edit Bot Identity
+            Edit Agent Identity
           </Text>
 
           <View style={styles.fieldGroup}>

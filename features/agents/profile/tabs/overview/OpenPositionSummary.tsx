@@ -3,8 +3,8 @@ import { type BotQuery } from "@/generated/graphql";
 import { relativeTime } from "@/utils/relative-time";
 import { StyleSheet, Text, View } from "react-native";
 
-type Bot = NonNullable<BotQuery["bot"]>;
-type Position = NonNullable<Bot["activePosition"]>;
+type Agent = NonNullable<BotQuery["bot"]>;
+type Position = NonNullable<Agent["activePosition"]>;
 
 interface OpenPositionSummaryProps {
   position: Position;

@@ -1,5 +1,5 @@
 import AgentProfile from "@/features/agents/profile";
 
-export default function BotDetailScreen() {
+export default function AgentDetails() {
   return <AgentProfile />;
 }

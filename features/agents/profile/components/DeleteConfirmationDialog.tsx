@@ -18,23 +18,23 @@ import {
   View,
 } from "react-native";
 
-type Bot = NonNullable<BotQuery["bot"]>;
+type Agent = NonNullable<BotQuery["bot"]>;
 
 interface Props {
-  bot: Bot;
+  agent: Agent;
   visible: boolean;
   onDismiss: () => void;
 }
 
-export function DeleteConfirmationDialog({ bot, visible, onDismiss }: Props) {
+export function DeleteConfirmationDialog({ agent, visible, onDismiss }: Props) {
   const theme = Colors[useColorScheme()];
   const client = useApolloClient();
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const hasOpenPosition =
-    bot.activePosition != null &&
-    bot.activePosition.status === PositionStatus.Open;
+    agent.activePosition != null &&
+    agent.activePosition.status === PositionStatus.Open;
 
   const [deleteBot] = useMutation(DeleteBotDocument);
 
@@ -44,9 +44,12 @@ export function DeleteConfirmationDialog({ bot, visible, onDismiss }: Props) {
     setError(null);
 
     try {
-      await deleteBot({ variables: { id: bot.id! } });
+      await deleteBot({ variables: { id: agent.id! } });
 
-      const cacheId = client.cache.identify({ __typename: "Bot", id: bot.id });
+      const cacheId = client.cache.identify({
+        __typename: "Bot",
+        id: agent.id,
+      });
       if (cacheId) {
         client.cache.evict({ id: cacheId });
         client.cache.gc();
@@ -75,7 +78,7 @@ export function DeleteConfirmationDialog({ bot, visible, onDismiss }: Props) {
       <Pressable style={styles.overlay} onPress={handleDismiss}>
         <Pressable style={[styles.dialog, { backgroundColor: theme.surface }]}>
           <Text style={[styles.title, { color: theme.textPrimary }]}>
-            Delete {bot.name ?? "Bot"}?
+            Delete {agent.name ?? "Agent"}?
           </Text>
 
           <Text style={[styles.body, { color: theme.textSecondary }]}>

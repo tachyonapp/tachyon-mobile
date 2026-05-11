@@ -10,13 +10,13 @@ import { MarketAwareness } from "./MarketAwareness";
 import { Parameters } from "./Parameters";
 import { SafetySystems } from "./SafetySystems";
 
-type Bot = NonNullable<BotQuery["bot"]>;
+type Agent = NonNullable<BotQuery["bot"]>;
 
 interface Props {
-  bot: Bot;
+  agent: Agent;
 }
 
-export function Configuration({ bot }: Props) {
+export function Configuration({ agent }: Props) {
   const theme = Colors[useColorScheme()];
 
   return (
@@ -25,34 +25,34 @@ export function Configuration({ bot }: Props) {
       contentContainerStyle={styles.content}
     >
       {/* 1. Frame & Identity */}
-      <Identity frame={bot.frame} name={bot.name} />
+      <Identity frame={agent.frame} name={agent.name} />
 
       {/* 2. Training Parameters */}
       <Parameters
-        riskAttitude={bot.riskAttitude}
-        tradeTempo={bot.tradeTempo}
-        combatPatience={bot.combatPatience}
-        allocationPct={bot.allocationPct}
+        riskAttitude={agent.riskAttitude}
+        tradeTempo={agent.tradeTempo}
+        combatPatience={agent.combatPatience}
+        allocationPct={agent.allocationPct}
       />
 
       {/* 3. Safety Systems */}
       <SafetySystems
-        dailyMaxGain={bot.dailyMaxGain}
-        dailyMaxLoss={bot.dailyMaxLoss}
-        stopStyle={bot.stopStyle}
+        dailyMaxGain={agent.dailyMaxGain}
+        dailyMaxLoss={agent.dailyMaxLoss}
+        stopStyle={agent.stopStyle}
       />
 
       {/* 4. Market Awareness */}
       <MarketAwareness
-        sectors={bot.sectors}
-        marketAwareness={bot.marketAwareness}
+        sectors={agent.sectors}
+        marketAwareness={agent.marketAwareness}
       />
 
       {/* 5. Exit Personality */}
-      <ExitPersonality exitStyle={bot.exitStyle} />
+      <ExitPersonality exitStyle={agent.exitStyle} />
 
       {/* 6. Brain */}
-      <Brain botBrainConfig={bot.botBrainConfig} />
+      <Brain agentBrainConfig={agent.botBrainConfig} />
     </ScrollView>
   );
 }
