@@ -79,9 +79,9 @@ function RootNavigator() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-        <Stack.Screen name="(bot-forge)" options={{ headerShown: false }} />
+        <Stack.Screen name="(agent-forge)" options={{ headerShown: false }} />
         <Stack.Screen name="(subscription)" options={{ headerShown: false }} />
-        <Stack.Screen name="(bot-detail)" options={{ headerShown: false }} />
+        <Stack.Screen name="(agent-detail)" options={{ headerShown: false }} />
         <Stack.Screen
           name="modal"
           options={{

@@ -1,5 +1,5 @@
-import { BiometricToggle } from "@/components/settings/BiometricToggle";
 import { Colors } from "@/constants/theme";
+import { BiometricToggle } from "@/features/user/settings/BiometricToggle";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 

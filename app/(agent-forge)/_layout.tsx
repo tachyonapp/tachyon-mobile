@@ -94,7 +94,7 @@ function ForgeLoadingScreen() {
   );
 }
 
-export default function BotForgeLayout() {
+export default function Layout() {
   const { data, loading } = useQuery(MeSubscriptionDocument);
 
   if (loading) return <ForgeLoadingScreen />;

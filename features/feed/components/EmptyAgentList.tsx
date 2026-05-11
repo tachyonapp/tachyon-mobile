@@ -7,7 +7,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 interface Props {
   subscriptionTier: SubscriptionTier | null | undefined;
   subscriptionStatus: SubscriptionStatus | null | undefined;
-  onCreateBot: () => void;
+  onCreateAgent: () => void;
 }
 
 function ctaLabel(
@@ -24,10 +24,10 @@ function ctaLabel(
   return "Create Agent";
 }
 
-export function EmptyBotListState({
+export function EmptyAgentList({
   subscriptionTier,
   subscriptionStatus,
-  onCreateBot,
+  onCreateAgent,
 }: Props) {
   const theme = Colors[useColorScheme()];
 
@@ -45,7 +45,7 @@ export function EmptyBotListState({
           { backgroundColor: theme.electricBlue },
           pressed && styles.ctaPressed,
         ]}
-        onPress={onCreateBot}
+        onPress={onCreateAgent}
       >
         <Text style={[styles.ctaText, { color: theme.textPrimary }]}>
           {ctaLabel(subscriptionTier, subscriptionStatus)}

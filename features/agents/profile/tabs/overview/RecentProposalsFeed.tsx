@@ -3,8 +3,8 @@ import { type BotQuery, ProposalStatus } from "@/generated/graphql";
 import { relativeTime } from "@/utils/relative-time";
 import { StyleSheet, Text, View } from "react-native";
 
-type Bot = NonNullable<BotQuery["bot"]>;
-type Proposal = NonNullable<Bot["proposals"]>[number];
+type Agent = NonNullable<BotQuery["bot"]>;
+type Proposal = NonNullable<Agent["proposals"]>[number];
 
 interface RecentProposalsFeedProps {
   proposals: Proposal[];

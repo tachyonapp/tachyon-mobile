@@ -1,7 +1,7 @@
 import { useAuth } from "@/auth/AuthProvider";
 import { HapticTab } from "@/components/layout/haptic-tab";
 import { HeaderNav } from "@/components/layout/header-nav";
-import { IconSymbol } from "@/components/ui/icon-symbol";
+import { IconSymbol } from "@/components/shared/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { CompleteOnboardingDocument, MeDocument } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";

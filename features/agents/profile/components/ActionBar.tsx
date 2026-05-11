@@ -5,7 +5,7 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 interface Props {
-  bot: NonNullable<BotQuery["bot"]>;
+  agent: NonNullable<BotQuery["bot"]>;
   onActivate?: () => void;
   onPause?: () => void;
   onDelete?: () => void;
@@ -13,17 +13,17 @@ interface Props {
 }
 
 export function ActionBar({
-  bot,
+  agent,
   onActivate,
   onPause,
   onDelete,
   onEditIdentity,
 }: Props) {
   const theme = Colors[useColorScheme()];
-  const isActive = bot.status === BotStatus.Active;
+  const isActive = agent.status === BotStatus.Active;
   const isPaused =
-    bot.status === BotStatus.Paused || bot.status === BotStatus.Draft;
-  const isStoodDown = bot.status === BotStatus.StoodDown;
+    agent.status === BotStatus.Paused || agent.status === BotStatus.Draft;
+  const isStoodDown = agent.status === BotStatus.StoodDown;
 
   return (
     <View

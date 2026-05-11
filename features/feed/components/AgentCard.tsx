@@ -38,7 +38,7 @@ interface Props {
   onPress: () => void;
 }
 
-export function BotCard({ bot, onPress }: Props) {
+export function AgentCard({ bot, onPress }: Props) {
   const theme = Colors[useColorScheme()];
   const colorway = bot.frame
     ? (FRAME_CONFIG[bot.frame]?.colorway ?? theme.electricBlue)

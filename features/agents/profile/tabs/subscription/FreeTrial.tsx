@@ -6,14 +6,19 @@ import { PrimaryButton } from "../../components/PrimaryButton";
 import { ScanCapBar } from "../../components/ScanCapBar";
 import { StatRow } from "../../components/StatRow";
 
-type Bot = NonNullable<BotQuery["bot"]>;
+type Agent = NonNullable<BotQuery["bot"]>;
+
+interface FreeTrialProps {
+  agent: Agent;
+  theme: ThemeColors;
+}
 
 const SCAN_CAP_FREE_TRIAL = 40;
 
-export const FreeTrial = ({ bot, theme }: { bot: Bot; theme: ThemeColors }) => {
+export const FreeTrial = ({ agent, theme }: FreeTrialProps) => {
   const router = useRouter();
-  const used = bot.scanCapUsed ?? 0;
-  const remaining = bot.scanCapRemaining ?? SCAN_CAP_FREE_TRIAL;
+  const used = agent.scanCapUsed ?? 0;
+  const remaining = agent.scanCapRemaining ?? SCAN_CAP_FREE_TRIAL;
 
   return (
     <>

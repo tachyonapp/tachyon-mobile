@@ -7,7 +7,7 @@ interface Props {
   onPress: () => void;
 }
 
-export function CreateBotFAB({ onPress }: Props) {
+export function CreateAgentFab({ onPress }: Props) {
   const theme = Colors[useColorScheme()];
 
   return (

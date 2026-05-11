@@ -5,16 +5,16 @@ import { useRouter } from "expo-router";
 import { SecondaryButton } from "../../components/SecondaryButton";
 import { StatRow } from "../../components/StatRow";
 
-type Bot = NonNullable<BotQuery["bot"]>;
+type Agent = NonNullable<BotQuery["bot"]>;
 
 interface ByokProps {
-  bot: Bot;
+  agent: Agent;
   theme: ThemeColors;
 }
 
-export const Byok = ({ bot, theme }: ByokProps) => {
+export const Byok = ({ agent, theme }: ByokProps) => {
   const router = useRouter();
-  const config = bot.botBrainConfig;
+  const config = agent.botBrainConfig;
   const provider = config?.provider ?? "Unknown";
   const keyPreview = config?.keyPreview;
   const keyConfigured = keyPreview != null;

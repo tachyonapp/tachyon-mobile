@@ -34,20 +34,20 @@ function getStatusColor(
 }
 
 interface Props {
-  bot: NonNullable<BotQuery["bot"]>;
+  agent: NonNullable<BotQuery["bot"]>;
 }
 
-export function Hero({ bot }: Props) {
+export function Hero({ agent }: Props) {
   const theme = Colors[useColorScheme()];
-  const statusColor = getStatusColor(bot.status, theme);
-  const statusLabel = bot.status ? STATUS_LABELS[bot.status] : "";
-  const initials = (bot.name ?? "?").slice(0, 2).toUpperCase();
+  const statusColor = getStatusColor(agent.status, theme);
+  const statusLabel = agent.status ? STATUS_LABELS[agent.status] : "";
+  const initials = (agent.name ?? "?").slice(0, 2).toUpperCase();
 
   return (
     <View style={[styles.container, { backgroundColor: theme.surface }]}>
       <View style={[styles.avatarInner]}>
-        {bot.avatarSeed ? (
-          <Avatar seed={bot.avatarSeed} backgroundColor={theme.background} />
+        {agent.avatarSeed ? (
+          <Avatar seed={agent.avatarSeed} backgroundColor={theme.background} />
         ) : (
           <Text style={[styles.avatarInitials, { color: theme.textPrimary }]}>
             {initials}
@@ -60,7 +60,7 @@ export function Hero({ bot }: Props) {
           style={[styles.botName, { color: theme.textPrimary }]}
           numberOfLines={1}
         >
-          {bot.name ?? "Unnamed Bot"}
+          {agent.name ?? "Unnamed Bot"}
         </Text>
         <View style={[styles.statusPill, { borderColor: statusColor }]}>
           <Text style={[styles.statusText, { color: statusColor }]}>
@@ -69,7 +69,7 @@ export function Hero({ bot }: Props) {
         </View>
       </View>
 
-      {bot.status === BotStatus.StoodDown && (
+      {agent.status === BotStatus.StoodDown && (
         <View
           style={[
             styles.stoodDownCallout,

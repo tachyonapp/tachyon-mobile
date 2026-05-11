@@ -8,7 +8,7 @@ import { Byok } from "./BYOK";
 import { FreeTrial } from "./FreeTrial";
 import { TachyonHosted } from "./TachyonHosted";
 
-type Bot = NonNullable<BotQuery["bot"]>;
+type Agent = NonNullable<BotQuery["bot"]>;
 
 function subscriptionVariant(
   brainType: string | null | undefined,
@@ -19,12 +19,12 @@ function subscriptionVariant(
 }
 
 interface SubscriptionProps {
-  bot: Bot;
+  agent: Agent;
 }
 
-export function Subscription({ bot }: SubscriptionProps) {
+export function Subscription({ agent }: SubscriptionProps) {
   const theme = Colors[useColorScheme()];
-  const variant = subscriptionVariant(bot.botBrainConfig?.brainType);
+  const variant = subscriptionVariant(agent.botBrainConfig?.brainType);
 
   return (
     <ScrollView
@@ -35,11 +35,11 @@ export function Subscription({ bot }: SubscriptionProps) {
         <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>
           BRAIN CONFIG
         </Text>
-        {variant === "FREE_TRIAL" && <FreeTrial bot={bot} theme={theme} />}
+        {variant === "FREE_TRIAL" && <FreeTrial agent={agent} theme={theme} />}
         {variant === "TACHYON_HOSTED" && (
-          <TachyonHosted bot={bot} theme={theme} />
+          <TachyonHosted agent={agent} theme={theme} />
         )}
-        {variant === "BYOK" && <Byok bot={bot} theme={theme} />}
+        {variant === "BYOK" && <Byok agent={agent} theme={theme} />}
       </View>
     </ScrollView>
   );

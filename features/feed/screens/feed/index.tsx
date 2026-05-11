@@ -1,9 +1,9 @@
 import { ReactivationBottomSheet } from "@/components/subscriptions/ReactivationBottomSheet";
 import { SubscriptionStatusBanner } from "@/components/subscriptions/SubscriptionStatusBanner";
 import { Colors } from "@/constants/theme";
-import { BotCard } from "@/features/feed/components/BotCard";
-import { CreateBotFAB } from "@/features/feed/components/CreateBotFAB";
-import { EmptyBotListState } from "@/features/feed/components/EmptyBotListState";
+import { AgentCard } from "@/features/feed/components/AgentCard";
+import { CreateAgentFab } from "@/features/feed/components/CreateAgentFab";
+import { EmptyAgentList } from "@/features/feed/components/EmptyAgentList";
 import {
   BotsDocument,
   BotStatus,
@@ -48,7 +48,7 @@ export default function FeedScreen() {
     subscriptionStatus === SubscriptionStatus.Suspended ||
     subscriptionStatus === SubscriptionStatus.Cancelled;
 
-  const handleCreateBot = useCallback(() => {
+  const handleCreateAgent = useCallback(() => {
     const tier = meData?.me?.subscriptionTier;
 
     if (!tier) {
@@ -79,17 +79,17 @@ export default function FeedScreen() {
         data={bots}
         keyExtractor={(item) => item.id ?? ""}
         renderItem={({ item }) => (
-          <BotCard
+          <AgentCard
             bot={item}
             onPress={() => router.push(`/(bot-detail)/${item.id}` as any)}
           />
         )}
         ListEmptyComponent={
           !loading ? (
-            <EmptyBotListState
+            <EmptyAgentList
               subscriptionTier={meData?.me?.subscriptionTier}
               subscriptionStatus={meData?.me?.subscriptionStatus}
-              onCreateBot={handleCreateBot}
+              onCreateAgent={handleCreateAgent}
             />
           ) : null
         }
@@ -113,7 +113,7 @@ export default function FeedScreen() {
           <ActivityIndicator size="large" color={theme.electricBlue} />
         </View>
       )}
-      <CreateBotFAB onPress={handleCreateBot} />
+      <CreateAgentFab onPress={handleCreateAgent} />
       {isBlocked && (
         <ReactivationBottomSheet
           visible={reactivationVisible}

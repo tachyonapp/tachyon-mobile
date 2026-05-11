@@ -2,7 +2,7 @@ import LottieView from "lottie-react-native";
 import { StyleSheet, View } from "react-native";
 
 /**
- * Slide 1 — Bot Builder / Assembly
+ * Slide 1 — Agent Builder / Assembly
  *
  * Animation concept: Geometric "bot frame" — abstract modular UI card tiles
  * snap into a symmetrical 3×3 dashboard grid, one tile at a time, staggered.
