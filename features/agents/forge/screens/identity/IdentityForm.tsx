@@ -1,4 +1,4 @@
-import { BotAvatar } from "@/components/bots/BotAvatar";
+import { AgentAvatar } from "@/components/shared/AgentAvatar";
 import { Colors } from "@/constants/theme";
 import type { WizardState } from "@/context/WizardContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -39,7 +39,7 @@ export const IdentityForm = ({
   return (
     <View style={styles.fieldGroup}>
       <View style={styles.avatar}>
-        <BotAvatar seed={avatarSeed} backgroundColor={theme.background} />
+        <AgentAvatar seed={avatarSeed} backgroundColor={theme.background} />
       </View>
       <TextInput
         style={[

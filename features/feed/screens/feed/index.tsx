@@ -1,9 +1,9 @@
-import { BotCard } from "@/components/bots/BotCard";
-import { CreateBotFAB } from "@/components/bots/CreateBotFAB";
-import { EmptyBotListState } from "@/components/bots/EmptyBotListState";
 import { ReactivationBottomSheet } from "@/components/subscriptions/ReactivationBottomSheet";
 import { SubscriptionStatusBanner } from "@/components/subscriptions/SubscriptionStatusBanner";
 import { Colors } from "@/constants/theme";
+import { BotCard } from "@/features/feed/components/BotCard";
+import { CreateBotFAB } from "@/features/feed/components/CreateBotFAB";
+import { EmptyBotListState } from "@/features/feed/components/EmptyBotListState";
 import {
   BotsDocument,
   BotStatus,
@@ -22,7 +22,7 @@ import {
   View,
 } from "react-native";
 
-export default function BotListScreen() {
+export default function FeedScreen() {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme];
   const [refreshing, setRefreshing] = useState(false);

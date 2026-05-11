@@ -1,8 +1,8 @@
-import { ActionBar } from "@/components/bots/ActionBar";
-import { DeleteConfirmationDialog } from "@/components/bots/DeleteConfirmationDialog";
-import { EditIdentitySheet } from "@/components/bots/EditIdentitySheet";
 import { ReactivationBottomSheet } from "@/components/subscriptions/ReactivationBottomSheet";
 import { Colors } from "@/constants/theme";
+import { ActionBar } from "@/features/agents/profile/components/ActionBar";
+import { DeleteConfirmationDialog } from "@/features/agents/profile/components/DeleteConfirmationDialog";
+import { EditIdentitySheet } from "@/features/agents/profile/components/EditIdentitySheet";
 import {
   BotDocument,
   MeSubscriptionDocument,

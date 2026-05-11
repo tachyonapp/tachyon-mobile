@@ -11,7 +11,7 @@ interface BotAvatarProps {
   backgroundColor: string;
 }
 
-export const BotAvatar = ({ seed, backgroundColor }: BotAvatarProps) => {
+export const AgentAvatar = ({ seed, backgroundColor }: BotAvatarProps) => {
   const avatarSvg = useMemo(
     () => createAvatar(rings, { seed: seed || "default" }).toString(),
     [seed],

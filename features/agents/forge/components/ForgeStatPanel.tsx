@@ -1,4 +1,4 @@
-import { BotAvatar } from "@/components/bots/BotAvatar";
+import { AgentAvatar } from "@/components/shared/AgentAvatar";
 import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import { type WizardState } from "@/context/WizardContext";
@@ -73,7 +73,7 @@ export function ForgeStatPanel({ state }: ForgeStatPanelProps) {
       {/* Stat chip rows */}
       <View style={styles.chipsGrid}>
         <View style={styles.chipsRow}>
-          <BotAvatar
+          <AgentAvatar
             seed={state.avatarSeed}
             backgroundColor={theme.background}
           />
