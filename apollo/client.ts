@@ -1,7 +1,7 @@
 /**
  * Apollo Client — tachyon-mobile's data layer for all communication with tachyon-api.
  *
- * Tachyon's API is GraphQL-first. Every piece of data the mobile app needs — bots,
+ * Tachyon's API is GraphQL-first. Every piece of data the mobile app needs — agents,
  * proposals, positions, account info — is fetched via GraphQL queries and mutations
  * defined in tachyon-api. Apollo Client is a standard React Native library for
  * consuming GraphQL: it handles request execution, normalized caching, loading/error

@@ -21,6 +21,7 @@ export default function VerifyScreen() {
     pendingEmail,
     verifySignIn,
     verifySignUp,
+    abandonVerification,
     resendVerificationCode,
     error,
   } = useAuth();
@@ -43,7 +44,7 @@ export default function VerifyScreen() {
   const title = isSignup ? "Verify your email" : "Verify your identity";
   const description = pendingEmail
     ? `We sent a 6-digit code to ${pendingEmail}. Enter it below to ${isSignup ? "complete your account setup" : "continue signing in"}.`
-    : `We sent a 6-digit code to your email. Enter it below.`;
+    : "We sent a 6-digit code to your email. Enter it below.";
 
   const handleVerify = async () => {
     if (submitting) return;
@@ -84,6 +85,8 @@ export default function VerifyScreen() {
 
   const errorMessage = (() => {
     if (!error) return null;
+    if (error.message === "signup_session_expired")
+      return "Your signup session expired. Please sign up again.";
     if (isClerkAPIResponseError(error)) {
       const code = error.errors[0]?.code;
       if (code === "incorrect_code" || code === "form_code_incorrect")
@@ -99,6 +102,11 @@ export default function VerifyScreen() {
   })();
 
   const displayedError = validationError ?? errorMessage;
+
+  // After a stale session, pendingVerification is cleared by AuthProvider and
+  // the Redirect above fires — but if the error renders before that effect runs,
+  // show a Back to Sign Up link so the user can restart immediately.
+  const showStartOver = error?.message === "signup_session_expired";
 
   return (
     <AuthScreen>
@@ -151,19 +159,30 @@ export default function VerifyScreen() {
         )}
       </Pressable>
 
-      <Pressable
-        style={styles.linkButton}
-        onPress={handleResend}
-        disabled={resending}
-      >
-        <Text style={[styles.linkText, { color: theme.textSecondary }]}>
-          {resending ? "Sending…" : "Didn't receive a code? Resend"}
-        </Text>
-      </Pressable>
+      {showStartOver ? (
+        <Pressable
+          style={styles.linkButton}
+          onPress={() => { abandonVerification(); router.replace("/(auth)/signup"); }}
+        >
+          <Text style={[styles.linkText, { color: theme.electricBlue }]}>
+            {"Start over"}
+          </Text>
+        </Pressable>
+      ) : (
+        <Pressable
+          style={styles.linkButton}
+          onPress={handleResend}
+          disabled={resending}
+        >
+          <Text style={[styles.linkText, { color: theme.textSecondary }]}>
+            {resending ? "Sending…" : "Didn't receive a code? Resend"}
+          </Text>
+        </Pressable>
+      )}
 
       <Pressable
         style={styles.linkButton}
-        onPress={() => router.replace("/(auth)/login")}
+        onPress={() => { abandonVerification(); router.replace("/(auth)/login"); }}
       >
         <Text style={[styles.linkText, { color: theme.textSecondary }]}>
           {"Back to Sign In"}

@@ -110,6 +110,7 @@ export default function SignupScreen() {
 
   const errorMessage = (() => {
     if (!error) return null;
+    console.log(error.message);
     if (isClerkAPIResponseError(error)) {
       const code = error.errors[0]?.code;
       if (code === "form_identifier_exists")

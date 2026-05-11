@@ -1,5 +1,4 @@
-// Fallback for using Material Icons on Android and web.
-
+import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { SymbolWeight } from "expo-symbols";
@@ -10,6 +9,7 @@ type MaterialIconName = ComponentProps<typeof MaterialIcons>["name"];
 type MaterialCommunityIconName = ComponentProps<
   typeof MaterialCommunityIcons
 >["name"];
+type IoniconName = ComponentProps<typeof Ionicons>["name"];
 
 /**
  * SF Symbol name → MaterialIcons name.
@@ -25,8 +25,10 @@ const MATERIAL_MAPPING = {
   "chevron.down": "expand-more",
   "info.circle": "info-outline",
   "gearshape.fill": "settings",
-  xmark: "close",
+  close: "close",
+  "hdr-plus": "rocket",
   checkmark: "check",
+  warning: "warning",
 } as const satisfies Record<string, MaterialIconName>;
 
 /**
@@ -37,9 +39,14 @@ const COMMUNITY_MAPPING = {
   "robot-outline": "robot-outline",
 } as const satisfies Record<string, MaterialCommunityIconName>;
 
+const IONICON_MAPPING = {
+  add: "add",
+} as const satisfies Record<string, IoniconName>;
+
 type IconSymbolName =
   | keyof typeof MATERIAL_MAPPING
-  | keyof typeof COMMUNITY_MAPPING;
+  | keyof typeof COMMUNITY_MAPPING
+  | keyof typeof IONICON_MAPPING;
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.
@@ -66,13 +73,22 @@ export function IconSymbol({
         style={style}
       />
     );
+  } else if (name in MATERIAL_MAPPING) {
+    return (
+      <MaterialIcons
+        color={color}
+        size={size}
+        name={MATERIAL_MAPPING[name as keyof typeof MATERIAL_MAPPING]}
+        style={style}
+      />
+    );
   }
 
   return (
-    <MaterialIcons
-      color={color}
+    <Ionicons
+      name={IONICON_MAPPING[name as keyof typeof IONICON_MAPPING]}
       size={size}
-      name={MATERIAL_MAPPING[name as keyof typeof MATERIAL_MAPPING]}
+      color={color}
       style={style}
     />
   );

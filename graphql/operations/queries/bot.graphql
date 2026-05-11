@@ -3,6 +3,7 @@ query Bot($id: ID!) {
   bot(id: $id) {
     id
     name
+    avatarSeed
     frame
     status
     allocationPct
@@ -11,6 +12,15 @@ query Bot($id: ID!) {
     riskAttitude
     tradeTempo
     combatPatience
+    marketAwareness {
+      momentum
+      meanReversion
+      volatility
+      trendFollowing
+    }
+    sectors
+    exitStyle
+    stopStyle
     activePosition {
       id
       symbol

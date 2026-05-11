@@ -42,7 +42,13 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     plugins: [
       "expo-secure-store",
       "expo-local-authentication",
-      "@stripe/stripe-react-native",
+      [
+        "@stripe/stripe-react-native",
+        {
+          merchantIdentifier: "merchant.com.marczenn.tachyon",
+          enableGooglePay: false,
+        },
+      ],
     ],
   };
 };

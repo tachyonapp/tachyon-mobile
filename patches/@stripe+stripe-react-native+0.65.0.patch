@@ -1,0 +1,13 @@
+diff --git a/node_modules/@stripe/stripe-react-native/src/components/PaymentMethodMessagingElement.tsx b/node_modules/@stripe/stripe-react-native/src/components/PaymentMethodMessagingElement.tsx
+index 1743736..b9ae525 100644
+--- a/node_modules/@stripe/stripe-react-native/src/components/PaymentMethodMessagingElement.tsx
++++ b/node_modules/@stripe/stripe-react-native/src/components/PaymentMethodMessagingElement.tsx
+@@ -51,7 +51,7 @@ export interface Props extends AccessibilityProps {
+  * @category ReactComponents
+  */
+ export const PaymentMethodMessagingElement = forwardRef<any, Props>(
+-  ({ appearance, configuration, onStateChange, ...props }) => {
++  ({ appearance, configuration, onStateChange, ...props }, _ref) => {
+     const viewRef =
+       useRef<React.ComponentRef<HostComponent<NativeProps>>>(null);
+ 

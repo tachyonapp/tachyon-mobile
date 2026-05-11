@@ -17,7 +17,7 @@ const DURATION = 1420;
 const SLIDE_DISTANCE = 14;
 
 const HERO_LINES = [
-  "Customize your own AI trading bots.",
+  "Build and Discover AI Trading Agents",
   "Decide when and how they trade.",
 ];
 
@@ -75,7 +75,11 @@ export default function OnboardingIntroScreen() {
         {HERO_LINES.map((line, i) => (
           <Animated.Text
             key={i}
-            style={[styles.heroCopy, { color: theme.textPrimary }, lineAnimatedStyles[i]]}
+            style={[
+              styles.heroCopy,
+              { color: theme.textPrimary },
+              lineAnimatedStyles[i],
+            ]}
           >
             {line}
           </Animated.Text>
@@ -92,7 +96,13 @@ export default function OnboardingIntroScreen() {
         }}
         onPress={() => router.push("/(onboarding)/slides")}
       >
-        <Animated.View style={[styles.ctaButton, { backgroundColor: theme.electricBlue }, animatedStyle]}>
+        <Animated.View
+          style={[
+            styles.ctaButton,
+            { backgroundColor: theme.electricBlue },
+            animatedStyle,
+          ]}
+        >
           <Text style={styles.ctaText}>Begin</Text>
         </Animated.View>
       </Pressable>
@@ -105,7 +115,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 32,
+    paddingHorizontal: 5,
     gap: 32,
   },
   logo: {
@@ -122,7 +132,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   heroCopy: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "200",
     lineHeight: 32,
   },

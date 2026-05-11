@@ -16,6 +16,7 @@ const LOCK_GRACE_PERIOD_MS = 3000;
 interface BiometricAuthState {
   isSupported: boolean;
   isDeviceEnrolled: boolean;
+  isInitialized: boolean;
   isEnabled: boolean;
   isLocked: boolean;
   isPrompting: boolean;
@@ -39,6 +40,7 @@ export function BiometricAuthProvider({
   const { isAuthenticated } = useAuth();
   const [isSupported, setIsSupported] = useState(false);
   const [isDeviceEnrolled, setIsDeviceEnrolled] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [isPrompting, setIsPrompting] = useState(false);
@@ -84,10 +86,14 @@ export function BiometricAuthProvider({
       }
     }
 
-    init().catch(() => {
-      // init failure is non-fatal — biometrics won't engage but the user
-      // can still access the app normally via Clerk session.
-    });
+    init()
+      .catch(() => {
+        // init failure is non-fatal — biometrics won't engage but the user
+        // can still access the app normally via Clerk session.
+      })
+      .finally(() => {
+        if (!cancelled) setIsInitialized(true);
+      });
 
     return () => {
       cancelled = true;
@@ -180,6 +186,7 @@ export function BiometricAuthProvider({
       value={{
         isSupported,
         isDeviceEnrolled,
+        isInitialized,
         isEnabled,
         isLocked,
         isPrompting,
