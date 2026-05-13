@@ -55,8 +55,7 @@ const COMM_STYLE_OPTIONS: {
   {
     value: "CAUTIOUS_MEASURED",
     label: "Cautious & Measured",
-    description:
-      "Thoughtful, nuanced proposals that acknowledge uncertainty.",
+    description: "Thoughtful, nuanced proposals that acknowledge uncertainty.",
   },
 ];
 
@@ -94,7 +93,7 @@ export default function IdentityScreen() {
       return;
     }
     await persistDraft();
-    router.push("/(bot-forge)/step-2-combat");
+    router.push("/(agent-forge)/step-2-trading-profile");
   }
 
   return (

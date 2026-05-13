@@ -34,7 +34,7 @@ export default function TradingProfile() {
 
   async function handleNext() {
     await persistDraft();
-    router.push("/(bot-forge)/step-3-intelligence");
+    router.push("/(agent-forge)/step-3-intelligence");
   }
 
   async function handleBack() {

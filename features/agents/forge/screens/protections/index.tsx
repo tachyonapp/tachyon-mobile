@@ -40,7 +40,7 @@ export default function Protections() {
 
   async function handleNext() {
     await persistDraft();
-    router.push("/(bot-forge)/step-5-brain");
+    router.push("/(agent-forge)/step-6-timing");
   }
 
   async function handleBack() {

@@ -55,7 +55,7 @@ export function AppInitProvider({ children }: { children: React.ReactNode }) {
     // 3) signed in + onboarding incomplete -> /(onboarding)
     // 4) signed in + onboarding complete -> /(tabs)
     // We intentionally do not rely on nav state restoration here because it can
-    // revive transient flows (e.g. bot-forge) after app relaunch.
+    // revive transient flows (e.g. agent-forge) after app relaunch.
     if (!isAuthenticated && pendingVerification) {
       // Verification was in progress when the app was last closed — return
       // the user directly to the verify screen so they can complete it.

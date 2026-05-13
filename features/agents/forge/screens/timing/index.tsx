@@ -12,13 +12,7 @@ import {
 } from "@tachyonapp/tachyon-queue-types/config";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 const SESSION_OPTIONS: {
   value: SessionPreference;
@@ -28,8 +22,7 @@ const SESSION_OPTIONS: {
   {
     value: "FULL_SESSION",
     label: "Full Session",
-    description:
-      "Trades throughout the entire market session (9:30am–4pm ET).",
+    description: "Trades throughout the entire market session (9:30am–4pm ET).",
   },
   {
     value: "MORNING_HUNTER",
@@ -83,7 +76,7 @@ const DAYS: { key: DayOfWeek; label: string }[] = [
   { key: "FRIDAY", label: "FRI" },
 ];
 
-export default function AgentHunts() {
+export default function Timing() {
   const { state, updateField, persistDraft, hasActiveTradingDay } = useWizard();
   const router = useRouter();
   const theme = Colors[useColorScheme()];
@@ -107,7 +100,7 @@ export default function AgentHunts() {
 
   async function handleNext() {
     await persistDraft();
-    router.push("/(agent-forge)/step-5-brain");
+    router.push("/(agent-forge)/step-7-model");
   }
 
   async function handleBack() {

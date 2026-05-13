@@ -93,8 +93,8 @@ export default function TierSelectionScreen() {
   };
 
   const navigateAfterSuccess = () => {
-    if (origin === "bot-forge") {
-      router.replace("/(bot-forge)" as never);
+    if (origin === "agent-forge") {
+      router.replace("/(agent-forge)" as never);
     } else {
       router.replace("/(tabs)" as never);
     }

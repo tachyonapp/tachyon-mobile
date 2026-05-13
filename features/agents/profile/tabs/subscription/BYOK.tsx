@@ -37,7 +37,7 @@ export const Byok = ({ agent, theme }: ByokProps) => {
       <StatRow label="Daily Scan Cap" value="Unlimited" theme={theme} />
       <SecondaryButton
         label="Manage API Key"
-        onPress={() => router.push("/(bot-forge)/brain" as never)}
+        onPress={() => router.push("/(agent-forge)/step-5-brain" as never)}
         theme={theme}
       />
     </>

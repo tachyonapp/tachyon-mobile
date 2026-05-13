@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Keyboard, Pressable, ScrollView, StyleSheet } from "react-native";
 import { Subscription } from "./Subscription";
 
-export default function Brain() {
+export default function Model() {
   const { state, updateBrain, brainCatalog, persistDraft } = useWizard();
   const router = useRouter();
 
@@ -20,7 +20,7 @@ export default function Brain() {
 
   async function handleNext() {
     await persistDraft();
-    router.push("/(bot-forge)/step-6-review");
+    router.push("/(agent-forge)/step-8-review");
   }
 
   async function handleBack() {

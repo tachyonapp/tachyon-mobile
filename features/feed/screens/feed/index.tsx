@@ -59,7 +59,7 @@ export default function FeedScreen() {
       setReactivationVisible(true);
       return;
     }
-    router.push("/(bot-forge)");
+    router.push("/(agent-forge)");
   }, [meData, isBlocked]);
 
   const bots = (botsData?.bots ?? []).filter(

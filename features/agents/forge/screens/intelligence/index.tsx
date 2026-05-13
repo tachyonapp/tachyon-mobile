@@ -1,100 +1,127 @@
-import { FRAME_CONFIG } from "@/constants/frameConfig";
+import { Colors } from "@/constants/theme";
 import { useWizard } from "@/context/WizardContext";
 import { ForgeNavBar } from "@/features/agents/forge/components/ForgeNavBar";
 import { ForgeOptionCard } from "@/features/agents/forge/components/ForgeOptionCard";
 import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
-import { TickerTagInput } from "@/features/agents/forge/components/TickerTagInput";
+import { FrameAdvisoryBanner } from "@/features/agents/forge/components/FrameAdvisoryBanner";
+import { SignalWeightSliders } from "@/features/agents/forge/components/SignalWeightSliders";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
-  type DividendPreference,
-  type ShortInterestSignal,
+  type ConfidenceThreshold,
+  type EarningsBehavior,
+  type RegimeAwareness,
 } from "@tachyonapp/tachyon-queue-types/config";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Keyboard, Pressable, ScrollView, StyleSheet } from "react-native";
-import { MarketAwareness } from "./MarketAwareness";
-import { SectorGrid } from "./Sectors";
-import { SubSectorExpansionPanel } from "./SubSectorExpansionPanel";
+import React, { useState } from "react";
+import {
+  Keyboard,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
-const DIVIDEND_OPTIONS: {
-  value: DividendPreference;
+const CONFIDENCE_OPTIONS: {
+  value: ConfidenceThreshold;
   label: string;
   description: string;
 }[] = [
   {
-    value: "PREFER_DIVIDEND",
-    label: "Prefer Dividend Stocks",
-    description: "Favors stocks that pay regular dividends.",
-  },
-  {
-    value: "NO_PREFERENCE",
-    label: "No Preference",
-    description: "Dividend status has no bearing on stock selection.",
-  },
-  {
-    value: "EXCLUDE_DIVIDEND",
-    label: "Exclude Dividend Stocks",
-    description: "Avoids dividend-paying stocks entirely.",
-  },
-];
-
-const SHORT_INTEREST_OPTIONS: {
-  value: ShortInterestSignal;
-  label: string;
-  description: string;
-}[] = [
-  {
-    value: "TARGET_SHORT_SQUEEZE",
-    label: "Target Short Squeeze Candidates",
+    value: "LOW",
+    label: "Low",
     description:
-      "Actively seeks stocks with high short interest as potential squeeze setups.",
+      "Your agent proposes trades on weaker signals. More frequent, higher risk.",
   },
   {
-    value: "AVOID_HIGH_SHORT_INTEREST",
-    label: "Avoid High Short Interest",
-    description: "Steers clear of heavily shorted stocks to reduce volatility risk.",
+    value: "MEDIUM",
+    label: "Medium",
+    description: "Balanced — proposes when signals are reasonably clear.",
   },
   {
-    value: "IGNORE",
-    label: "Ignore",
-    description: "Short interest data is not factored into stock selection.",
+    value: "HIGH",
+    label: "High",
+    description:
+      "Waits for strong confirmation. Fewer trades, higher conviction.",
+  },
+  {
+    value: "VERY_HIGH",
+    label: "Very High",
+    description:
+      "Only acts on very strong signals. May miss some opportunities.",
   },
 ];
 
-export default function MarketIntelligence() {
-  const {
-    state,
-    updateField,
-    persistDraft,
-    parentSectorsData,
-    setCustomWatchlist,
-    setExclusionList,
-    noTickerOverlap,
-  } = useWizard();
+const REGIME_OPTIONS: {
+  value: RegimeAwareness;
+  label: string;
+  description: string;
+}[] = [
+  {
+    value: "NO_CHANGE",
+    label: "No Change",
+    description: "Ignores broader market regime. Trades as normal regardless.",
+  },
+  {
+    value: "REDUCE_SIZE_BEAR",
+    label: "Reduce Size in Bear Markets",
+    description:
+      "Scales down position sizes when the market is in a bearish trend.",
+  },
+  {
+    value: "STAND_DOWN_BEAR",
+    label: "Stand Down in Bear Markets",
+    description: "Pauses all trading when the market enters a bearish regime.",
+  },
+  {
+    value: "INCREASE_AGGRESSION_BULL",
+    label: "Increase Aggression in Bull Markets",
+    description:
+      "Scales up position sizes and trade frequency during bullish conditions.",
+  },
+];
+
+const EARNINGS_OPTIONS: {
+  value: EarningsBehavior;
+  label: string;
+  description: string;
+}[] = [
+  {
+    value: "MORE_AGGRESSIVE",
+    label: "More Aggressive",
+    description:
+      "Increases activity around earnings events to capture price moves.",
+  },
+  {
+    value: "NEUTRAL",
+    label: "Neutral",
+    description: "No change in behavior during earnings seasons.",
+  },
+  {
+    value: "STAND_DOWN",
+    label: "Stand Down",
+    description:
+      "Avoids opening new positions during earnings windows to limit volatility risk.",
+  },
+];
+
+export default function Intelligence() {
+  const { state, updateField, persistDraft, signalWeightsValid } = useWizard();
   const router = useRouter();
+  const theme = Colors[useColorScheme()];
+  const [dismissedAdvisories, setDismissedAdvisories] = useState<string[]>([]);
 
-  const [sectorAttempted, setSectorAttempted] = useState(false);
+  const visibleAdvisories = state.activeAdvisories.filter(
+    (a) => !dismissedAdvisories.includes(a.code),
+  );
 
-  const frameConfig = state.frameName ? FRAME_CONFIG[state.frameName] : null;
-  const combatComplete =
-    !!state.riskAttitude && !!state.tradeTempo && !!state.combatPatience;
-
-  const marketAwarenessBounds = frameConfig?.bounds.marketAwareness ?? {
-    momentum: { min: 0, max: 1 },
-    meanReversion: { min: 0, max: 1 },
-    volatility: { min: 0, max: 1 },
-    trendFollowing: { min: 0, max: 1 },
+  const handleDismiss = (code: string) => {
+    setDismissedAdvisories((prev) => [...prev, code]);
   };
 
-  const nextBlocked = state.sectors.length === 0 || !noTickerOverlap;
-
   async function handleNext() {
-    if (state.sectors.length === 0) {
-      setSectorAttempted(true);
-      return;
-    }
-    if (!noTickerOverlap) return;
     await persistDraft();
-    router.push("/(bot-forge)/step-4-protection");
+    router.push("/(agent-forge)/step-4-sectors");
   }
 
   async function handleBack() {
@@ -110,118 +137,96 @@ export default function MarketIntelligence() {
         contentContainerStyle={styles.scrollContent}
       >
         <Pressable onPress={() => Keyboard.dismiss()}>
+          {/* Signal Weights */}
           <ForgeSection
-            title="Market Behavior"
-            subtitle="How your agent interacts with markets"
+            title="Signal Weights"
+            subtitle="Balance how your agent weighs different types of market signals."
           >
-            <></>
+            <SignalWeightSliders
+              value={state.signalWeights}
+              onChange={(v) => updateField("signalWeights", v)}
+            />
+            {!signalWeightsValid && (
+              <Text style={[styles.validationHint, { color: theme.warning }]}>
+                Signal weights must add up to 100 before continuing.
+              </Text>
+            )}
+            {visibleAdvisories
+              .filter((a) => a.field === "signalWeights")
+              .map((a) => (
+                <View key={a.code} style={styles.advisorySpacing}>
+                  <FrameAdvisoryBanner advisory={a} onDismiss={handleDismiss} />
+                </View>
+              ))}
           </ForgeSection>
 
+          {/* Confidence Threshold */}
           <ForgeSection
-            title="Intelligence"
-            subtitle="Tune your agent's market perception signals."
-            tooltip={{
-              title: "Market Awareness",
-              body: "These weights tune how your agent weighs different market signals. They are independent — they do not need to add up to anything.",
-            }}
-            locked={!combatComplete}
-            lockedMessage="Complete your Trading Profile first."
+            title="Confidence Threshold"
+            subtitle="How strong must a signal be before your agent proposes a trade?"
           >
-            <MarketAwareness
-              value={state.marketAwareness}
-              onChange={(v) => updateField("marketAwareness", v)}
-              bounds={marketAwarenessBounds}
-            />
-          </ForgeSection>
-
-          {/* Sectors — existing, unchanged */}
-          <ForgeSection
-            title="Sectors"
-            subtitle="Select one or more market sectors your agent can trade in."
-            locked={!combatComplete}
-            lockedMessage="Complete your Trading Profile first."
-          >
-            <SectorGrid
-              selected={state.sectors}
-              onChange={(sectors) => {
-                updateField("sectors", sectors);
-                if (sectors.length > 0) setSectorAttempted(false);
-              }}
-              showError={sectorAttempted}
-            />
-
-            {/* Sub-sector refinement — hidden if parentSectorsData unavailable */}
-            <SubSectorExpansionPanel
-              selectedSectors={state.sectors}
-              parentSectorsData={parentSectorsData}
-              subSectors={state.subSectors}
-              onChange={(subs) => updateField("subSectors", subs)}
-            />
-          </ForgeSection>
-
-          {/* Watchlist & exclusion */}
-          <ForgeSection
-            title="Custom Watchlist"
-            subtitle="Specific stocks your agent should focus on within its selected sectors."
-            locked={!combatComplete}
-            lockedMessage="Complete your Trading Profile first."
-          >
-            <TickerTagInput
-              label="Watchlist"
-              value={state.customWatchlist}
-              onChange={setCustomWatchlist}
-              overlappingTickers={state.exclusionList}
-            />
-          </ForgeSection>
-
-          <ForgeSection
-            title="Exclusion List"
-            subtitle="Stocks your agent will never trade, regardless of signals."
-            locked={!combatComplete}
-            lockedMessage="Complete your Trading Profile first."
-          >
-            <TickerTagInput
-              label="Exclusions"
-              value={state.exclusionList}
-              onChange={setExclusionList}
-              overlappingTickers={state.customWatchlist}
-            />
-          </ForgeSection>
-
-          {/* Dividend preference */}
-          <ForgeSection
-            title="Dividend Preference"
-            subtitle="How should your agent treat dividend-paying stocks?"
-            locked={!combatComplete}
-            lockedMessage="Complete your Trading Profile first."
-          >
-            {DIVIDEND_OPTIONS.map((opt) => (
+            {CONFIDENCE_OPTIONS.map((opt) => (
               <ForgeOptionCard
                 key={opt.value}
                 label={opt.label}
                 description={opt.description}
-                selected={state.dividendPreference === opt.value}
-                onSelect={() => updateField("dividendPreference", opt.value)}
+                selected={state.confidenceThreshold === opt.value}
+                onSelect={() => updateField("confidenceThreshold", opt.value)}
               />
             ))}
+            {visibleAdvisories
+              .filter((a) => a.field === "confidenceThreshold")
+              .map((a) => (
+                <View key={a.code} style={styles.advisorySpacing}>
+                  <FrameAdvisoryBanner advisory={a} onDismiss={handleDismiss} />
+                </View>
+              ))}
           </ForgeSection>
 
-          {/* Short interest signal */}
+          {/* Regime Awareness */}
           <ForgeSection
-            title="Short Interest Signal"
-            subtitle="How should your agent use short interest data in its analysis?"
-            locked={!combatComplete}
-            lockedMessage="Complete your Trading Profile first."
+            title="Market Regime Awareness"
+            subtitle="How should your agent respond to broader market conditions?"
           >
-            {SHORT_INTEREST_OPTIONS.map((opt) => (
+            {REGIME_OPTIONS.map((opt) => (
               <ForgeOptionCard
                 key={opt.value}
                 label={opt.label}
                 description={opt.description}
-                selected={state.shortInterestSignal === opt.value}
-                onSelect={() => updateField("shortInterestSignal", opt.value)}
+                selected={state.regimeAwareness === opt.value}
+                onSelect={() => updateField("regimeAwareness", opt.value)}
               />
             ))}
+            {visibleAdvisories
+              .filter((a) => a.field === "regimeAwareness")
+              .map((a) => (
+                <View key={a.code} style={styles.advisorySpacing}>
+                  <FrameAdvisoryBanner advisory={a} onDismiss={handleDismiss} />
+                </View>
+              ))}
+          </ForgeSection>
+
+          {/* Earnings Behavior */}
+          <ForgeSection
+            title="Earnings Behavior"
+            subtitle="How should your agent behave around company earnings announcements?"
+          >
+            {EARNINGS_OPTIONS.map((opt) => (
+              <ForgeOptionCard
+                key={opt.value}
+                label={opt.label}
+                description={opt.description}
+                selected={state.earningsBehavior === opt.value}
+                onSelect={() => updateField("earningsBehavior", opt.value)}
+              />
+            ))}
+            {visibleAdvisories
+              .filter((a) => a.field === "earningsBehavior")
+              .map((a) => (
+                <View key={a.code} style={styles.advisorySpacing}>
+                  <FrameAdvisoryBanner advisory={a} onDismiss={handleDismiss} />
+                </View>
+              ))}
           </ForgeSection>
         </Pressable>
       </ScrollView>
@@ -229,7 +234,7 @@ export default function MarketIntelligence() {
       <ForgeNavBar
         onBack={handleBack}
         onNext={handleNext}
-        nextDisabled={nextBlocked}
+        nextDisabled={!signalWeightsValid}
       />
     </>
   );
@@ -240,5 +245,12 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 28,
     paddingBottom: 16,
+  },
+  advisorySpacing: {
+    marginTop: 8,
+  },
+  validationHint: {
+    fontSize: 13,
+    marginTop: 6,
   },
 });
