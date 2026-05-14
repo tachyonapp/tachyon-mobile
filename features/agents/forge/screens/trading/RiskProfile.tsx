@@ -1,21 +1,13 @@
-import { FrameConfig } from "@/constants/frameConfig";
 import type { WizardState } from "@/context/WizardContext";
 import { ForgeOptionCard } from "@/features/agents/forge/components/ForgeOptionCard";
 import { RiskAttitude } from "@/generated/graphql";
-import { capitalize } from "@/utils/capitalize";
 import { StyleSheet, View } from "react-native";
 
 interface RiskProfileProps {
-  frameConfig: FrameConfig | null;
   updateField: <K extends keyof WizardState>(
     field: K,
     value: WizardState[K],
   ) => void;
-  disabledReasonFor: (
-    frameName: string,
-    label: string,
-    count: number,
-  ) => string;
   riskAttitude: RiskAttitude | null;
 }
 
@@ -42,22 +34,7 @@ const RISK_OPTIONS: {
   },
 ];
 
-export const RiskProfile = ({
-  frameConfig,
-  updateField,
-  disabledReasonFor,
-  riskAttitude,
-}: RiskProfileProps) => {
-  const riskBounds =
-    frameConfig?.bounds.riskAttitude ?? Object.values(RiskAttitude);
-  const riskDisabledReason = frameConfig
-    ? disabledReasonFor(
-        frameConfig.gamifiedName,
-        riskBounds.map((r) => capitalize(r)).join(", ") + " risk attitude",
-        riskBounds.length,
-      )
-    : undefined;
-
+export const RiskProfile = ({ updateField, riskAttitude }: RiskProfileProps) => {
   return (
     <View style={styles.subSection}>
       <View style={styles.optionList}>
@@ -68,10 +45,6 @@ export const RiskProfile = ({
             description={opt.description}
             selected={riskAttitude === opt.value}
             onSelect={() => updateField("riskAttitude", opt.value)}
-            disabled={!riskBounds.includes(opt.value)}
-            disabledReason={
-              !riskBounds.includes(opt.value) ? riskDisabledReason : undefined
-            }
           />
         ))}
       </View>

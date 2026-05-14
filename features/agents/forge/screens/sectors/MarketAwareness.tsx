@@ -1,16 +1,22 @@
 import { EducationalTooltip } from "@/components/EducationalTooltip";
 import { PillSlider } from "@/components/PillSlider";
-import { type FrameConfig } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import { type MarketAwarenessInput } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React, { useState } from "react";
 import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
 
+type MarketAwarenessBounds = {
+  momentum: { min: number; max: number };
+  meanReversion: { min: number; max: number };
+  volatility: { min: number; max: number };
+  trendFollowing: { min: number; max: number };
+};
+
 interface MarketAwarenessSlidersProps {
   value: MarketAwarenessInput;
   onChange: (v: MarketAwarenessInput) => void;
-  bounds: FrameConfig["bounds"]["marketAwareness"];
+  bounds: MarketAwarenessBounds;
 }
 
 const SLIDER_LABELS: Record<keyof MarketAwarenessInput, string> = {

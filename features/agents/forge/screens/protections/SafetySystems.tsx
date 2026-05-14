@@ -1,5 +1,4 @@
 import { PillSlider } from "@/components/PillSlider";
-import { type FrameConfig } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import { ForgeOptionCard } from "@/features/agents/forge/components/ForgeOptionCard";
 import {
@@ -22,7 +21,7 @@ interface SafetySystemsProps {
   frameName: string;
   dailyMaxLossPct: number;
   onDailyMaxLossChange: (v: number) => void;
-  dailyMaxLossBounds: FrameConfig["bounds"]["dailyMaxLoss"];
+  dailyMaxLossBounds: { minPct: number; maxPct: number };
   allocationPct: number;
   userCashBalance: number;
   dailyMaxGain: number | null;

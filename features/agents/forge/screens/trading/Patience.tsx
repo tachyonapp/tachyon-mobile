@@ -1,24 +1,16 @@
-import { FrameConfig } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import type { WizardState } from "@/context/WizardContext";
 import { ForgeOptionCard } from "@/features/agents/forge/components/ForgeOptionCard";
 import { CombatPatience } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { capitalize } from "@/utils/capitalize";
 import { StyleSheet, Text, View } from "react-native";
 
 interface PatienceProps {
-  frameConfig: FrameConfig | null;
   combatPatience: CombatPatience | null;
   updateField: <K extends keyof WizardState>(
     field: K,
     value: WizardState[K],
   ) => void;
-  disabledReasonFor: (
-    frameName: string,
-    label: string,
-    count: number,
-  ) => string;
 }
 
 const PATIENCE_OPTIONS: {
@@ -57,22 +49,8 @@ const PATIENCE_HINTS: Record<CombatPatience, string> = {
   [CombatPatience.STRATEGIC]: "Minimum hold: 72 hours (3 days)",
 };
 
-export const Patience = ({
-  frameConfig,
-  combatPatience,
-  updateField,
-  disabledReasonFor,
-}: PatienceProps) => {
+export const Patience = ({ combatPatience, updateField }: PatienceProps) => {
   const theme = Colors[useColorScheme()];
-  const patienceBounds =
-    frameConfig?.bounds.combatPatience ?? Object.values(CombatPatience);
-  const patienceDisabledReason = frameConfig
-    ? disabledReasonFor(
-        frameConfig.gamifiedName,
-        patienceBounds.map((p) => capitalize(p)).join(", ") + " patience",
-        patienceBounds.length,
-      )
-    : undefined;
 
   return (
     <View style={styles.subSection}>
@@ -89,12 +67,6 @@ export const Patience = ({
             description={opt.description}
             selected={combatPatience === opt.value}
             onSelect={() => updateField("combatPatience", opt.value)}
-            disabled={!patienceBounds.includes(opt.value)}
-            disabledReason={
-              !patienceBounds.includes(opt.value)
-                ? patienceDisabledReason
-                : undefined
-            }
           />
         ))}
       </View>

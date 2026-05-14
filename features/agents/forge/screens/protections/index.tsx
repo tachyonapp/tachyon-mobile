@@ -1,9 +1,9 @@
-import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { useWizard } from "@/context/WizardContext";
 import { ForgeNavBar } from "@/features/agents/forge/components/ForgeNavBar";
 import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
 import { BalanceDocument, type BalanceQuery } from "@/generated/graphql";
 import { useQuery } from "@apollo/client/react";
+import { FRAME_CONFIG } from "@tachyonapp/tachyon-queue-types/config";
 import { useRouter } from "expo-router";
 import { Keyboard, Pressable, ScrollView, StyleSheet } from "react-native";
 import { Engagement } from "./Engagement";
@@ -23,10 +23,7 @@ export default function Protections() {
   );
 
   const frameConfig = state.frameName ? FRAME_CONFIG[state.frameName] : null;
-  const dailyMaxLossBounds = frameConfig?.bounds.dailyMaxLoss ?? {
-    minPct: 0,
-    maxPct: 1,
-  };
+  const dailyMaxLossBounds = { minPct: 0.01, maxPct: 0.25 };
 
   const isDailyMaxLossValid =
     state.dailyMaxLoss >= dailyMaxLossBounds.minPct &&

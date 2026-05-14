@@ -1,4 +1,4 @@
-import { FRAME_CONFIG } from "@/constants/frameConfig";
+import { FRAME_CONFIG } from "@tachyonapp/tachyon-queue-types/config";
 import { Colors, type ThemeColors } from "@/constants/theme";
 import { BotStatus, type BotsQuery } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";

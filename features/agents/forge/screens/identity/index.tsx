@@ -1,4 +1,4 @@
-import { FRAME_CONFIG } from "@/constants/frameConfig";
+// import { FRAME_CONFIG } from "@tachyonapp/tachyon-queue-types/config";
 import { Colors } from "@/constants/theme";
 import { useWizard } from "@/context/WizardContext";
 import { ForgeNavBar } from "@/features/agents/forge/components/ForgeNavBar";
@@ -12,7 +12,10 @@ import {
 import { Draft } from "@/features/agents/forge/draft";
 import { BotFrame } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { ProposalCommunicationStyle } from "@tachyonapp/tachyon-queue-types/config";
+import {
+  FRAME_CONFIG,
+  ProposalCommunicationStyle,
+} from "@tachyonapp/tachyon-queue-types/config";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {

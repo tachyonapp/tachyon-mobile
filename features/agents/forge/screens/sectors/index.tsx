@@ -1,4 +1,3 @@
-import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { useWizard } from "@/context/WizardContext";
 import { ForgeNavBar } from "@/features/agents/forge/components/ForgeNavBar";
 import { ForgeOptionCard } from "@/features/agents/forge/components/ForgeOptionCard";
@@ -75,11 +74,10 @@ export default function Sectors() {
 
   const [sectorAttempted, setSectorAttempted] = useState(false);
 
-  const frameConfig = state.frameName ? FRAME_CONFIG[state.frameName] : null;
   const combatComplete =
     !!state.riskAttitude && !!state.tradeTempo && !!state.combatPatience;
 
-  const marketAwarenessBounds = frameConfig?.bounds.marketAwareness ?? {
+  const marketAwarenessBounds = {
     momentum: { min: 0, max: 1 },
     meanReversion: { min: 0, max: 1 },
     volatility: { min: 0, max: 1 },
