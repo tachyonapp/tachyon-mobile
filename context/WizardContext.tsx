@@ -555,9 +555,9 @@ export function WizardProvider({ children }: { children: ReactNode }) {
         // Existing frame-determined fields (bounds-clamping removed)
         allocationPct: defaults.allocationPct,
         dailyMaxLoss: defaults.dailyMaxLossPct,
-        riskAttitude: defaults.riskAttitude as unknown as RiskAttitude,
-        tradeTempo: defaults.tradeTempo as unknown as TradeTempo,
-        combatPatience: defaults.combatPatience as unknown as CombatPatience,
+        riskAttitude: defaults.riskAttitude,
+        tradeTempo: defaults.tradeTempo,
+        combatPatience: defaults.combatPatience,
         exitPersonality: {
           name: defaults.exitPersonality as ExitPersonalityName,
         },

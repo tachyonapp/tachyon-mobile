@@ -27,17 +27,17 @@ const TEMPO_OPTIONS: {
   description: string;
 }[] = [
   {
-    value: TradeTempo.Opportunistic,
+    value: TradeTempo.OPPORTUNISTIC,
     label: "Opportunistic",
     description: "Waits for high-conviction setups. Trades infrequently.",
   },
   {
-    value: TradeTempo.Active,
+    value: TradeTempo.ACTIVE,
     label: "Active",
     description: "Consistent scanning. Fires when conditions align.",
   },
   {
-    value: TradeTempo.Relentless,
+    value: TradeTempo.RELENTLESS,
     label: "Relentless",
     description:
       "Scans constantly. High trade frequency — maximum opportunity capture.",
@@ -45,9 +45,9 @@ const TEMPO_OPTIONS: {
 ];
 
 const TEMPO_HINTS: Record<TradeTempo, string> = {
-  [TradeTempo.Opportunistic]: "At most one proposal per hour",
-  [TradeTempo.Active]: "At most one proposal every 20 minutes",
-  [TradeTempo.Relentless]: "Scans every 5 minutes — fires when ready",
+  [TradeTempo.OPPORTUNISTIC]: "At most one proposal per hour",
+  [TradeTempo.ACTIVE]: "At most one proposal every 20 minutes",
+  [TradeTempo.RELENTLESS]: "Scans every 5 minutes — fires when ready",
 };
 
 export const Tempo = ({

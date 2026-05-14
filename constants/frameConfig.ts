@@ -44,7 +44,7 @@ export interface FrameConfig {
 }
 
 export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
-  [BotFrame.Scout]: {
+  [BotFrame.SCOUT]: {
     gamifiedName: "Scout",
     strategyName: "Momentum Confirmation",
     shortDescription: "Quick reactions, low risk. Fires on momentum signals.",
@@ -53,19 +53,19 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     colorway: "#2C6BED",
     bounds: {
       riskAttitude: [
-        RiskAttitude.Cautious,
-        RiskAttitude.Balanced,
-        RiskAttitude.Aggressive,
+        RiskAttitude.CAUTIOUS,
+        RiskAttitude.BALANCED,
+        RiskAttitude.AGGRESSIVE,
       ],
       tradeTempo: [
-        TradeTempo.Opportunistic,
-        TradeTempo.Active,
-        TradeTempo.Relentless,
+        TradeTempo.OPPORTUNISTIC,
+        TradeTempo.ACTIVE,
+        TradeTempo.RELENTLESS,
       ],
       combatPatience: [
-        CombatPatience.Impulsive,
-        CombatPatience.Calculated,
-        CombatPatience.Patient,
+        CombatPatience.IMPULSIVE,
+        CombatPatience.CALCULATED,
+        CombatPatience.PATIENT,
       ],
       allocationPct: { min: 0.05, max: 0.5 },
       dailyMaxLoss: { minPct: 0.04, maxPct: 0.15 },
@@ -79,9 +79,9 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     defaults: {
       allocationPct: 0.2,
       dailyMaxLoss: 0.1,
-      riskAttitude: RiskAttitude.Balanced,
-      tradeTempo: TradeTempo.Active,
-      combatPatience: CombatPatience.Calculated,
+      riskAttitude: RiskAttitude.BALANCED,
+      tradeTempo: TradeTempo.ACTIVE,
+      combatPatience: CombatPatience.CALCULATED,
       exitPersonality: { name: ExitPersonalityName.Balanced },
       stopLossStyle: { name: StopStyleName.Flexible },
       marketAwareness: {
@@ -92,7 +92,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
       },
     },
   },
-  [BotFrame.Sniper]: {
+  [BotFrame.SNIPER]: {
     gamifiedName: "Sniper",
     strategyName: "Breakout Trading",
     shortDescription:
@@ -102,15 +102,15 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     colorway: "#E8F4FF",
     bounds: {
       riskAttitude: [
-        RiskAttitude.Cautious,
-        RiskAttitude.Balanced,
-        RiskAttitude.Aggressive,
+        RiskAttitude.CAUTIOUS,
+        RiskAttitude.BALANCED,
+        RiskAttitude.AGGRESSIVE,
       ],
-      tradeTempo: [TradeTempo.Opportunistic, TradeTempo.Active],
+      tradeTempo: [TradeTempo.OPPORTUNISTIC, TradeTempo.ACTIVE],
       combatPatience: [
-        CombatPatience.Calculated,
-        CombatPatience.Patient,
-        CombatPatience.Strategic,
+        CombatPatience.CALCULATED,
+        CombatPatience.PATIENT,
+        CombatPatience.STRATEGIC,
       ],
       allocationPct: { min: 0.05, max: 0.6 },
       dailyMaxLoss: { minPct: 0.03, maxPct: 0.15 },
@@ -124,9 +124,9 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     defaults: {
       allocationPct: 0.2,
       dailyMaxLoss: 0.1,
-      riskAttitude: RiskAttitude.Balanced,
-      tradeTempo: TradeTempo.Opportunistic,
-      combatPatience: CombatPatience.Patient,
+      riskAttitude: RiskAttitude.BALANCED,
+      tradeTempo: TradeTempo.OPPORTUNISTIC,
+      combatPatience: CombatPatience.PATIENT,
       exitPersonality: { name: ExitPersonalityName.Patient },
       stopLossStyle: { name: StopStyleName.Hard },
       marketAwareness: {
@@ -137,7 +137,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
       },
     },
   },
-  [BotFrame.Guardian]: {
+  [BotFrame.GUARDIAN]: {
     gamifiedName: "Guardian",
     strategyName: "Mean Reversion",
     shortDescription:
@@ -146,12 +146,12 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
       "Defensive, capital-preserving. Low risk, mean reversion focus. Buys oversold conditions when price reverts toward its statistical mean after an extended deviation. Exits near mean or when reversion stalls. Avoids trending markets; sized conservatively.",
     colorway: "#1C9C61",
     bounds: {
-      riskAttitude: [RiskAttitude.Cautious, RiskAttitude.Balanced],
-      tradeTempo: [TradeTempo.Opportunistic, TradeTempo.Active],
+      riskAttitude: [RiskAttitude.CAUTIOUS, RiskAttitude.BALANCED],
+      tradeTempo: [TradeTempo.OPPORTUNISTIC, TradeTempo.ACTIVE],
       combatPatience: [
-        CombatPatience.Calculated,
-        CombatPatience.Patient,
-        CombatPatience.Strategic,
+        CombatPatience.CALCULATED,
+        CombatPatience.PATIENT,
+        CombatPatience.STRATEGIC,
       ],
       allocationPct: { min: 0.03, max: 0.4 },
       dailyMaxLoss: { minPct: 0.02, maxPct: 0.08 },
@@ -165,9 +165,9 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     defaults: {
       allocationPct: 0.15,
       dailyMaxLoss: 0.05,
-      riskAttitude: RiskAttitude.Cautious,
-      tradeTempo: TradeTempo.Opportunistic,
-      combatPatience: CombatPatience.Patient,
+      riskAttitude: RiskAttitude.CAUTIOUS,
+      tradeTempo: TradeTempo.OPPORTUNISTIC,
+      combatPatience: CombatPatience.PATIENT,
       exitPersonality: { name: ExitPersonalityName.Balanced },
       stopLossStyle: { name: StopStyleName.Flexible },
       marketAwareness: {
@@ -178,7 +178,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
       },
     },
   },
-  [BotFrame.Bruiser]: {
+  [BotFrame.BRUISER]: {
     gamifiedName: "Bruiser",
     strategyName: "Trend Following",
     shortDescription:
@@ -187,12 +187,12 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
       "Slower, higher conviction. Rides trends for maximum capture. Enters established uptrends on pullbacks to support, targeting continuation of the primary trend. Holds through minor noise; exits on trend structure break.",
     colorway: "#F2B705",
     bounds: {
-      riskAttitude: [RiskAttitude.Balanced, RiskAttitude.Aggressive],
-      tradeTempo: [TradeTempo.Opportunistic, TradeTempo.Active],
+      riskAttitude: [RiskAttitude.BALANCED, RiskAttitude.AGGRESSIVE],
+      tradeTempo: [TradeTempo.OPPORTUNISTIC, TradeTempo.ACTIVE],
       combatPatience: [
-        CombatPatience.Calculated,
-        CombatPatience.Patient,
-        CombatPatience.Strategic,
+        CombatPatience.CALCULATED,
+        CombatPatience.PATIENT,
+        CombatPatience.STRATEGIC,
       ],
       allocationPct: { min: 0.1, max: 0.7 },
       dailyMaxLoss: { minPct: 0.06, maxPct: 0.2 },
@@ -206,9 +206,9 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     defaults: {
       allocationPct: 0.25,
       dailyMaxLoss: 0.12,
-      riskAttitude: RiskAttitude.Balanced,
-      tradeTempo: TradeTempo.Active,
-      combatPatience: CombatPatience.Strategic,
+      riskAttitude: RiskAttitude.BALANCED,
+      tradeTempo: TradeTempo.ACTIVE,
+      combatPatience: CombatPatience.STRATEGIC,
       exitPersonality: { name: ExitPersonalityName.Patient },
       stopLossStyle: { name: StopStyleName.Flexible },
       marketAwareness: {
@@ -219,7 +219,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
       },
     },
   },
-  [BotFrame.Berserker]: {
+  [BotFrame.BERSERKER]: {
     gamifiedName: "Berserker",
     strategyName: "Volatility Trading",
     shortDescription:
@@ -228,9 +228,9 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
       "Aggressive, high volatility. High risk, fast in and out. Targets high-volatility conditions — wide ATR, elevated IV, or momentum surges. Enters on breakouts or volume spikes; exits fast when volatility compresses. Adaptive stops accommodate wide intraday swings.",
     colorway: "#D64545",
     bounds: {
-      riskAttitude: [RiskAttitude.Balanced, RiskAttitude.Aggressive],
-      tradeTempo: [TradeTempo.Active, TradeTempo.Relentless],
-      combatPatience: [CombatPatience.Impulsive, CombatPatience.Calculated],
+      riskAttitude: [RiskAttitude.BALANCED, RiskAttitude.AGGRESSIVE],
+      tradeTempo: [TradeTempo.ACTIVE, TradeTempo.RELENTLESS],
+      combatPatience: [CombatPatience.IMPULSIVE, CombatPatience.CALCULATED],
       allocationPct: { min: 0.05, max: 0.4 },
       dailyMaxLoss: { minPct: 0.1, maxPct: 0.25 },
       marketAwareness: {
@@ -243,9 +243,9 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     defaults: {
       allocationPct: 0.15,
       dailyMaxLoss: 0.15,
-      riskAttitude: RiskAttitude.Aggressive,
-      tradeTempo: TradeTempo.Relentless,
-      combatPatience: CombatPatience.Impulsive,
+      riskAttitude: RiskAttitude.AGGRESSIVE,
+      tradeTempo: TradeTempo.RELENTLESS,
+      combatPatience: CombatPatience.IMPULSIVE,
       exitPersonality: { name: ExitPersonalityName.QuickFinisher },
       stopLossStyle: { name: StopStyleName.Adaptive },
       marketAwareness: {
@@ -256,7 +256,7 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
       },
     },
   },
-  [BotFrame.Brawler]: {
+  [BotFrame.BRAWLER]: {
     gamifiedName: "Brawler",
     strategyName: "Swing Trading",
     shortDescription:
@@ -266,19 +266,19 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     colorway: "#8B7CFF",
     bounds: {
       riskAttitude: [
-        RiskAttitude.Cautious,
-        RiskAttitude.Balanced,
-        RiskAttitude.Aggressive,
+        RiskAttitude.CAUTIOUS,
+        RiskAttitude.BALANCED,
+        RiskAttitude.AGGRESSIVE,
       ],
       tradeTempo: [
-        TradeTempo.Opportunistic,
-        TradeTempo.Active,
-        TradeTempo.Relentless,
+        TradeTempo.OPPORTUNISTIC,
+        TradeTempo.ACTIVE,
+        TradeTempo.RELENTLESS,
       ],
       combatPatience: [
-        CombatPatience.Impulsive,
-        CombatPatience.Calculated,
-        CombatPatience.Patient,
+        CombatPatience.IMPULSIVE,
+        CombatPatience.CALCULATED,
+        CombatPatience.PATIENT,
       ],
       allocationPct: { min: 0.05, max: 0.55 },
       dailyMaxLoss: { minPct: 0.05, maxPct: 0.15 },
@@ -292,9 +292,9 @@ export const FRAME_CONFIG: Record<BotFrame, FrameConfig> = {
     defaults: {
       allocationPct: 0.2,
       dailyMaxLoss: 0.1,
-      riskAttitude: RiskAttitude.Balanced,
-      tradeTempo: TradeTempo.Active,
-      combatPatience: CombatPatience.Calculated,
+      riskAttitude: RiskAttitude.BALANCED,
+      tradeTempo: TradeTempo.ACTIVE,
+      combatPatience: CombatPatience.CALCULATED,
       exitPersonality: { name: ExitPersonalityName.Balanced },
       stopLossStyle: { name: StopStyleName.Flexible },
       marketAwareness: {

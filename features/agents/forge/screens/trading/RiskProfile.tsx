@@ -25,18 +25,18 @@ const RISK_OPTIONS: {
   description: string;
 }[] = [
   {
-    value: RiskAttitude.Cautious,
+    value: RiskAttitude.CAUTIOUS,
     label: "Cautious",
     description:
       "Smaller positions. Prioritizes capital protection over upside.",
   },
   {
-    value: RiskAttitude.Balanced,
+    value: RiskAttitude.BALANCED,
     label: "Balanced",
     description: "Standard position sizing. Balances risk and reward.",
   },
   {
-    value: RiskAttitude.Aggressive,
+    value: RiskAttitude.AGGRESSIVE,
     label: "Aggressive",
     description: "Larger positions. Accepts higher drawdown for more upside.",
   },

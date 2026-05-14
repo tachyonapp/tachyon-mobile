@@ -12,7 +12,7 @@ import {
 import { Draft } from "@/features/agents/forge/draft";
 import { BotFrame } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { type ProposalCommunicationStyle } from "@tachyonapp/tachyon-queue-types/config";
+import { ProposalCommunicationStyle } from "@tachyonapp/tachyon-queue-types/config";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -37,23 +37,23 @@ const COMM_STYLE_OPTIONS: {
   description: string;
 }[] = [
   {
-    value: "TERSE",
+    value: ProposalCommunicationStyle.TERSE,
     label: "Terse",
     description: "Short, direct proposals. Just the signal and the numbers.",
   },
   {
-    value: "DETAILED",
+    value: ProposalCommunicationStyle.DETAILED,
     label: "Detailed",
     description:
       "Full context with each proposal — reasoning, market conditions, risk factors.",
   },
   {
-    value: "AGGRESSIVE_CONFIDENT",
+    value: ProposalCommunicationStyle.AGGRESSIVE_CONFIDENT,
     label: "Aggressive & Confident",
     description: "Bold, high-conviction language. Your agent doesn't hedge.",
   },
   {
-    value: "CAUTIOUS_MEASURED",
+    value: ProposalCommunicationStyle.CAUTIOUS_MEASURED,
     label: "Cautious & Measured",
     description: "Thoughtful, nuanced proposals that acknowledge uncertainty.",
   },

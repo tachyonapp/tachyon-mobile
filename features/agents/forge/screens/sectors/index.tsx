@@ -5,8 +5,8 @@ import { ForgeOptionCard } from "@/features/agents/forge/components/ForgeOptionC
 import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
 import { TickerTagInput } from "@/features/agents/forge/components/TickerTagInput";
 import {
-  type DividendPreference,
-  type ShortInterestSignal,
+  DividendPreference,
+  ShortInterestSignal,
 } from "@tachyonapp/tachyon-queue-types/config";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -21,17 +21,17 @@ const DIVIDEND_OPTIONS: {
   description: string;
 }[] = [
   {
-    value: "PREFER_DIVIDEND",
+    value: DividendPreference.PREFER_DIVIDEND,
     label: "Prefer Dividend Stocks",
     description: "Favors stocks that pay regular dividends.",
   },
   {
-    value: "NO_PREFERENCE",
+    value: DividendPreference.NO_PREFERENCE,
     label: "No Preference",
     description: "Dividend status has no bearing on stock selection.",
   },
   {
-    value: "EXCLUDE_DIVIDEND",
+    value: DividendPreference.EXCLUDE_DIVIDEND,
     label: "Exclude Dividend Stocks",
     description: "Avoids dividend-paying stocks entirely.",
   },
@@ -43,19 +43,19 @@ const SHORT_INTEREST_OPTIONS: {
   description: string;
 }[] = [
   {
-    value: "TARGET_SHORT_SQUEEZE",
+    value: ShortInterestSignal.TARGET_SHORT_SQUEEZE,
     label: "Target Short Squeeze Candidates",
     description:
       "Actively seeks stocks with high short interest as potential squeeze setups.",
   },
   {
-    value: "AVOID_HIGH_SHORT_INTEREST",
+    value: ShortInterestSignal.AVOID_HIGH_SHORT_INTEREST,
     label: "Avoid High Short Interest",
     description:
       "Steers clear of heavily shorted stocks to reduce volatility risk.",
   },
   {
-    value: "IGNORE",
+    value: ShortInterestSignal.IGNORE,
     label: "Ignore",
     description: "Short interest data is not factored into stock selection.",
   },

@@ -27,23 +27,23 @@ const PATIENCE_OPTIONS: {
   description: string;
 }[] = [
   {
-    value: CombatPatience.Impulsive,
+    value: CombatPatience.IMPULSIVE,
     label: "Impulsive",
     description:
       "Exits quickly. No minimum hold. Reactive to short-term signals.",
   },
   {
-    value: CombatPatience.Calculated,
+    value: CombatPatience.CALCULATED,
     label: "Calculated",
     description: "Short commitment. Gives trades a few hours to play out.",
   },
   {
-    value: CombatPatience.Patient,
+    value: CombatPatience.PATIENT,
     label: "Patient",
     description: "Holds overnight. Waits for meaningful price movement.",
   },
   {
-    value: CombatPatience.Strategic,
+    value: CombatPatience.STRATEGIC,
     label: "Strategic",
     description:
       "Multi-day holds. Conviction-driven. Ignores short-term noise.",
@@ -51,10 +51,10 @@ const PATIENCE_OPTIONS: {
 ];
 
 const PATIENCE_HINTS: Record<CombatPatience, string> = {
-  [CombatPatience.Impulsive]: "No minimum hold. Can exit same day.",
-  [CombatPatience.Calculated]: "Minimum hold: 4 hours",
-  [CombatPatience.Patient]: "Minimum hold: 24 hours",
-  [CombatPatience.Strategic]: "Minimum hold: 72 hours (3 days)",
+  [CombatPatience.IMPULSIVE]: "No minimum hold. Can exit same day.",
+  [CombatPatience.CALCULATED]: "Minimum hold: 4 hours",
+  [CombatPatience.PATIENT]: "Minimum hold: 24 hours",
+  [CombatPatience.STRATEGIC]: "Minimum hold: 72 hours (3 days)",
 };
 
 export const Patience = ({

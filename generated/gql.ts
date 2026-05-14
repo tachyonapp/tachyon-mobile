@@ -19,7 +19,7 @@ type Documents = {
   "mutation CancelSubscription {\n  cancelSubscription {\n    success\n  }\n}": typeof types.CancelSubscriptionDocument;
   "mutation CompleteOnboarding {\n  completeOnboarding\n}": typeof types.CompleteOnboardingDocument;
   "mutation ConnectBroker($brokerName: String!, $credentials: String!) {\n  connectBroker(brokerName: $brokerName, credentials: $credentials) {\n    ... on Account {\n      id\n      status\n      providerName\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n  }\n}": typeof types.ConnectBrokerDocument;
-  "mutation CreateBot($input: CreateBotInput!) {\n  createBot(input: $input) {\n    ... on Bot {\n      id\n      name\n      frame\n      status\n      allocationPct\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n  }\n}": typeof types.CreateBotDocument;
+  "mutation CreateBot($input: CreateBotInput!) {\n  createBot(input: $input) {\n    bot {\n      id\n      name\n      frame\n      status\n      allocationPct\n    }\n    advisories {\n      code\n      field\n      message\n    }\n  }\n}": typeof types.CreateBotDocument;
   "mutation DeleteBot($id: ID!) {\n  deleteBot(id: $id) {\n    success\n  }\n}": typeof types.DeleteBotDocument;
   "mutation PauseBot($id: ID!) {\n  pauseBot(id: $id) {\n    ... on Bot {\n      id\n      status\n    }\n    ... on NotFoundError {\n      message\n    }\n  }\n}": typeof types.PauseBotDocument;
   "mutation SelectTier($tier: SubscriptionTier!, $stripePaymentMethodId: String) {\n  selectTier(tier: $tier, stripePaymentMethodId: $stripePaymentMethodId) {\n    subscriptionTier\n    subscriptionStatus\n    trialExpiresAt\n  }\n}": typeof types.SelectTierDocument;
@@ -33,6 +33,7 @@ type Documents = {
   "query Bots {\n  bots {\n    id\n    name\n    frame\n    status\n    allocationPct\n    dailyMaxLoss\n    dailyMaxGain\n    riskAttitude\n    tradeTempo\n    combatPatience\n    createdAt\n    updatedAt\n  }\n}": typeof types.BotsDocument;
   "query Me {\n  me {\n    id\n    email\n    auth0Id\n    createdAt\n    onboardingCompleted\n  }\n}": typeof types.MeDocument;
   "query MeSubscription {\n  me {\n    id\n    subscriptionTier\n    subscriptionStatus\n    trialExpiresAt\n    currentPeriodEnd\n  }\n}": typeof types.MeSubscriptionDocument;
+  "query ParentSectors {\n  parentSectors {\n    parentSector\n    subSectors\n  }\n}": typeof types.ParentSectorsDocument;
   "query Positions {\n  positions {\n    id\n    symbol\n    qty\n    avgEntryPrice\n    status\n    openedAt\n    closedAt\n    bot {\n      id\n      name\n    }\n  }\n}": typeof types.PositionsDocument;
   "query Proposals($status: ProposalStatus) {\n  proposals(status: $status) {\n    id\n    symbol\n    side\n    qty\n    limitPrice\n    rationaleText\n    status\n    expiresAt\n    createdAt\n    bot {\n      id\n      name\n    }\n  }\n}": typeof types.ProposalsDocument;
 };
@@ -47,7 +48,7 @@ const documents: Documents = {
     types.CompleteOnboardingDocument,
   "mutation ConnectBroker($brokerName: String!, $credentials: String!) {\n  connectBroker(brokerName: $brokerName, credentials: $credentials) {\n    ... on Account {\n      id\n      status\n      providerName\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n  }\n}":
     types.ConnectBrokerDocument,
-  "mutation CreateBot($input: CreateBotInput!) {\n  createBot(input: $input) {\n    ... on Bot {\n      id\n      name\n      frame\n      status\n      allocationPct\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n  }\n}":
+  "mutation CreateBot($input: CreateBotInput!) {\n  createBot(input: $input) {\n    bot {\n      id\n      name\n      frame\n      status\n      allocationPct\n    }\n    advisories {\n      code\n      field\n      message\n    }\n  }\n}":
     types.CreateBotDocument,
   "mutation DeleteBot($id: ID!) {\n  deleteBot(id: $id) {\n    success\n  }\n}":
     types.DeleteBotDocument,
@@ -75,6 +76,8 @@ const documents: Documents = {
     types.MeDocument,
   "query MeSubscription {\n  me {\n    id\n    subscriptionTier\n    subscriptionStatus\n    trialExpiresAt\n    currentPeriodEnd\n  }\n}":
     types.MeSubscriptionDocument,
+  "query ParentSectors {\n  parentSectors {\n    parentSector\n    subSectors\n  }\n}":
+    types.ParentSectorsDocument,
   "query Positions {\n  positions {\n    id\n    symbol\n    qty\n    avgEntryPrice\n    status\n    openedAt\n    closedAt\n    bot {\n      id\n      name\n    }\n  }\n}":
     types.PositionsDocument,
   "query Proposals($status: ProposalStatus) {\n  proposals(status: $status) {\n    id\n    symbol\n    side\n    qty\n    limitPrice\n    rationaleText\n    status\n    expiresAt\n    createdAt\n    bot {\n      id\n      name\n    }\n  }\n}":
@@ -129,8 +132,8 @@ export function gql(
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(
-  source: "mutation CreateBot($input: CreateBotInput!) {\n  createBot(input: $input) {\n    ... on Bot {\n      id\n      name\n      frame\n      status\n      allocationPct\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n  }\n}",
-): (typeof documents)["mutation CreateBot($input: CreateBotInput!) {\n  createBot(input: $input) {\n    ... on Bot {\n      id\n      name\n      frame\n      status\n      allocationPct\n    }\n    ... on ValidationError {\n      message\n      field\n      code\n    }\n  }\n}"];
+  source: "mutation CreateBot($input: CreateBotInput!) {\n  createBot(input: $input) {\n    bot {\n      id\n      name\n      frame\n      status\n      allocationPct\n    }\n    advisories {\n      code\n      field\n      message\n    }\n  }\n}",
+): (typeof documents)["mutation CreateBot($input: CreateBotInput!) {\n  createBot(input: $input) {\n    bot {\n      id\n      name\n      frame\n      status\n      allocationPct\n    }\n    advisories {\n      code\n      field\n      message\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -209,6 +212,12 @@ export function gql(
 export function gql(
   source: "query MeSubscription {\n  me {\n    id\n    subscriptionTier\n    subscriptionStatus\n    trialExpiresAt\n    currentPeriodEnd\n  }\n}",
 ): (typeof documents)["query MeSubscription {\n  me {\n    id\n    subscriptionTier\n    subscriptionStatus\n    trialExpiresAt\n    currentPeriodEnd\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(
+  source: "query ParentSectors {\n  parentSectors {\n    parentSector\n    subSectors\n  }\n}",
+): (typeof documents)["query ParentSectors {\n  parentSectors {\n    parentSector\n    subSectors\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

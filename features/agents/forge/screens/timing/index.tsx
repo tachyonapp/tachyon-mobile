@@ -6,9 +6,9 @@ import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
 import { FrameAdvisoryBanner } from "@/features/agents/forge/components/FrameAdvisoryBanner";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
-  type DayOfWeek,
-  type SessionPreference,
-  type VolatilityEnvPreference,
+  DayOfWeek,
+  SessionPreference,
+  VolatilityEnvPreference,
 } from "@tachyonapp/tachyon-queue-types/config";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -20,24 +20,24 @@ const SESSION_OPTIONS: {
   description: string;
 }[] = [
   {
-    value: "FULL_SESSION",
+    value: SessionPreference.FULL_SESSION,
     label: "Full Session",
     description: "Trades throughout the entire market session (9:30am–4pm ET).",
   },
   {
-    value: "MORNING_HUNTER",
+    value: SessionPreference.MORNING_HUNTER,
     label: "Morning Hunter (9:30–12pm)",
     description:
       "Focuses activity in the morning when volume and price discovery are highest.",
   },
   {
-    value: "AFTERNOON_HUNTER",
+    value: SessionPreference.AFTERNOON_HUNTER,
     label: "Afternoon Hunter (12–4pm)",
     description:
       "Focuses activity in the afternoon session after morning noise settles.",
   },
   {
-    value: "AVOID_FIRST_30",
+    value: SessionPreference.AVOID_FIRST_30,
     label: "Avoid First 30 Min",
     description:
       "Skips the opening 30 minutes to avoid erratic spreads. Trades from 10am onward.",
@@ -50,30 +50,30 @@ const VOLATILITY_OPTIONS: {
   description: string;
 }[] = [
   {
-    value: "PREFERS_LOW_VIX",
+    value: VolatilityEnvPreference.PREFERS_LOW_VIX,
     label: "Prefers Calm Markets",
     description:
       "More active when the VIX is low. Pulls back in high-volatility environments.",
   },
   {
-    value: "PREFERS_HIGH_VIX",
+    value: VolatilityEnvPreference.PREFERS_HIGH_VIX,
     label: "Prefers Volatile Markets",
     description:
       "Thrives when the VIX is elevated. Seeks larger intraday moves.",
   },
   {
-    value: "NO_PREFERENCE",
+    value: VolatilityEnvPreference.NO_PREFERENCE,
     label: "No Preference",
     description: "Trades in any volatility environment without adjustment.",
   },
 ];
 
 const DAYS: { key: DayOfWeek; label: string }[] = [
-  { key: "MONDAY", label: "MON" },
-  { key: "TUESDAY", label: "TUE" },
-  { key: "WEDNESDAY", label: "WED" },
-  { key: "THURSDAY", label: "THU" },
-  { key: "FRIDAY", label: "FRI" },
+  { key: DayOfWeek.MONDAY, label: "MON" },
+  { key: DayOfWeek.TUESDAY, label: "TUE" },
+  { key: DayOfWeek.WEDNESDAY, label: "WED" },
+  { key: DayOfWeek.THURSDAY, label: "THU" },
+  { key: DayOfWeek.FRIDAY, label: "FRI" },
 ];
 
 export default function Timing() {

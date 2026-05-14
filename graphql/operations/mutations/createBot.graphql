@@ -1,16 +1,16 @@
 mutation CreateBot($input: CreateBotInput!) {
   createBot(input: $input) {
-    ... on Bot {
+    bot {
       id
       name
       frame
       status
       allocationPct
     }
-    ... on ValidationError {
-      message
-      field
+    advisories {
       code
+      field
+      message
     }
   }
 }

@@ -7,9 +7,9 @@ import { FrameAdvisoryBanner } from "@/features/agents/forge/components/FrameAdv
 import { SignalWeightSliders } from "@/features/agents/forge/components/SignalWeightSliders";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
-  type ConfidenceThreshold,
-  type EarningsBehavior,
-  type RegimeAwareness,
+  ConfidenceThreshold,
+  EarningsBehavior,
+  RegimeAwareness,
 } from "@tachyonapp/tachyon-queue-types/config";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -28,24 +28,24 @@ const CONFIDENCE_OPTIONS: {
   description: string;
 }[] = [
   {
-    value: "LOW",
+    value: ConfidenceThreshold.LOW,
     label: "Low",
     description:
       "Your agent proposes trades on weaker signals. More frequent, higher risk.",
   },
   {
-    value: "MEDIUM",
+    value: ConfidenceThreshold.MEDIUM,
     label: "Medium",
     description: "Balanced — proposes when signals are reasonably clear.",
   },
   {
-    value: "HIGH",
+    value: ConfidenceThreshold.HIGH,
     label: "High",
     description:
       "Waits for strong confirmation. Fewer trades, higher conviction.",
   },
   {
-    value: "VERY_HIGH",
+    value: ConfidenceThreshold.VERY_HIGH,
     label: "Very High",
     description:
       "Only acts on very strong signals. May miss some opportunities.",
@@ -58,23 +58,23 @@ const REGIME_OPTIONS: {
   description: string;
 }[] = [
   {
-    value: "NO_CHANGE",
+    value: RegimeAwareness.NO_CHANGE,
     label: "No Change",
     description: "Ignores broader market regime. Trades as normal regardless.",
   },
   {
-    value: "REDUCE_SIZE_BEAR",
+    value: RegimeAwareness.REDUCE_SIZE_BEAR,
     label: "Reduce Size in Bear Markets",
     description:
       "Scales down position sizes when the market is in a bearish trend.",
   },
   {
-    value: "STAND_DOWN_BEAR",
+    value: RegimeAwareness.STAND_DOWN_BEAR,
     label: "Stand Down in Bear Markets",
     description: "Pauses all trading when the market enters a bearish regime.",
   },
   {
-    value: "INCREASE_AGGRESSION_BULL",
+    value: RegimeAwareness.INCREASE_AGGRESSION_BULL,
     label: "Increase Aggression in Bull Markets",
     description:
       "Scales up position sizes and trade frequency during bullish conditions.",
@@ -87,18 +87,18 @@ const EARNINGS_OPTIONS: {
   description: string;
 }[] = [
   {
-    value: "MORE_AGGRESSIVE",
+    value: EarningsBehavior.MORE_AGGRESSIVE,
     label: "More Aggressive",
     description:
       "Increases activity around earnings events to capture price moves.",
   },
   {
-    value: "NEUTRAL",
+    value: EarningsBehavior.NEUTRAL,
     label: "Neutral",
     description: "No change in behavior during earnings seasons.",
   },
   {
-    value: "STAND_DOWN",
+    value: EarningsBehavior.STAND_DOWN,
     label: "Stand Down",
     description:
       "Avoids opening new positions during earnings windows to limit volatility risk.",
