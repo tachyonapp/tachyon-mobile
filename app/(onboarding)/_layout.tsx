@@ -16,7 +16,7 @@ export default function OnboardingLayout() {
 
   // Completed FTUE and signed in → main app
   if (isComplete === true && isAuthenticated) {
-    return <Redirect href="/(tabs)" />;
+    return <Redirect href="/(tabs)/feed" />;
   }
 
   return (

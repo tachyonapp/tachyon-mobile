@@ -77,7 +77,7 @@ export default function OnboardingSlides() {
 
   const handleComplete = async () => {
     await markComplete();
-    router.replace("/(tabs)");
+    router.replace("/(tabs)/feed");
   };
 
   const handleNext = () => {

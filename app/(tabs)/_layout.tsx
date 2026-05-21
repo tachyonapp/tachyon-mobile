@@ -53,7 +53,7 @@ export default function TabLayout() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
-      <HeaderNav navPath="/(tabs)" iconName="add" />
+      <HeaderNav navPath="/(agent-forge)" iconName="add" />
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: tabColor,

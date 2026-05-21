@@ -1,6 +1,6 @@
 import { useAuth } from "@/auth/AuthProvider";
 import { useOnboardingState } from "@/hooks/use-onboarding-state";
-import { useRouter } from "expo-router";
+import { useRouter, useRootNavigationState } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, {
   createContext,
@@ -9,12 +9,20 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { AppState } from "react-native";
 
 interface AppInitContextValue {
   isReady: boolean;
+  isAuthenticated: boolean;
+  isOnboarded: boolean;
 }
 
-const AppInitContext = createContext<AppInitContextValue>({ isReady: false });
+const AppInitContext = createContext<AppInitContextValue>({
+  isReady: false,
+  isAuthenticated: false,
+  isOnboarded: false,
+});
+
 // Module-level sentinel used to survive provider remounts.
 // Without this, a remount resets local state to `false` and can re-run startup
 // redirects, causing visible route flashes and loading-loop behavior.
@@ -25,9 +33,8 @@ let appInitCompleted = false;
  * pending verification restoration, initial route selection, and splash
  * screen dismissal.
  *
- * Exposes a single `isReady` flag. The root layout gates the Stack on this
- * value — when false, the branded loading screen is shown; when true, the
- * navigator renders with the correct initial route already committed.
+ * Exposes isReady, isAuthenticated, and isOnboarded so that RootNavigator
+ * can use Stack.Protected without importing auth hooks directly.
  *
  * Must be mounted inside AuthProvider and ApolloProvider.
  */
@@ -35,17 +42,23 @@ export function AppInitProvider({ children }: { children: React.ReactNode }) {
   const { isLoading, isAuthenticated, pendingVerification } = useAuth();
   const { isComplete } = useOnboardingState();
   const router = useRouter();
+  // useRootNavigationState resolves once the navigation container has finished
+  // initializing, including any navigation state restoration from persistence.
+  // Routing before rootNavState?.key is truthy means router.replace() races
+  // against restoration and can lose — the restored state overwrites our call.
+  const rootNavState = useRootNavigationState();
+  const isNavReady = !!rootNavState?.key;
+
   const [isReady, setIsReady] = useState(appInitCompleted);
   // Mirrors the module sentinel inside the effect lifecycle.
-  // Prevents multiple `router.replace` calls when dependencies re-evaluate
+  // Prevents multiple router.replace calls when dependencies re-evaluate
   // during the same mounted lifetime.
   const initRef = useRef(appInitCompleted);
 
+  // Startup routing — fires once per JS context, after the nav container and
+  // all async state (Clerk, SecureStore) have resolved.
   useEffect(() => {
-    // isLoading includes Clerk readiness + SecureStore verification restore.
-    // `isComplete === null` means onboarding SecureStore hydration is pending.
-    // Routing before both resolve risks transient redirects to wrong trees.
-    if (isLoading || isComplete === null) return;
+    if (!isNavReady || isLoading || isComplete === null) return;
     if (initRef.current) return;
     initRef.current = true;
 
@@ -57,30 +70,54 @@ export function AppInitProvider({ children }: { children: React.ReactNode }) {
     // We intentionally do not rely on nav state restoration here because it can
     // revive transient flows (e.g. agent-forge) after app relaunch.
     if (!isAuthenticated && pendingVerification) {
-      // Verification was in progress when the app was last closed — return
-      // the user directly to the verify screen so they can complete it.
       router.replace("/(auth)/verify");
     } else if (!isAuthenticated) {
       router.replace("/(auth)/login");
     } else if (!isComplete) {
       router.replace("/(onboarding)");
     } else {
-      router.replace("/(tabs)");
+      router.replace("/(tabs)/feed");
     }
 
     // Persist readiness across provider remounts (which can happen during
     // route tree transitions) so the loading gate does not re-appear forever.
-    // This avoids a race where init re-enters, emits a second replace, and
-    // flashes onboarding/auth trees before biometric lock resolves.
     appInitCompleted = true;
     setIsReady(true);
     SplashScreen.hideAsync().catch(() => {
       // Non-fatal in dev/hot-reload flows where splash may already be hidden.
     });
-  }, [isLoading, isComplete, isAuthenticated, pendingVerification, router]);
+  }, [isNavReady, isLoading, isComplete, isAuthenticated, pendingVerification, router]);
+
+  // Foreground routing — re-runs the decision tree whenever the app becomes
+  // active. The Stack is always mounted (biometric lock renders as an overlay,
+  // not a Stack replacement), so router.replace() always has a valid target.
+  useEffect(() => {
+    if (!isReady) return;
+
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      if (nextState !== "active") return;
+      if (!isAuthenticated && pendingVerification) {
+        router.replace("/(auth)/verify");
+      } else if (!isAuthenticated) {
+        router.replace("/(auth)/login");
+      } else if (!isComplete) {
+        router.replace("/(onboarding)");
+      } else {
+        router.replace("/(tabs)/feed");
+      }
+    });
+
+    return () => subscription.remove();
+  }, [isReady, isAuthenticated, isComplete, pendingVerification, router]);
 
   return (
-    <AppInitContext.Provider value={{ isReady }}>
+    <AppInitContext.Provider
+      value={{
+        isReady,
+        isAuthenticated,
+        isOnboarded: isComplete === true,
+      }}
+    >
       {children}
     </AppInitContext.Provider>
   );

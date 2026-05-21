@@ -57,7 +57,7 @@ function ForgeLayoutContent() {
         if (router.canGoBack()) {
           router.back();
         } else {
-          router.replace("/(tabs)");
+          router.replace("/(tabs)/feed");
         }
       }
       prevAppState.current = nextState;
@@ -67,7 +67,7 @@ function ForgeLayoutContent() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
-      <HeaderNav navPath="/(tabs)" iconName="close" />
+      <HeaderNav navPath="/(tabs)/feed" iconName="close" />
 
       {showProgress && (
         <ForgeProgressBar currentStep={currentStep} totalSteps={TOTAL_STEPS} />

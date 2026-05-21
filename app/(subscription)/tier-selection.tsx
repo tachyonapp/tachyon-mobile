@@ -96,7 +96,7 @@ export default function TierSelectionScreen() {
     if (origin === "agent-forge") {
       router.replace("/(agent-forge)" as never);
     } else {
-      router.replace("/(tabs)" as never);
+      router.replace("/(tabs)/feed" as never);
     }
   };
 
@@ -106,7 +106,7 @@ export default function TierSelectionScreen() {
     >
       <Pressable
         style={styles.closeBtn}
-        onPress={() => router.replace("/(tabs)")}
+        onPress={() => router.replace("/(tabs)/feed")}
         accessibilityRole="button"
         accessibilityLabel="Close"
         hitSlop={12}
