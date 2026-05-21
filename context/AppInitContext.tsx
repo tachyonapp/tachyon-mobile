@@ -29,14 +29,18 @@ const AppInitContext = createContext<AppInitContextValue>({
 let appInitCompleted = false;
 
 /**
- * Owns all app initialization logic: auth resolution, onboarding state,
- * pending verification restoration, initial route selection, and splash
- * screen dismissal.
+ * Orchestrates app shell startup: initial and foreground route selection,
+ * splash dismissal, and the isReady gate.
  *
- * Exposes isReady, isAuthenticated, and isOnboarded so that RootNavigator
- * can use Stack.Protected without importing auth hooks directly.
+ * Consumes auth (useAuth) and FTUE completion (useOnboardingState) but does
+ * not own either — onboarding persistence and markComplete live in
+ * OnboardingStateProvider.
  *
- * Must be mounted inside AuthProvider and ApolloProvider.
+ * Exposes isReady, isAuthenticated, and isOnboarded so RootNavigator can
+ * use Stack.Protected without importing auth or onboarding hooks directly.
+ *
+ * Must be mounted inside AuthProvider, ApolloProvider, and
+ * OnboardingStateProvider.
  */
 export function AppInitProvider({ children }: { children: React.ReactNode }) {
   const { isLoading, isAuthenticated, pendingVerification } = useAuth();

@@ -10,6 +10,7 @@ import { AuthLoadingState } from "@/components/auth/auth-loading-state";
 import { BiometricLockScreen } from "@/components/auth/BiometricLockScreen";
 import { AppInitProvider, useAppInit } from "@/context/AppInitContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { OnboardingStateProvider } from "@/context/OnboardingStateContext";
 import { ApolloProvider } from "@apollo/client/react";
 import { ClerkProvider } from "@clerk/clerk-expo";
 import {
@@ -115,13 +116,15 @@ export default function RootLayout() {
         <AuthProvider>
           <BiometricAuthProvider>
             <ApolloProvider client={apolloClient}>
-              <ThemeProvider
-                value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-              >
-                <AppInitProvider>
-                  <RootNavigator />
-                </AppInitProvider>
-              </ThemeProvider>
+              <OnboardingStateProvider>
+                <ThemeProvider
+                  value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+                >
+                  <AppInitProvider>
+                    <RootNavigator />
+                  </AppInitProvider>
+                </ThemeProvider>
+              </OnboardingStateProvider>
             </ApolloProvider>
           </BiometricAuthProvider>
         </AuthProvider>
