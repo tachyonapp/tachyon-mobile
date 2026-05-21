@@ -117,7 +117,7 @@ export default function Sectors() {
           </ForgeSection>
 
           <ForgeSection
-            title="Intelligence"
+            title="Awareness"
             subtitle="Tune your agent's market perception signals."
             tooltip={{
               title: "Market Awareness",

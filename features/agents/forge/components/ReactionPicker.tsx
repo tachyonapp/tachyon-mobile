@@ -12,9 +12,9 @@ interface ReactionPickerProps {
 
 // TODO: legal review required before App Store submission (e.g. "Numbers don't lie")
 export const WIN_REACTIONS = [
-  "Let's go!",
+  "Win!",
   "Profit secured.",
-  "Numbers don't lie.",
+  "Numbers look good.",
   "Clean entry, clean exit.",
   "Patience pays.",
   "On to the next one.",
