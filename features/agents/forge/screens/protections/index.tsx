@@ -13,7 +13,6 @@ import { SafetySystems } from "./SafetySystems";
 export default function Protections() {
   const { state, updateField, persistDraft } = useWizard();
   const router = useRouter();
-  const sectorsSet = state.sectors.length > 0;
 
   const { data: balanceData } = useQuery<BalanceQuery>(BalanceDocument, {
     fetchPolicy: "cache-first",
@@ -30,7 +29,6 @@ export default function Protections() {
     state.dailyMaxLoss <= dailyMaxLossBounds.maxPct;
 
   const stopLossSet = state.stopLossStyle !== null;
-  const exitSet = state.exitPersonality !== null;
 
   const canAdvance =
     state.exitPersonality !== null && stopLossSet && isDailyMaxLossValid;
@@ -60,57 +58,35 @@ export default function Protections() {
             <></>
           </ForgeSection>
 
-          <ForgeSection
-            title="Exit Strategy"
-            subtitle="Set how your agent exits positions?"
-            tooltip={{
-              title: "Exit Personality",
-              body: "Exit personality controls when your agent closes a winning position.",
-            }}
-            locked={!sectorsSet}
-            lockedMessage="Select at least one sector first."
-          >
-            <Exit
-              exitPersonality={state.exitPersonality}
-              updateField={updateField}
-            />
-          </ForgeSection>
+          <Exit
+            exitPersonality={state.exitPersonality}
+            updateField={updateField}
+            sectorsSet={state.sectors.length > 0}
+          />
 
-          <ForgeSection
-            title="Daily Loss Limit"
-            subtitle="Configure safety limits to protect your allocated capital."
-            locked={!exitSet}
-            lockedMessage="Choose an exit strategy first."
-          >
-            <SafetySystems
-              frameName={frameConfig?.gamifiedName ?? "your frame"}
-              dailyMaxLossPct={state.dailyMaxLoss}
-              onDailyMaxLossChange={(v) => updateField("dailyMaxLoss", v)}
-              dailyMaxLossBounds={dailyMaxLossBounds}
-              allocationPct={state.allocationPct}
-              userCashBalance={userCashBalance}
-              dailyMaxGain={state.dailyMaxGain}
-              onDailyMaxGainChange={(v) => updateField("dailyMaxGain", v)}
-              stopLossStyle={state.stopLossStyle}
-              onStopLossStyleChange={(v) => updateField("stopLossStyle", v)}
-              emotionalControls={state.emotionalControls}
-              onEmotionalControlsChange={(v) =>
-                updateField("emotionalControls", v)
-              }
-            />
-          </ForgeSection>
+          <SafetySystems
+            frameName={frameConfig?.gamifiedName ?? "your frame"}
+            dailyMaxLossPct={state.dailyMaxLoss}
+            onDailyMaxLossChange={(v) => updateField("dailyMaxLoss", v)}
+            dailyMaxLossBounds={dailyMaxLossBounds}
+            allocationPct={state.allocationPct}
+            userCashBalance={userCashBalance}
+            dailyMaxGain={state.dailyMaxGain}
+            onDailyMaxGainChange={(v) => updateField("dailyMaxGain", v)}
+            stopLossStyle={state.stopLossStyle}
+            onStopLossStyleChange={(v) => updateField("stopLossStyle", v)}
+            emotionalControls={state.emotionalControls}
+            onEmotionalControlsChange={(v) =>
+              updateField("emotionalControls", v)
+            }
+            exitSet={state.exitPersonality !== null}
+          />
 
-          <ForgeSection
-            title="Rules of Engagement"
-            subtitle="Set the operating rules your agent must follow."
-            locked={!stopLossSet}
-            lockedMessage="Configure your stop-loss style first."
-          >
-            <Engagement
-              rulesOfEngagement={state.rulesOfEngagement}
-              updateField={updateField}
-            />
-          </ForgeSection>
+          <Engagement
+            rulesOfEngagement={state.rulesOfEngagement}
+            updateField={updateField}
+            stopLossSet={stopLossSet}
+          />
         </Pressable>
       </ScrollView>
 

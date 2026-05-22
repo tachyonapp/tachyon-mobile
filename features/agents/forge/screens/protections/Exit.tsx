@@ -1,5 +1,6 @@
 import type { WizardState } from "@/context/WizardContext";
 import { ForgeOptionCard } from "@/features/agents/forge/components/ForgeOptionCard";
+import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
 import { ExitPersonalityInput, ExitPersonalityName } from "@/generated/graphql";
 import { StyleSheet, View } from "react-native";
 
@@ -9,6 +10,7 @@ interface ExitProps {
     value: WizardState[K],
   ) => void;
   exitPersonality: ExitPersonalityInput | null;
+  sectorsSet: boolean;
 }
 
 const EXIT_OPTIONS: {
@@ -33,21 +35,38 @@ const EXIT_OPTIONS: {
   },
 ];
 
-export const Exit = ({ updateField, exitPersonality }: ExitProps) => {
+export const Exit = ({
+  updateField,
+  exitPersonality,
+  sectorsSet,
+}: ExitProps) => {
   return (
-    <View>
-      <View style={styles.optionList}>
-        {EXIT_OPTIONS.map((opt) => (
-          <ForgeOptionCard
-            key={opt.value}
-            label={opt.label}
-            description={opt.description}
-            selected={exitPersonality?.name === opt.value}
-            onSelect={() => updateField("exitPersonality", { name: opt.value })}
-          />
-        ))}
+    <ForgeSection
+      title="Exit Strategy"
+      subtitle="Set how your agent exits positions?"
+      tooltip={{
+        title: "Exit Personality",
+        body: "Exit personality controls when your agent closes a winning position.",
+      }}
+      locked={!sectorsSet}
+      lockedMessage="Select at least one sector first."
+    >
+      <View>
+        <View style={styles.optionList}>
+          {EXIT_OPTIONS.map((opt) => (
+            <ForgeOptionCard
+              key={opt.value}
+              label={opt.label}
+              description={opt.description}
+              selected={exitPersonality?.name === opt.value}
+              onSelect={() =>
+                updateField("exitPersonality", { name: opt.value })
+              }
+            />
+          ))}
+        </View>
       </View>
-    </View>
+    </ForgeSection>
   );
 };
 

@@ -1,6 +1,5 @@
 import { useWizard } from "@/context/WizardContext";
 import { ForgeNavBar } from "@/features/agents/forge/components/ForgeNavBar";
-import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
 import { BrainType } from "@/generated/graphql";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -13,7 +12,7 @@ export default function Model() {
 
   const [isKeyValidated, setIsKeyValidated] = useState(false);
 
-  const stopLossSet = state.stopLossStyle !== null;
+  // const stopLossSet = state.stopLossStyle !== null;
 
   const canAdvance =
     state.brain.brainType === BrainType.TachyonHosted || isKeyValidated;
@@ -36,20 +35,14 @@ export default function Model() {
         contentContainerStyle={styles.scrollContent}
       >
         <Pressable onPress={() => Keyboard.dismiss()}>
-          <ForgeSection
-            title="AI Model"
-            subtitle="Your agent uses AI to analyze and interact with markets, reason about its trading as well as explain and propose trades to you — No trade execute without your explicit approval."
-            locked={!stopLossSet}
-            lockedMessage="Set your protections first."
-          >
-            <Subscription
-              brain={state.brain}
-              brainCatalog={brainCatalog}
-              isKeyValidated={isKeyValidated}
-              updateBrain={updateBrain}
-              setIsKeyValidated={setIsKeyValidated}
-            />
-          </ForgeSection>
+          <Subscription
+            brain={state.brain}
+            brainCatalog={brainCatalog}
+            isKeyValidated={isKeyValidated}
+            updateBrain={updateBrain}
+            setIsKeyValidated={setIsKeyValidated}
+            stopLossSet={state.stopLossStyle !== null}
+          />
         </Pressable>
       </ScrollView>
 

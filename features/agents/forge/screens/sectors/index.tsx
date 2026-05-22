@@ -116,47 +116,31 @@ export default function Sectors() {
             <></>
           </ForgeSection>
 
-          <ForgeSection
-            title="Awareness"
-            subtitle="Tune your agent's market perception signals."
-            tooltip={{
-              title: "Market Awareness",
-              body: "These weights tune how your agent weighs different market signals. They are independent — they do not need to add up to anything.",
-            }}
-            locked={!combatComplete}
-            lockedMessage="Complete your Trading Profile first."
-          >
-            <MarketAwareness
-              value={state.marketAwareness}
-              onChange={(v) => updateField("marketAwareness", v)}
-              bounds={marketAwarenessBounds}
-            />
-          </ForgeSection>
+          <MarketAwareness
+            value={state.marketAwareness}
+            onChange={(v) => updateField("marketAwareness", v)}
+            bounds={marketAwarenessBounds}
+            combatComplete={combatComplete}
+          />
 
           {/* Sectors — existing, unchanged */}
-          <ForgeSection
-            title="Sectors"
-            subtitle="Select one or more market sectors your agent can trade in."
-            locked={!combatComplete}
-            lockedMessage="Complete your Trading Profile first."
-          >
-            <SectorGrid
-              selected={state.sectors}
-              onChange={(sectors) => {
-                updateField("sectors", sectors);
-                if (sectors.length > 0) setSectorAttempted(false);
-              }}
-              showError={sectorAttempted}
-            />
+          <SectorGrid
+            selected={state.sectors}
+            onChange={(sectors) => {
+              updateField("sectors", sectors);
+              if (sectors.length > 0) setSectorAttempted(false);
+            }}
+            showError={sectorAttempted}
+            combatComplete={combatComplete}
+          />
 
-            {/* Sub-sector refinement — hidden if parentSectorsData unavailable */}
-            <SubSectorExpansionPanel
-              selectedSectors={state.sectors}
-              parentSectorsData={parentSectorsData}
-              subSectors={state.subSectors}
-              onChange={(subs) => updateField("subSectors", subs)}
-            />
-          </ForgeSection>
+          {/* Sub-sector refinement — hidden if parentSectorsData unavailable */}
+          <SubSectorExpansionPanel
+            selectedSectors={state.sectors}
+            parentSectorsData={parentSectorsData}
+            subSectors={state.subSectors}
+            onChange={(subs) => updateField("subSectors", subs)}
+          />
 
           {/* Watchlist & exclusion */}
           <ForgeSection
