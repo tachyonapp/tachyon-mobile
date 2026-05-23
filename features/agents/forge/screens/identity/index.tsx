@@ -1,9 +1,15 @@
-import { FRAME_CONFIG } from "@/constants/frameConfig";
+import { AgentAvatar } from "@/components/shared/AgentAvatar";
+import { Colors } from "@/constants/theme";
 import { useWizard } from "@/context/WizardContext";
 import { ForgeNavBar } from "@/features/agents/forge/components/ForgeNavBar";
 import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
+import {
+  LOSS_REACTIONS,
+  ReactionPicker,
+  WIN_REACTIONS,
+} from "@/features/agents/forge/components/ReactionPicker";
 import { Draft } from "@/features/agents/forge/draft";
-import { BotFrame } from "@/generated/graphql";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -13,10 +19,10 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { FrameCard } from "./FrameCard";
+import { Background } from "./Background";
+import { Communication } from "./Communication";
 import { IdentityForm } from "./IdentityForm";
-
-const FRAMES = Object.values(BotFrame);
+import { Strategy } from "./Strategy";
 
 export default function IdentityScreen() {
   const {
@@ -27,10 +33,13 @@ export default function IdentityScreen() {
     draftPrompt,
     resumeDraft,
     startFresh,
+    setWinReaction,
+    setLossReaction,
   } = useWizard();
   const router = useRouter();
-  const [nameFocused, setNameFocused] = useState(false);
+  const theme = Colors[useColorScheme()];
   const [nameError, setNameError] = useState(false);
+
   const nameSet = state.name.trim().length > 0;
   const canAdvance = state.name.trim().length > 0 && state.frameName !== null;
 
@@ -40,7 +49,7 @@ export default function IdentityScreen() {
       return;
     }
     await persistDraft();
-    router.push("/(bot-forge)/step-2-combat");
+    router.push("/(agent-forge)/step-2-trading-profile");
   }
 
   return (
@@ -54,46 +63,76 @@ export default function IdentityScreen() {
           {draftPrompt === "resume-or-fresh" && (
             <Draft resumeDraft={resumeDraft} startFresh={startFresh} />
           )}
-          <ForgeSection
-            title="Identity"
-            subtitle="Your agents trading personality and strategy"
-          >
-            <></>
-          </ForgeSection>
 
-          <ForgeSection title="Agent Name" subtitle="Name your agent.">
-            <IdentityForm
-              name={state.name}
-              avatarSeed={state.avatarSeed}
-              nameFocused={nameFocused}
-              nameError={nameError}
-              updateField={updateField}
-              setNameError={setNameError}
-              setNameFocused={setNameFocused}
+          <View style={styles.header}>
+            <ForgeSection
+              title="Identity"
+              subtitle="Your agents trading personality and strategy"
+            >
+              <></>
+            </ForgeSection>
+            <View style={styles.avatar}>
+              <AgentAvatar
+                seed={state.avatarSeed}
+                backgroundColor={theme.inputBackground}
+              />
+            </View>
+          </View>
+
+          <IdentityForm
+            name={state.name}
+            avatarSeed={state.avatarSeed}
+            nameError={nameError}
+            updateField={updateField}
+            setNameError={setNameError}
+          />
+
+          <Strategy
+            nameSet={nameSet}
+            frameName={state.frameName}
+            selectFrame={selectFrame}
+          />
+
+          <Background
+            canAdvance={canAdvance}
+            updateField={updateField}
+            agentBackground={state.agentBackground}
+          />
+
+          <Communication
+            canAdvance={canAdvance}
+            updateField={updateField}
+            proposalCommunicationStyle={state.proposalCommunicationStyle}
+          />
+
+          {/* Win Reactions */}
+          <ForgeSection
+            title="Win Reaction"
+            subtitle="How does your agent respond after a winning trade? (Optional)"
+            locked={!canAdvance}
+            lockedMessage="Set your agent name and strategy first."
+          >
+            <ReactionPicker
+              type="win"
+              value={state.winReaction}
+              onChange={setWinReaction}
+              options={WIN_REACTIONS}
             />
           </ForgeSection>
 
+          {/* Loss Reactions */}
           <ForgeSection
-            title="Core Strategy"
-            subtitle="Your agent's core strategy type"
-            tooltip={{
-              title: "Personality Frame",
-              body: "The strategy type defines your agent's core trading strategy archetype. It sets bounds on all other settings and pre-fills sensible default configurations.",
-            }}
-            locked={!nameSet}
-            lockedMessage="Name your agent first."
+            title="Loss Reaction"
+            subtitle="How does your agent respond after a losing trade? (Optional)"
+            locked={!canAdvance}
+            lockedMessage="Set your agent name and strategy first."
           >
-            <View style={styles.frameGrid}>
-              {FRAMES.map((frame) => (
-                <View key={frame} style={styles.frameCardWrapper}>
-                  <FrameCard
-                    frame={FRAME_CONFIG[frame]}
-                    selected={state.frameName === frame}
-                    onSelect={() => selectFrame(frame)}
-                  />
-                </View>
-              ))}
-            </View>
+            <ReactionPicker
+              type="loss"
+              value={state.lossReaction}
+              onChange={setLossReaction}
+              options={LOSS_REACTIONS}
+            />
           </ForgeSection>
         </Pressable>
       </ScrollView>
@@ -109,12 +148,13 @@ const styles = StyleSheet.create({
     gap: 28,
     paddingBottom: 16,
   },
-  frameGrid: {
+  header: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
+    alignContent: "center",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
-  frameCardWrapper: {
-    width: "48%",
+  avatar: {
+    marginTop: 35,
   },
 });

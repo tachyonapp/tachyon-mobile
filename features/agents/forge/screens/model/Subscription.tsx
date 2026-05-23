@@ -13,7 +13,8 @@ import {
 import { useMutation, useQuery } from "@apollo/client/react";
 import { useEffect } from "react";
 import { View } from "react-native";
-import { BrainSelector } from "./Selector";
+import { ForgeSection } from "../../components/ForgeSection";
+import { Selector } from "./components/Selector";
 
 interface SubscriptionProps {
   brain: BrainConfigInput;
@@ -21,6 +22,7 @@ interface SubscriptionProps {
   isKeyValidated: boolean;
   updateBrain: (partial: Partial<BrainState>) => void;
   setIsKeyValidated: React.Dispatch<React.SetStateAction<boolean>>;
+  stopLossSet: boolean;
 }
 
 export const Subscription = ({
@@ -29,6 +31,7 @@ export const Subscription = ({
   isKeyValidated,
   updateBrain,
   setIsKeyValidated,
+  stopLossSet,
 }: SubscriptionProps) => {
   const { data: meData } = useQuery<MeSubscriptionQuery>(
     MeSubscriptionDocument,
@@ -85,25 +88,32 @@ export const Subscription = ({
   }
 
   return (
-    <View>
-      <BrainSelector
-        brainType={brain.brainType}
-        provider={brain.provider ?? ""}
-        modelId={brain.modelId}
-        byokProviders={brainCatalog?.byokProviders ?? []}
-        isKeyValidated={isKeyValidated}
-        hasByokDraft={
-          brain.brainType === BrainType.Byok && brain.apiKey === null
-        }
-        subscriptionTier={subscriptionTier}
-        onBrainTypeChange={handleBrainTypeChange}
-        onProviderChange={(p) => {
-          updateBrain({ provider: p, apiKey: null });
-          setIsKeyValidated(false);
-        }}
-        onModelChange={(m) => updateBrain({ modelId: m })}
-        onValidateKey={handleValidateKey}
-      />
-    </View>
+    <ForgeSection
+      title="AI Model"
+      subtitle="Your agent uses AI to analyze and interact with markets, reason about its trading as well as explain and propose trades to you — No trade execute without your explicit approval."
+      locked={!stopLossSet}
+      lockedMessage="Set your protections first."
+    >
+      <View>
+        <Selector
+          brainType={brain.brainType}
+          provider={brain.provider ?? ""}
+          modelId={brain.modelId}
+          byokProviders={brainCatalog?.byokProviders ?? []}
+          isKeyValidated={isKeyValidated}
+          hasByokDraft={
+            brain.brainType === BrainType.Byok && brain.apiKey === null
+          }
+          subscriptionTier={subscriptionTier}
+          onBrainTypeChange={handleBrainTypeChange}
+          onProviderChange={(p) => {
+            updateBrain({ provider: p, apiKey: null });
+            setIsKeyValidated(false);
+          }}
+          onModelChange={(m) => updateBrain({ modelId: m })}
+          onValidateKey={handleValidateKey}
+        />
+      </View>
+    </ForgeSection>
   );
 };

@@ -45,14 +45,26 @@
  *
  * - `brainCatalog` is fetched from the API at wizard entry via `brainProviders` query.
  *   Mobile never hardcodes provider/model lists — the API is the single source of truth.
+ *
+ * Parent sectors:
+ *
+ * - `parentSectorsData` is fetched from the API at wizard entry via `parentSectors` query.
+ *   On query failure, `parentSectorsData` is `[]` and sub-sector panels are hidden gracefully.
+ *
+ * Active advisories:
+ *
+ * - `activeAdvisories` is derived from the current frame config and wizard state.
+ *   It is recomputed whenever advisory-relevant fields change. Never persisted to AsyncStorage.
+ *   Advisories are informational only — they never block wizard progression.
  */
 
 import { apolloClient } from "@/apollo/client";
-import { FRAME_CONFIG } from "@/constants/frameConfig";
 import {
   BotFrame,
   BrainType,
+  ExitPersonalityName,
   SectorFilter,
+  StopStyleName,
   type BrainCatalog,
   type CombatPatience,
   type EmotionalControlsInput,
@@ -65,6 +77,24 @@ import {
 } from "@/generated/graphql";
 import { gql } from "@apollo/client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  FRAME_CONFIG,
+  type BotFrameName,
+  type ConfidenceThreshold,
+  type DayOfWeek,
+  type DividendPreference,
+  type EarningsBehavior,
+  type FrameAdvisory,
+  type PositionSizingMethod,
+  type ProposalCommunicationStyle,
+  type RecoveryMode,
+  type RegimeAwareness,
+  type SectorDefinition,
+  type SessionPreference,
+  type ShortInterestSignal,
+  type SignalWeights,
+  type VolatilityEnvPreference,
+} from "@tachyonapp/tachyon-queue-types/config";
 import React, {
   createContext,
   useCallback,
@@ -105,10 +135,34 @@ export interface WizardState {
   rulesOfEngagement: RulesOfEngagementInput;
   brain: BrainState;
   existingAllocationTotal: number; // fetched at wizard entry; not persisted
+  signalWeights: SignalWeights;
+  confidenceThreshold: ConfidenceThreshold | null;
+  regimeAwareness: RegimeAwareness | null;
+  earningsBehavior: EarningsBehavior | null;
+  subSectors: string[];
+  customWatchlist: string[];
+  exclusionList: string[];
+  dividendPreference: DividendPreference | null;
+  shortInterestSignal: ShortInterestSignal | null;
+  positionSizingMethod: PositionSizingMethod | null;
+  minRrRatio: number | null;
+  maxDrawdownProtectionPct: number | null;
+  recoveryMode: RecoveryMode | null;
+  sessionPreference: SessionPreference | null;
+  dayAvoidance: DayOfWeek[];
+  volatilityEnvPreference: VolatilityEnvPreference | null;
+  agentBackground: string;
+  proposalCommunicationStyle: ProposalCommunicationStyle | null;
+  winReaction: string | null;
+  lossReaction: string | null;
+  activeAdvisories: FrameAdvisory[]; // derived — NOT persisted to AsyncStorage
 }
 
-// Subset written to AsyncStorage — apiKey and existingAllocationTotal excluded
-type PersistedDraft = Omit<WizardState, "existingAllocationTotal" | "brain"> & {
+// Subset written to AsyncStorage — apiKey, existingAllocationTotal, and activeAdvisories excluded
+type PersistedDraft = Omit<
+  WizardState,
+  "existingAllocationTotal" | "brain" | "activeAdvisories"
+> & {
   brain: Omit<BrainState, "apiKey">;
 };
 
@@ -152,6 +206,28 @@ const EMPTY_STATE: WizardState = {
   },
   brain: DEFAULT_BRAIN,
   existingAllocationTotal: 0,
+  // null/empty until a frame is selected
+  signalWeights: { technicals: 0, news: 0, fundamentals: 0 },
+  confidenceThreshold: null,
+  regimeAwareness: null,
+  earningsBehavior: null,
+  subSectors: [],
+  customWatchlist: [],
+  exclusionList: [],
+  dividendPreference: null,
+  shortInterestSignal: null,
+  positionSizingMethod: null,
+  minRrRatio: null,
+  maxDrawdownProtectionPct: null,
+  recoveryMode: null,
+  sessionPreference: null,
+  dayAvoidance: [],
+  volatilityEnvPreference: null,
+  agentBackground: "",
+  proposalCommunicationStyle: null,
+  winReaction: null,
+  lossReaction: null,
+  activeAdvisories: [],
 };
 
 // ── GraphQL ───────────────────────────────────────────────────────────────────
@@ -186,20 +262,126 @@ const EXISTING_ALLOCATION_QUERY = gql`
   }
 `;
 
+const PARENT_SECTORS_QUERY = gql`
+  query ParentSectors {
+    parentSectors {
+      parentSector
+      subSectors
+    }
+  }
+`;
+
+// ── Advisory derivation ───────────────────────────────────────────────────────
+
+function deriveAdvisories(
+  frameName: BotFrameName | null,
+  settings: Partial<WizardState>,
+): FrameAdvisory[] {
+  if (!frameName) return [];
+  const config = FRAME_CONFIG[frameName];
+  if (!config) return [];
+  return config.advisories.filter((advisory) => {
+    try {
+      return advisory.condition(settings as any);
+    } catch {
+      return false; // advisory evaluation error — suppress, never crash wizard
+    }
+  });
+}
+
+// ── Draft deserialization ─────────────────────────────────────────────────────
+
+function deserializeDraft(
+  raw: unknown,
+  existingAllocationTotal: number,
+): WizardState {
+  const draft = raw as Partial<PersistedDraft>;
+  const frameName = draft.frameName as BotFrameName | null;
+  const frameDefaults =
+    frameName && FRAME_CONFIG[frameName]
+      ? FRAME_CONFIG[frameName].defaults
+      : null;
+
+  return {
+    ...EMPTY_STATE,
+    ...(draft as Partial<WizardState>),
+    brain: {
+      brainType:
+        (draft.brain?.brainType as BrainType) ?? BrainType.TachyonHosted,
+      provider: draft.brain?.provider ?? "anthropic",
+      modelId: draft.brain?.modelId ?? "claude-haiku-4-5-20251001",
+      apiKey: null, // apiKey never stored — user must re-enter after resuming a BYOK draft
+    },
+    existingAllocationTotal,
+    activeAdvisories: [], // always recomputed — never from draft
+    // use draft value if present, else frame default, else null/empty
+    signalWeights: draft.signalWeights ??
+      frameDefaults?.signalWeights ?? {
+        technicals: 34,
+        news: 33,
+        fundamentals: 33,
+      },
+    confidenceThreshold:
+      draft.confidenceThreshold ?? frameDefaults?.confidenceThreshold ?? null,
+    regimeAwareness:
+      draft.regimeAwareness ?? frameDefaults?.regimeAwareness ?? null,
+    earningsBehavior:
+      draft.earningsBehavior ?? frameDefaults?.earningsBehavior ?? null,
+    subSectors: draft.subSectors ?? [],
+    customWatchlist: draft.customWatchlist ?? [],
+    exclusionList: draft.exclusionList ?? [],
+    dividendPreference:
+      draft.dividendPreference ?? frameDefaults?.dividendPreference ?? null,
+    shortInterestSignal:
+      draft.shortInterestSignal ?? frameDefaults?.shortInterestSignal ?? null,
+    positionSizingMethod:
+      draft.positionSizingMethod ?? frameDefaults?.positionSizingMethod ?? null,
+    minRrRatio: draft.minRrRatio ?? frameDefaults?.minRrRatio ?? null,
+    maxDrawdownProtectionPct:
+      draft.maxDrawdownProtectionPct ??
+      frameDefaults?.maxDrawdownProtectionPct ??
+      null,
+    recoveryMode: draft.recoveryMode ?? frameDefaults?.recoveryMode ?? null,
+    sessionPreference:
+      draft.sessionPreference ?? frameDefaults?.sessionPreference ?? null,
+    dayAvoidance: draft.dayAvoidance ?? frameDefaults?.dayAvoidance ?? [],
+    volatilityEnvPreference:
+      draft.volatilityEnvPreference ??
+      frameDefaults?.volatilityEnvPreference ??
+      null,
+    agentBackground: draft.agentBackground ?? "",
+    proposalCommunicationStyle:
+      draft.proposalCommunicationStyle ??
+      frameDefaults?.proposalCommunicationStyle ??
+      null,
+    winReaction: draft.winReaction ?? null,
+    lossReaction: draft.lossReaction ?? null,
+  };
+}
+
 // ── Context ───────────────────────────────────────────────────────────────────
 
 interface WizardContextValue {
   state: WizardState;
   brainCatalog: BrainCatalog | null;
+  parentSectorsData: SectorDefinition[];
   isLoading: boolean;
   /** Non-null when a saved draft was found on cold launch; show Resume / Start Fresh prompt */
   draftPrompt: "resume-or-fresh" | null;
+  /** Validation guards — consumed by wizard steps to gate Next CTA */
+  signalWeightsValid: boolean;
+  noTickerOverlap: boolean;
+  hasActiveTradingDay: boolean;
   selectFrame: (frameName: BotFrame) => void;
   updateField: <K extends keyof WizardState>(
     field: K,
     value: WizardState[K],
   ) => void;
   updateBrain: (partial: Partial<BrainState>) => void;
+  setCustomWatchlist: (tickers: string[]) => void;
+  setExclusionList: (tickers: string[]) => void;
+  setWinReaction: (phrase: string | null) => void;
+  setLossReaction: (phrase: string | null) => void;
   persistDraft: () => Promise<void>;
   clearDraft: () => Promise<void>;
   resumeDraft: () => void;
@@ -213,6 +395,9 @@ const WizardContext = createContext<WizardContextValue | null>(null);
 export function WizardProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<WizardState>(EMPTY_STATE);
   const [brainCatalog, setBrainCatalog] = useState<BrainCatalog | null>(null);
+  const [parentSectorsData, setParentSectorsData] = useState<
+    SectorDefinition[]
+  >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [draftPrompt, setDraftPrompt] = useState<"resume-or-fresh" | null>(
     null,
@@ -220,20 +405,58 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   // Holds the deserialized draft while waiting for the user to choose Resume or Start Fresh
   const pendingDraftRef = useRef<WizardState | null>(null);
 
+  // ── Advisory derivation ────────────────────────────────────────────────────
+  // Recompute when any field that could trigger an advisory changes.
+  // The identity check inside setState prevents spurious re-renders.
+
+  useEffect(() => {
+    if (!state.frameName) return;
+    const derived = deriveAdvisories(state.frameName as BotFrameName, state);
+    setState((prev) => {
+      if (
+        prev.activeAdvisories.length === derived.length &&
+        prev.activeAdvisories.every((a, i) => a.code === derived[i]?.code)
+      ) {
+        return prev;
+      }
+      return { ...prev, activeAdvisories: derived };
+    });
+  }, [
+    state.frameName,
+    state.signalWeights,
+    state.confidenceThreshold,
+    state.regimeAwareness,
+    state.earningsBehavior,
+    state.riskAttitude,
+    state.tradeTempo,
+    state.positionSizingMethod,
+    state.dividendPreference,
+    state.shortInterestSignal,
+    state.recoveryMode,
+    state.sessionPreference,
+    state.volatilityEnvPreference,
+  ]);
+
+  // ── Initialize ─────────────────────────────────────────────────────────────
+
   const initialize = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Fetch brain catalog and existing allocation concurrently
-      const [catalogResult, allocationResult] = await Promise.allSettled([
-        apolloClient.query({
-          query: BRAIN_PROVIDERS_QUERY,
-          fetchPolicy: "cache-first",
-        }),
-        apolloClient.query({
-          query: EXISTING_ALLOCATION_QUERY,
-          fetchPolicy: "network-only",
-        }),
-      ]);
+      const [catalogResult, allocationResult, sectorsResult] =
+        await Promise.allSettled([
+          apolloClient.query({
+            query: BRAIN_PROVIDERS_QUERY,
+            fetchPolicy: "cache-first",
+          }),
+          apolloClient.query({
+            query: EXISTING_ALLOCATION_QUERY,
+            fetchPolicy: "network-only",
+          }),
+          apolloClient.query({
+            query: PARENT_SECTORS_QUERY,
+            fetchPolicy: "cache-first",
+          }),
+        ]);
 
       const catalog =
         catalogResult.status === "fulfilled"
@@ -241,6 +464,19 @@ export function WizardProvider({ children }: { children: ReactNode }) {
               ?.brainProviders as BrainCatalog | null) ?? null)
           : null;
       setBrainCatalog(catalog);
+
+      if (sectorsResult.status === "fulfilled") {
+        const sectors = (sectorsResult.value.data as any)?.parentSectors as
+          | SectorDefinition[]
+          | null;
+        setParentSectorsData(sectors ?? []);
+      } else {
+        console.error(
+          "[WizardContext] parentSectors query failed:",
+          (sectorsResult as PromiseRejectedResult).reason,
+        );
+        setParentSectorsData([]);
+      }
 
       const bots: { allocationPct?: string | null }[] =
         allocationResult.status === "fulfilled"
@@ -256,12 +492,10 @@ export function WizardProvider({ children }: { children: ReactNode }) {
       try {
         const raw = await AsyncStorage.getItem(DRAFT_KEY);
         if (raw) {
-          const draft = JSON.parse(raw) as PersistedDraft;
-          restoredState = {
-            ...draft,
-            brain: { ...draft.brain, apiKey: null }, // apiKey never stored
+          restoredState = deserializeDraft(
+            JSON.parse(raw),
             existingAllocationTotal,
-          };
+          );
         }
       } catch (err) {
         console.error(
@@ -308,81 +542,45 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const selectFrame = useCallback((frameName: BotFrame) => {
-    const { colorway, defaults, bounds } = FRAME_CONFIG[frameName];
     setState((prev) => {
-      // First frame selection — apply all defaults as a good starting point
-      if (!prev.frameName) {
-        return {
-          ...prev,
-          frameName,
-          colorway,
-          allocationPct: bounds.allocationPct.min,
-          dailyMaxLoss: defaults.dailyMaxLoss,
-          riskAttitude: defaults.riskAttitude,
-          tradeTempo: defaults.tradeTempo,
-          combatPatience: defaults.combatPatience,
-          exitPersonality: defaults.exitPersonality,
-          stopLossStyle: defaults.stopLossStyle,
-          marketAwareness: defaults.marketAwareness,
-        };
-      }
+      if (prev.frameName === frameName) return prev;
 
-      // Re-selecting the same frame — no-op
-      if (prev.frameName === frameName) {
-        return prev;
-      }
+      const frameKey = frameName as BotFrameName;
+      const { colorway, defaults } = FRAME_CONFIG[frameKey];
 
-      // Frame switch: keep settings still valid under the new frame's bounds,
-      // null out incompatible enum selections, clamp numeric/range values.
-      const ma = bounds.marketAwareness;
       return {
         ...prev,
         frameName,
         colorway,
-        allocationPct: Math.min(
-          Math.max(prev.allocationPct, bounds.allocationPct.min),
-          bounds.allocationPct.max,
-        ),
-        dailyMaxLoss: Math.min(
-          Math.max(prev.dailyMaxLoss, bounds.dailyMaxLoss.minPct),
-          bounds.dailyMaxLoss.maxPct,
-        ),
-        marketAwareness: {
-          momentum: Math.min(
-            Math.max(prev.marketAwareness.momentum, ma.momentum.min),
-            ma.momentum.max,
-          ),
-          meanReversion: Math.min(
-            Math.max(prev.marketAwareness.meanReversion, ma.meanReversion.min),
-            ma.meanReversion.max,
-          ),
-          volatility: Math.min(
-            Math.max(prev.marketAwareness.volatility, ma.volatility.min),
-            ma.volatility.max,
-          ),
-          trendFollowing: Math.min(
-            Math.max(
-              prev.marketAwareness.trendFollowing,
-              ma.trendFollowing.min,
-            ),
-            ma.trendFollowing.max,
-          ),
+        // Existing frame-determined fields (bounds-clamping removed)
+        allocationPct: defaults.allocationPct,
+        dailyMaxLoss: defaults.dailyMaxLossPct,
+        riskAttitude: defaults.riskAttitude,
+        tradeTempo: defaults.tradeTempo,
+        combatPatience: defaults.combatPatience,
+        exitPersonality: {
+          name: defaults.exitPersonality as ExitPersonalityName,
         },
-        riskAttitude:
-          prev.riskAttitude && bounds.riskAttitude.includes(prev.riskAttitude)
-            ? prev.riskAttitude
-            : null,
-        tradeTempo:
-          prev.tradeTempo && bounds.tradeTempo.includes(prev.tradeTempo)
-            ? prev.tradeTempo
-            : null,
-        combatPatience:
-          prev.combatPatience &&
-          bounds.combatPatience.includes(prev.combatPatience)
-            ? prev.combatPatience
-            : null,
-        // exitPersonality and stopLossStyle have no per-frame bounds — preserve user's choice
-        // brain is preserved across frame changes
+        stopLossStyle: { name: defaults.stopLossStyle as StopStyleName },
+        marketAwareness: defaults.marketAwareness,
+        // frame-determined defaults
+        signalWeights: defaults.signalWeights,
+        confidenceThreshold: defaults.confidenceThreshold,
+        regimeAwareness: defaults.regimeAwareness,
+        earningsBehavior: defaults.earningsBehavior,
+        dividendPreference: defaults.dividendPreference,
+        shortInterestSignal: defaults.shortInterestSignal,
+        positionSizingMethod: defaults.positionSizingMethod,
+        minRrRatio: defaults.minRrRatio,
+        maxDrawdownProtectionPct: defaults.maxDrawdownProtectionPct,
+        recoveryMode: defaults.recoveryMode,
+        sessionPreference: defaults.sessionPreference,
+        dayAvoidance: defaults.dayAvoidance,
+        volatilityEnvPreference: defaults.volatilityEnvPreference,
+        proposalCommunicationStyle: defaults.proposalCommunicationStyle,
+        // User-entered fields preserved across frame switches:
+        // name, avatarSeed, brain, sectors, subSectors, customWatchlist,
+        // exclusionList, agentBackground, winReaction, lossReaction
       };
     });
   }, []);
@@ -398,10 +596,31 @@ export function WizardProvider({ children }: { children: ReactNode }) {
     setState((prev) => ({ ...prev, brain: { ...prev.brain, ...partial } }));
   }, []);
 
+  const setCustomWatchlist = useCallback((tickers: string[]) => {
+    setState((prev) => ({ ...prev, customWatchlist: tickers }));
+  }, []);
+
+  const setExclusionList = useCallback((tickers: string[]) => {
+    setState((prev) => ({ ...prev, exclusionList: tickers }));
+  }, []);
+
+  const setWinReaction = useCallback((phrase: string | null) => {
+    setState((prev) => ({ ...prev, winReaction: phrase }));
+  }, []);
+
+  const setLossReaction = useCallback((phrase: string | null) => {
+    setState((prev) => ({ ...prev, lossReaction: phrase }));
+  }, []);
+
   const persistDraft = useCallback(async () => {
     const start = Date.now();
 
-    const { brain, existingAllocationTotal: _ignored, ...rest } = state;
+    const {
+      brain,
+      existingAllocationTotal: _ignored,
+      activeAdvisories: _advisories, // never persisted — functions can't serialize
+      ...rest
+    } = state;
     const draft: PersistedDraft = {
       ...rest,
       brain: {
@@ -427,16 +646,38 @@ export function WizardProvider({ children }: { children: ReactNode }) {
     await AsyncStorage.removeItem(DRAFT_KEY);
   }, []);
 
+  // ── Computed validation values ─────────────────────────────────────────────
+
+  const signalWeightsValid =
+    state.signalWeights.technicals +
+      state.signalWeights.news +
+      state.signalWeights.fundamentals ===
+    100;
+
+  const noTickerOverlap = !state.customWatchlist.some((t) =>
+    state.exclusionList.includes(t),
+  );
+
+  const hasActiveTradingDay = state.dayAvoidance.length < 5;
+
   return (
     <WizardContext.Provider
       value={{
         state,
         brainCatalog,
+        parentSectorsData,
         isLoading,
         draftPrompt,
+        signalWeightsValid,
+        noTickerOverlap,
+        hasActiveTradingDay,
         selectFrame,
         updateField,
         updateBrain,
+        setCustomWatchlist,
+        setExclusionList,
+        setWinReaction,
+        setLossReaction,
         persistDraft,
         clearDraft,
         resumeDraft,

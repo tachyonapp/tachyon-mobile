@@ -1,16 +1,24 @@
 import { EducationalTooltip } from "@/components/EducationalTooltip";
 import { PillSlider } from "@/components/PillSlider";
-import { type FrameConfig } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
+import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
 import { type MarketAwarenessInput } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React, { useState } from "react";
 import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
 
+type MarketAwarenessBounds = {
+  momentum: { min: number; max: number };
+  meanReversion: { min: number; max: number };
+  volatility: { min: number; max: number };
+  trendFollowing: { min: number; max: number };
+};
+
 interface MarketAwarenessSlidersProps {
   value: MarketAwarenessInput;
   onChange: (v: MarketAwarenessInput) => void;
-  bounds: FrameConfig["bounds"]["marketAwareness"];
+  bounds: MarketAwarenessBounds;
+  combatComplete: boolean;
 }
 
 const SLIDER_LABELS: Record<keyof MarketAwarenessInput, string> = {
@@ -53,6 +61,7 @@ export function MarketAwareness({
   value,
   onChange,
   bounds,
+  combatComplete,
 }: MarketAwarenessSlidersProps) {
   const theme = Colors[useColorScheme()];
   const [trackWidth, setTrackWidth] = useState(0);
@@ -66,41 +75,52 @@ export function MarketAwareness({
   }
 
   return (
-    <View style={styles.container} onLayout={handleLayout}>
-      {FIELDS.map((field) => {
-        const fieldBounds = bounds[field];
-        const clampedValue = Math.min(
-          fieldBounds.max,
-          Math.max(fieldBounds.min, value[field]),
-        );
+    <ForgeSection
+      title="Awareness"
+      subtitle="Tune your agent's market perception signals."
+      tooltip={{
+        title: "Market Awareness",
+        body: "These weights tune how your agent weighs different market signals. They are independent — they do not need to add up to anything.",
+      }}
+      locked={!combatComplete}
+      lockedMessage="Complete your Trading Profile first."
+    >
+      <View style={styles.container} onLayout={handleLayout}>
+        {FIELDS.map((field) => {
+          const fieldBounds = bounds[field];
+          const clampedValue = Math.min(
+            fieldBounds.max,
+            Math.max(fieldBounds.min, value[field]),
+          );
 
-        return (
-          <View key={field} style={styles.row}>
-            <View style={styles.labelRow}>
-              <View style={styles.labelWithInfo}>
-                <Text style={[styles.label, { color: theme.textPrimary }]}>
-                  {SLIDER_LABELS[field]}
+          return (
+            <View key={field} style={styles.row}>
+              <View style={styles.labelRow}>
+                <View style={styles.labelWithInfo}>
+                  <Text style={[styles.label, { color: theme.textPrimary }]}>
+                    {SLIDER_LABELS[field]}
+                  </Text>
+                  <EducationalTooltip
+                    title={SLIDER_TOOLTIPS[field].title}
+                    body={SLIDER_TOOLTIPS[field].body}
+                  />
+                </View>
+                <Text style={[styles.valueText, { color: theme.electricBlue }]}>
+                  {clampedValue.toFixed(2)}
                 </Text>
-                <EducationalTooltip
-                  title={SLIDER_TOOLTIPS[field].title}
-                  body={SLIDER_TOOLTIPS[field].body}
-                />
               </View>
-              <Text style={[styles.valueText, { color: theme.electricBlue }]}>
-                {clampedValue.toFixed(2)}
-              </Text>
+              <PillSlider
+                value={clampedValue}
+                min={fieldBounds.min}
+                max={fieldBounds.max}
+                onChange={(raw) => handleChange(field, raw)}
+                trackWidth={trackWidth}
+              />
             </View>
-            <PillSlider
-              value={clampedValue}
-              min={fieldBounds.min}
-              max={fieldBounds.max}
-              onChange={(raw) => handleChange(field, raw)}
-              trackWidth={trackWidth}
-            />
-          </View>
-        );
-      })}
-    </View>
+          );
+        })}
+      </View>
+    </ForgeSection>
   );
 }
 

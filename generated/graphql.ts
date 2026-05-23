@@ -1,4 +1,19 @@
 /* eslint-disable */
+import { BotFrameName as BotFrame } from "@tachyonapp/tachyon-queue-types/config";
+import { RiskAttitude } from "@tachyonapp/tachyon-queue-types/config";
+import { TradeTempo } from "@tachyonapp/tachyon-queue-types/config";
+import { CombatPatience } from "@tachyonapp/tachyon-queue-types/config";
+import { ConfidenceThreshold } from "@tachyonapp/tachyon-queue-types/config";
+import { RegimeAwareness } from "@tachyonapp/tachyon-queue-types/config";
+import { EarningsBehavior } from "@tachyonapp/tachyon-queue-types/config";
+import { DividendPreference } from "@tachyonapp/tachyon-queue-types/config";
+import { ShortInterestSignal } from "@tachyonapp/tachyon-queue-types/config";
+import { PositionSizingMethod } from "@tachyonapp/tachyon-queue-types/config";
+import { RecoveryMode } from "@tachyonapp/tachyon-queue-types/config";
+import { SessionPreference } from "@tachyonapp/tachyon-queue-types/config";
+import { DayOfWeek } from "@tachyonapp/tachyon-queue-types/config";
+import { VolatilityEnvPreference } from "@tachyonapp/tachyon-queue-types/config";
+import { ProposalCommunicationStyle } from "@tachyonapp/tachyon-queue-types/config";
 import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -66,29 +81,49 @@ export type BaseError = {
 export type Bot = {
   __typename?: "Bot";
   activePosition?: Maybe<Position>;
+  agentBackground?: Maybe<Scalars["String"]["output"]>;
   allocationPct?: Maybe<Scalars["Decimal"]["output"]>;
   avatarSeed?: Maybe<Scalars["String"]["output"]>;
   botBrainConfig?: Maybe<BotBrainConfig>;
   brain?: Maybe<BotBrainConfig>;
   combatPatience?: Maybe<CombatPatience>;
+  confidenceThreshold?: Maybe<ConfidenceThreshold>;
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
+  customWatchlist?: Maybe<Array<Scalars["String"]["output"]>>;
   dailyMaxGain?: Maybe<Scalars["Decimal"]["output"]>;
   dailyMaxLoss?: Maybe<Scalars["Decimal"]["output"]>;
+  dayAvoidance?: Maybe<Array<DayOfWeek>>;
+  dividendPreference?: Maybe<DividendPreference>;
+  earningsBehavior?: Maybe<EarningsBehavior>;
+  exclusionList?: Maybe<Array<Scalars["String"]["output"]>>;
   exitStyle?: Maybe<Scalars["String"]["output"]>;
   frame?: Maybe<BotFrame>;
   id?: Maybe<Scalars["ID"]["output"]>;
+  lossReaction?: Maybe<Scalars["String"]["output"]>;
   marketAwareness?: Maybe<MarketAwareness>;
+  maxDrawdownProtectionPct?: Maybe<Scalars["Float"]["output"]>;
+  minRrRatio?: Maybe<Scalars["Float"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
   owner?: Maybe<User>;
+  positionSizingMethod?: Maybe<PositionSizingMethod>;
+  proposalCommunicationStyle?: Maybe<ProposalCommunicationStyle>;
   proposals?: Maybe<Array<Proposal>>;
+  recoveryMode?: Maybe<RecoveryMode>;
+  regimeAwareness?: Maybe<RegimeAwareness>;
   riskAttitude?: Maybe<RiskAttitude>;
   scanCapRemaining?: Maybe<Scalars["Int"]["output"]>;
   scanCapUsed?: Maybe<Scalars["Int"]["output"]>;
   sectors?: Maybe<Array<SectorFilter>>;
+  sessionPreference?: Maybe<SessionPreference>;
+  shortInterestSignal?: Maybe<ShortInterestSignal>;
+  signalWeights?: Maybe<SignalWeightsOutput>;
   status?: Maybe<BotStatus>;
   stopStyle?: Maybe<Scalars["String"]["output"]>;
+  subSectors?: Maybe<Array<Scalars["String"]["output"]>>;
   tradeTempo?: Maybe<TradeTempo>;
   updatedAt?: Maybe<Scalars["DateTime"]["output"]>;
+  volatilityEnvPreference?: Maybe<VolatilityEnvPreference>;
+  winReaction?: Maybe<Scalars["String"]["output"]>;
 };
 
 /** A user-configured AI trading bot */
@@ -104,14 +139,13 @@ export type BotBrainConfig = {
   provider?: Maybe<Scalars["String"]["output"]>;
 };
 
-export enum BotFrame {
-  Berserker = "BERSERKER",
-  Brawler = "BRAWLER",
-  Bruiser = "BRUISER",
-  Guardian = "GUARDIAN",
-  Scout = "SCOUT",
-  Sniper = "SNIPER",
-}
+export { BotFrame };
+
+export type BotMutationResult = {
+  __typename?: "BotMutationResult";
+  advisories?: Maybe<Array<MutationAdvisory>>;
+  bot?: Maybe<Bot>;
+};
 
 export type BotPerformanceResult = {
   __typename?: "BotPerformanceResult";
@@ -191,36 +225,53 @@ export type CancelSubscriptionResult = {
   success?: Maybe<Scalars["Boolean"]["output"]>;
 };
 
-export enum CombatPatience {
-  Calculated = "CALCULATED",
-  Impulsive = "IMPULSIVE",
-  Patient = "PATIENT",
-  Strategic = "STRATEGIC",
-}
+export { CombatPatience };
+
+export { ConfidenceThreshold };
 
 export type ConnectBrokerResult = Account | ValidationError;
 
 export type CreateBotInput = {
+  agentBackground?: InputMaybe<Scalars["String"]["input"]>;
   allocationPct: Scalars["Decimal"]["input"];
   avatarSeed: Scalars["String"]["input"];
   brain: BrainConfigInput;
   colorway: Scalars["String"]["input"];
   combatPatience: CombatPatience;
+  confidenceThreshold?: InputMaybe<ConfidenceThreshold>;
+  customWatchlist?: InputMaybe<Array<Scalars["String"]["input"]>>;
   dailyMaxGain?: InputMaybe<Scalars["Decimal"]["input"]>;
   dailyMaxLossPct: Scalars["Decimal"]["input"];
+  dayAvoidance?: InputMaybe<Array<DayOfWeek>>;
+  dividendPreference?: InputMaybe<DividendPreference>;
+  earningsBehavior?: InputMaybe<EarningsBehavior>;
   emotionalControls: EmotionalControlsInput;
+  exclusionList?: InputMaybe<Array<Scalars["String"]["input"]>>;
   exitPersonality: ExitPersonalityInput;
   frameName: BotFrame;
+  lossReaction?: InputMaybe<Scalars["String"]["input"]>;
   marketAwareness: MarketAwarenessInput;
+  maxDrawdownProtectionPct?: InputMaybe<Scalars["Float"]["input"]>;
+  minRrRatio?: InputMaybe<Scalars["Float"]["input"]>;
   name: Scalars["String"]["input"];
+  positionSizingMethod?: InputMaybe<PositionSizingMethod>;
+  proposalCommunicationStyle?: InputMaybe<ProposalCommunicationStyle>;
+  recoveryMode?: InputMaybe<RecoveryMode>;
+  regimeAwareness?: InputMaybe<RegimeAwareness>;
   riskAttitude: RiskAttitude;
   rulesOfEngagement: RulesOfEngagementInput;
   sectors: Array<SectorFilter>;
+  sessionPreference?: InputMaybe<SessionPreference>;
+  shortInterestSignal?: InputMaybe<ShortInterestSignal>;
+  signalWeights?: InputMaybe<SignalWeightsInput>;
   stopLossStyle: StopLossStyleInput;
+  subSectors?: InputMaybe<Array<Scalars["String"]["input"]>>;
   tradeTempo: TradeTempo;
+  volatilityEnvPreference?: InputMaybe<VolatilityEnvPreference>;
+  winReaction?: InputMaybe<Scalars["String"]["input"]>;
 };
 
-export type CreateBotResult = Bot | ValidationError;
+export { DayOfWeek };
 
 export type DefaultBrainInfo = {
   __typename?: "DefaultBrainInfo";
@@ -235,6 +286,10 @@ export type DeleteBotResult = {
   __typename?: "DeleteBotResult";
   success?: Maybe<Scalars["Boolean"]["output"]>;
 };
+
+export { DividendPreference };
+
+export { EarningsBehavior };
 
 export type EmotionalControlsInput = {
   cooldownAfterVolatility: Scalars["Boolean"]["input"];
@@ -275,7 +330,7 @@ export type Mutation = {
   /** Mark the authenticated user's FTUE as complete. Idempotent. */
   completeOnboarding?: Maybe<Scalars["Boolean"]["output"]>;
   connectBroker?: Maybe<ConnectBrokerResult>;
-  createBot?: Maybe<CreateBotResult>;
+  createBot?: Maybe<BotMutationResult>;
   deleteBot?: Maybe<DeleteBotResult>;
   pauseBot?: Maybe<BotResult>;
   selectTier?: Maybe<SelectTierResult>;
@@ -328,6 +383,13 @@ export type MutationValidateBrainKeyArgs = {
   provider: Scalars["String"]["input"];
 };
 
+export type MutationAdvisory = {
+  __typename?: "MutationAdvisory";
+  code?: Maybe<Scalars["String"]["output"]>;
+  field?: Maybe<Scalars["String"]["output"]>;
+  message?: Maybe<Scalars["String"]["output"]>;
+};
+
 export type NotFoundError = BaseError & {
   __typename?: "NotFoundError";
   message?: Maybe<Scalars["String"]["output"]>;
@@ -358,6 +420,8 @@ export type Position = {
   symbol?: Maybe<Scalars["String"]["output"]>;
 };
 
+export { PositionSizingMethod };
+
 export enum PositionStatus {
   Closed = "CLOSED",
   Open = "OPEN",
@@ -383,6 +447,8 @@ export type Proposal = {
   targetPrice?: Maybe<Scalars["Decimal"]["output"]>;
 };
 
+export { ProposalCommunicationStyle };
+
 export enum ProposalSide {
   Buy = "BUY",
   Sell = "SELL",
@@ -405,6 +471,7 @@ export type Query = {
   bots?: Maybe<Array<Bot>>;
   brainProviders?: Maybe<BrainCatalog>;
   me?: Maybe<User>;
+  parentSectors: Array<SectorDefinition>;
   positions?: Maybe<Array<Position>>;
   proposals?: Maybe<Array<Proposal>>;
 };
@@ -421,15 +488,21 @@ export type QueryProposalsArgs = {
   status?: InputMaybe<ProposalStatus>;
 };
 
-export enum RiskAttitude {
-  Aggressive = "AGGRESSIVE",
-  Balanced = "BALANCED",
-  Cautious = "CAUTIOUS",
-}
+export { RecoveryMode };
+
+export { RegimeAwareness };
+
+export { RiskAttitude };
 
 export type RulesOfEngagementInput = {
   noSameDayExitUnlessStopLoss: Scalars["Boolean"]["input"];
   overnightHoldAllowed: Scalars["Boolean"]["input"];
+};
+
+export type SectorDefinition = {
+  __typename?: "SectorDefinition";
+  parentSector?: Maybe<Scalars["String"]["output"]>;
+  subSectors?: Maybe<Array<Scalars["String"]["output"]>>;
 };
 
 export enum SectorFilter {
@@ -448,6 +521,23 @@ export type SelectTierResult = {
   subscriptionStatus?: Maybe<SubscriptionStatus>;
   subscriptionTier?: Maybe<SubscriptionTier>;
   trialExpiresAt?: Maybe<Scalars["DateTime"]["output"]>;
+};
+
+export { SessionPreference };
+
+export { ShortInterestSignal };
+
+export type SignalWeightsInput = {
+  fundamentals: Scalars["Int"]["input"];
+  news: Scalars["Int"]["input"];
+  technicals: Scalars["Int"]["input"];
+};
+
+export type SignalWeightsOutput = {
+  __typename?: "SignalWeightsOutput";
+  fundamentals?: Maybe<Scalars["Int"]["output"]>;
+  news?: Maybe<Scalars["Int"]["output"]>;
+  technicals?: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type SkipProposalResult = AuthError | NotFoundError | Proposal;
@@ -490,11 +580,7 @@ export enum SubscriptionTier {
   TachyonHosted = "TACHYON_HOSTED",
 }
 
-export enum TradeTempo {
-  Active = "ACTIVE",
-  Opportunistic = "OPPORTUNISTIC",
-  Relentless = "RELENTLESS",
-}
+export { TradeTempo };
 
 export type UpdateBotIdentityInput = {
   avatarSeed: Scalars["String"]["input"];
@@ -533,6 +619,8 @@ export type ValidationError = BaseError & {
   field?: Maybe<Scalars["String"]["output"]>;
   message?: Maybe<Scalars["String"]["output"]>;
 };
+
+export { VolatilityEnvPreference };
 
 export type ActivateBotMutationVariables = Exact<{
   id: Scalars["ID"]["input"];
@@ -614,22 +702,23 @@ export type CreateBotMutationVariables = Exact<{
 
 export type CreateBotMutation = {
   __typename?: "Mutation";
-  createBot?:
-    | {
-        __typename?: "Bot";
-        id?: string | null;
-        name?: string | null;
-        frame?: BotFrame | null;
-        status?: BotStatus | null;
-        allocationPct?: any | null;
-      }
-    | {
-        __typename?: "ValidationError";
-        message?: string | null;
-        field?: string | null;
-        code?: string | null;
-      }
-    | null;
+  createBot?: {
+    __typename?: "BotMutationResult";
+    bot?: {
+      __typename?: "Bot";
+      id?: string | null;
+      name?: string | null;
+      frame?: BotFrame | null;
+      status?: BotStatus | null;
+      allocationPct?: any | null;
+    } | null;
+    advisories?: Array<{
+      __typename?: "MutationAdvisory";
+      code?: string | null;
+      field?: string | null;
+      message?: string | null;
+    }> | null;
+  } | null;
 };
 
 export type DeleteBotMutationVariables = Exact<{
@@ -889,6 +978,17 @@ export type MeSubscriptionQuery = {
     trialExpiresAt?: any | null;
     currentPeriodEnd?: any | null;
   } | null;
+};
+
+export type ParentSectorsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type ParentSectorsQuery = {
+  __typename?: "Query";
+  parentSectors: Array<{
+    __typename?: "SectorDefinition";
+    parentSector?: string | null;
+    subSectors?: Array<string> | null;
+  }>;
 };
 
 export type PositionsQueryVariables = Exact<{ [key: string]: never }>;
@@ -1317,11 +1417,8 @@ export const CreateBotDocument = {
               kind: "SelectionSet",
               selections: [
                 {
-                  kind: "InlineFragment",
-                  typeCondition: {
-                    kind: "NamedType",
-                    name: { kind: "Name", value: "Bot" },
-                  },
+                  kind: "Field",
+                  name: { kind: "Name", value: "bot" },
                   selectionSet: {
                     kind: "SelectionSet",
                     selections: [
@@ -1340,20 +1437,17 @@ export const CreateBotDocument = {
                   },
                 },
                 {
-                  kind: "InlineFragment",
-                  typeCondition: {
-                    kind: "NamedType",
-                    name: { kind: "Name", value: "ValidationError" },
-                  },
+                  kind: "Field",
+                  name: { kind: "Name", value: "advisories" },
                   selectionSet: {
                     kind: "SelectionSet",
                     selections: [
+                      { kind: "Field", name: { kind: "Name", value: "code" } },
+                      { kind: "Field", name: { kind: "Name", value: "field" } },
                       {
                         kind: "Field",
                         name: { kind: "Name", value: "message" },
                       },
-                      { kind: "Field", name: { kind: "Name", value: "field" } },
-                      { kind: "Field", name: { kind: "Name", value: "code" } },
                     ],
                   },
                 },
@@ -2304,6 +2398,35 @@ export const MeSubscriptionDocument = {
     },
   ],
 } as unknown as DocumentNode<MeSubscriptionQuery, MeSubscriptionQueryVariables>;
+export const ParentSectorsDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "ParentSectors" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "parentSectors" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "parentSector" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "subSectors" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ParentSectorsQuery, ParentSectorsQueryVariables>;
 export const PositionsDocument = {
   kind: "Document",
   definitions: [

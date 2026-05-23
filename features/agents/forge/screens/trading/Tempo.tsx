@@ -1,24 +1,16 @@
-import { FrameConfig } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import type { WizardState } from "@/context/WizardContext";
 import { ForgeOptionCard } from "@/features/agents/forge/components/ForgeOptionCard";
 import { TradeTempo } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { capitalize } from "@/utils/capitalize";
 import { StyleSheet, Text, View } from "react-native";
 
 interface TempoProps {
-  frameConfig: FrameConfig | null;
   tradeTempo: TradeTempo | null;
   updateField: <K extends keyof WizardState>(
     field: K,
     value: WizardState[K],
   ) => void;
-  disabledReasonFor: (
-    frameName: string,
-    label: string,
-    count: number,
-  ) => string;
 }
 
 const TEMPO_OPTIONS: {
@@ -27,17 +19,17 @@ const TEMPO_OPTIONS: {
   description: string;
 }[] = [
   {
-    value: TradeTempo.Opportunistic,
+    value: TradeTempo.OPPORTUNISTIC,
     label: "Opportunistic",
     description: "Waits for high-conviction setups. Trades infrequently.",
   },
   {
-    value: TradeTempo.Active,
+    value: TradeTempo.ACTIVE,
     label: "Active",
     description: "Consistent scanning. Fires when conditions align.",
   },
   {
-    value: TradeTempo.Relentless,
+    value: TradeTempo.RELENTLESS,
     label: "Relentless",
     description:
       "Scans constantly. High trade frequency — maximum opportunity capture.",
@@ -45,27 +37,13 @@ const TEMPO_OPTIONS: {
 ];
 
 const TEMPO_HINTS: Record<TradeTempo, string> = {
-  [TradeTempo.Opportunistic]: "At most one proposal per hour",
-  [TradeTempo.Active]: "At most one proposal every 20 minutes",
-  [TradeTempo.Relentless]: "Scans every 5 minutes — fires when ready",
+  [TradeTempo.OPPORTUNISTIC]: "At most one proposal per hour",
+  [TradeTempo.ACTIVE]: "At most one proposal every 20 minutes",
+  [TradeTempo.RELENTLESS]: "Scans every 5 minutes — fires when ready",
 };
 
-export const Tempo = ({
-  frameConfig,
-  tradeTempo,
-  updateField,
-  disabledReasonFor,
-}: TempoProps) => {
+export const Tempo = ({ tradeTempo, updateField }: TempoProps) => {
   const theme = Colors[useColorScheme()];
-  const tempoBounds =
-    frameConfig?.bounds.tradeTempo ?? Object.values(TradeTempo);
-  const tempoDisabledReason = frameConfig
-    ? disabledReasonFor(
-        frameConfig.gamifiedName,
-        tempoBounds.map((t) => capitalize(t)).join(", ") + " tempo",
-        tempoBounds.length,
-      )
-    : undefined;
 
   return (
     <View style={styles.subSection}>
@@ -82,10 +60,6 @@ export const Tempo = ({
             description={opt.description}
             selected={tradeTempo === opt.value}
             onSelect={() => updateField("tradeTempo", opt.value)}
-            disabled={!tempoBounds.includes(opt.value)}
-            disabledReason={
-              !tempoBounds.includes(opt.value) ? tempoDisabledReason : undefined
-            }
           />
         ))}
       </View>

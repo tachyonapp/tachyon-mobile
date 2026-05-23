@@ -24,7 +24,7 @@ export const Allocation = ({
   combatComplete,
   existingAllocationTotal,
   userCashBalance,
-  frameName,
+  frameName: _frameName,
 }: AllocationProps) => {
   const theme = Colors[useColorScheme()];
   const allocationMax = Math.min(
@@ -35,11 +35,6 @@ export const Allocation = ({
 
   return (
     <View>
-      {frameName && (
-        <Text style={{ color: theme.textDisabled, fontSize: 15 }}>
-          {`${frameName} agent type requires a minimum ${Math.round(allocationBounds.min * 100)}% and a ${Math.round(allocationBounds.max * 100)}% maximum allocation.`}
-        </Text>
-      )}
       {fullyAllocated ? (
         <Text style={{ color: theme.warning, fontSize: 13 }}>
           Your other agents are using 100% of your capital. Free up allocation

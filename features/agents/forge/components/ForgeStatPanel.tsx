@@ -1,9 +1,9 @@
 import { AgentAvatar } from "@/components/shared/AgentAvatar";
-import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import { type WizardState } from "@/context/WizardContext";
 import { BrainType } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { FRAME_CONFIG } from "@tachyonapp/tachyon-queue-types/config";
 import LottieView from "lottie-react-native";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -82,7 +82,7 @@ export function ForgeStatPanel({ state }: ForgeStatPanelProps) {
           <ForgeStatChip label="NAME" value={state.name.trim() || null} />
           <ForgeStatChip
             label="FRAME"
-            value={frameConfig?.gamifiedName ?? null}
+            value={frameConfig?.strategyName ?? null}
             colorway={frameConfig?.colorway ?? null}
           />
         </View>

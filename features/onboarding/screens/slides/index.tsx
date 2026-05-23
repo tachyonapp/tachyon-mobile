@@ -6,7 +6,6 @@ import { SlideIllustration4 } from "@/features/onboarding/components/SlideIllust
 import { SlideIllustration5 } from "@/features/onboarding/components/SlideIllustration5";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useOnboardingState } from "@/hooks/use-onboarding-state";
-import { router } from "expo-router";
 import { useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -36,25 +35,25 @@ const TIMING_CONFIG = {
 
 const SLIDES = [
   {
-    headline: "Build AI trading agents",
+    headline: "Build & Customize AI Trading Agents",
     Illustration: SlideIllustration1,
   },
   {
-    headline: "Customize how they interact with markets",
+    headline: "Control How They Interact With Markets",
     Illustration: SlideIllustration2,
   },
   {
-    // COMPLIANCE CRITICAL: This copy must not be altered without compliance review.
-    headline: "You approve every trade",
-    Illustration: SlideIllustration3,
-  },
-  {
-    headline: "Discover agents built by others",
+    headline: "Discover Agents Built By Others",
     Illustration: SlideIllustration5,
   },
   {
-    headline: "Keep the winners",
+    headline: "Show Off Your Winners",
     Illustration: SlideIllustration4,
+  },
+  {
+    // COMPLIANCE CRITICAL: This copy must not be altered without compliance review.
+    headline: "You Approve Every Trade",
+    Illustration: SlideIllustration3,
   },
 ];
 
@@ -77,7 +76,6 @@ export default function OnboardingSlides() {
 
   const handleComplete = async () => {
     await markComplete();
-    router.replace("/(tabs)");
   };
 
   const handleNext = () => {

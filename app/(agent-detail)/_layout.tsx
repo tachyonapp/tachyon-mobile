@@ -9,7 +9,7 @@ export default function Layout() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
-      <HeaderNav navPath="/(tabs)" iconName="close" />
+      <HeaderNav navPath="/(tabs)/feed" iconName="close" />
 
       <View style={styles.stackContainer}>
         <Stack

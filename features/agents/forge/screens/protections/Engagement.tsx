@@ -1,5 +1,6 @@
 import { Colors } from "@/constants/theme";
 import type { WizardState } from "@/context/WizardContext";
+import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
 import { RulesOfEngagementInput } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { StyleSheet, Switch, Text, View } from "react-native";
@@ -10,78 +11,88 @@ interface EngagementProps {
     field: K,
     value: WizardState[K],
   ) => void;
+  stopLossSet: boolean;
 }
 
 export const Engagement = ({
   rulesOfEngagement,
   updateField,
+  stopLossSet,
 }: EngagementProps) => {
   const theme = Colors[useColorScheme()];
 
   return (
-    <View>
-      <View style={[styles.toggleGroup, { borderColor: theme.inputBorder }]}>
-        <View
-          style={[styles.toggleRow, { borderBottomColor: theme.inputBorder }]}
-        >
-          <Text style={[styles.toggleLabel, { color: theme.textPrimary }]}>
-            Allow overnight holding
-          </Text>
-          <Switch
-            value={rulesOfEngagement.overnightHoldAllowed}
-            onValueChange={(on) =>
-              updateField("rulesOfEngagement", {
-                ...rulesOfEngagement,
-                overnightHoldAllowed: on,
-              })
-            }
-            trackColor={{ true: theme.electricBlue, false: theme.surface }}
-            thumbColor={theme.textPrimary}
-          />
-        </View>
-        <View
-          style={[styles.toggleRow, { borderBottomColor: theme.inputBorder }]}
-        >
-          <Text style={[styles.toggleLabel, { color: theme.textPrimary }]}>
-            Avoid same-day exits unless stop-loss triggered
-          </Text>
-          <Switch
-            value={rulesOfEngagement.noSameDayExitUnlessStopLoss}
-            onValueChange={(on) =>
-              updateField("rulesOfEngagement", {
-                ...rulesOfEngagement,
-                noSameDayExitUnlessStopLoss: on,
-              })
-            }
-            trackColor={{ true: theme.electricBlue, false: theme.surface }}
-            thumbColor={theme.textPrimary}
-          />
-        </View>
-        <View
-          style={[
-            styles.toggleRow,
-            styles.toggleRowLocked,
-            { borderBottomColor: "transparent" },
-          ]}
-        >
-          <View style={styles.lockedLabelGroup}>
-            <Text style={styles.lockIcon}>🔒</Text>
+    <ForgeSection
+      title="Rules of Engagement"
+      subtitle="Set the operating rules your agent must follow."
+      locked={!stopLossSet}
+      lockedMessage="Configure your stop-loss style first."
+    >
+      <View>
+        <View style={[styles.toggleGroup, { borderColor: theme.inputBorder }]}>
+          <View
+            style={[styles.toggleRow, { borderBottomColor: theme.inputBorder }]}
+          >
             <Text style={[styles.toggleLabel, { color: theme.textPrimary }]}>
-              One trade at a time
+              Allow overnight holding
             </Text>
-            <Text style={[styles.lockedHint, { color: theme.textSecondary }]}>
-              Required in MVP. Your agent will only hold one position at a time.
-            </Text>
+            <Switch
+              value={rulesOfEngagement.overnightHoldAllowed}
+              onValueChange={(on) =>
+                updateField("rulesOfEngagement", {
+                  ...rulesOfEngagement,
+                  overnightHoldAllowed: on,
+                })
+              }
+              trackColor={{ true: theme.electricBlue, false: theme.surface }}
+              thumbColor={theme.textPrimary}
+            />
           </View>
-          <Switch
-            value={true}
-            disabled={true}
-            trackColor={{ true: theme.electricBlue, false: theme.surface }}
-            thumbColor={theme.textPrimary}
-          />
+          <View
+            style={[styles.toggleRow, { borderBottomColor: theme.inputBorder }]}
+          >
+            <Text style={[styles.toggleLabel, { color: theme.textPrimary }]}>
+              Avoid same-day exits unless stop-loss triggered
+            </Text>
+            <Switch
+              value={rulesOfEngagement.noSameDayExitUnlessStopLoss}
+              onValueChange={(on) =>
+                updateField("rulesOfEngagement", {
+                  ...rulesOfEngagement,
+                  noSameDayExitUnlessStopLoss: on,
+                })
+              }
+              trackColor={{ true: theme.electricBlue, false: theme.surface }}
+              thumbColor={theme.textPrimary}
+            />
+          </View>
+          <View
+            style={[
+              styles.toggleRow,
+              styles.toggleRowLocked,
+              { borderBottomColor: "transparent" },
+            ]}
+          >
+            <View style={styles.lockedLabelGroup}>
+              <Text style={styles.lockIcon}>🔒</Text>
+              <Text style={[styles.toggleLabel, { color: theme.textPrimary }]}>
+                One trade at a time
+              </Text>
+              <Text style={[styles.lockedHint, { color: theme.textSecondary }]}>
+                Required in MVP. Your agent will only hold one position at a
+                time.
+              </Text>
+            </View>
+            <Switch
+              value={true}
+              disabled={true}
+              trackColor={{ true: theme.electricBlue, false: theme.surface }}
+              thumbColor={theme.textPrimary}
+            />
+          </View>
         </View>
       </View>
-    </View>
+    </ForgeSection>
   );
 };
 

@@ -15,7 +15,7 @@ export default function AuthLayout() {
     // authenticated user — routing before isComplete resolves would send
     // every new sign-up to /(tabs), skipping FTUE entirely.
     if (isComplete === null) return null;
-    return <Redirect href={isComplete ? "/(tabs)" : "/(onboarding)"} />;
+    return <Redirect href={isComplete ? "/(tabs)/feed" : "/(onboarding)"} />;
   }
 
   return (

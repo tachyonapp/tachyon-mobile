@@ -1,8 +1,7 @@
-import { FRAME_CONFIG } from "@/constants/frameConfig";
+import { FRAME_CONFIG } from "@tachyonapp/tachyon-queue-types/config";
 import { useWizard } from "@/context/WizardContext";
 import { ForgeNavBar } from "@/features/agents/forge/components/ForgeNavBar";
 import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
-import { disabledReasonFor } from "@/features/agents/forge/utils";
 import { BalanceDocument, type BalanceQuery } from "@/generated/graphql";
 import { useQuery } from "@apollo/client/react";
 import { useRouter } from "expo-router";
@@ -24,17 +23,13 @@ export default function TradingProfile() {
   );
 
   const frameConfig = state.frameName ? FRAME_CONFIG[state.frameName] : null;
-  const allocationBounds = frameConfig?.bounds.allocationPct ?? {
-    min: 0.01,
-    max: 1.0,
-  };
 
   const combatComplete =
     !!state.riskAttitude && !!state.tradeTempo && !!state.combatPatience;
 
   async function handleNext() {
     await persistDraft();
-    router.push("/(bot-forge)/step-3-intelligence");
+    router.push("/(agent-forge)/step-3-intelligence");
   }
 
   async function handleBack() {
@@ -66,10 +61,8 @@ export default function TradingProfile() {
             }}
           >
             <RiskProfile
-              frameConfig={frameConfig}
               riskAttitude={state.riskAttitude}
               updateField={updateField}
-              disabledReasonFor={disabledReasonFor}
             />
           </ForgeSection>
 
@@ -82,10 +75,8 @@ export default function TradingProfile() {
             }}
           >
             <Tempo
-              frameConfig={frameConfig}
               tradeTempo={state.tradeTempo}
               updateField={updateField}
-              disabledReasonFor={disabledReasonFor}
             />
           </ForgeSection>
 
@@ -98,10 +89,8 @@ export default function TradingProfile() {
             }}
           >
             <Patience
-              frameConfig={frameConfig}
               combatPatience={state.combatPatience}
               updateField={updateField}
-              disabledReasonFor={disabledReasonFor}
             />
           </ForgeSection>
 
@@ -118,7 +107,7 @@ export default function TradingProfile() {
             <Allocation
               allocationPct={state.allocationPct}
               updateField={updateField}
-              allocationBounds={allocationBounds}
+              allocationBounds={{ min: 0.01, max: 1.0 }}
               combatComplete={combatComplete}
               existingAllocationTotal={state.existingAllocationTotal}
               userCashBalance={userCashBalance}

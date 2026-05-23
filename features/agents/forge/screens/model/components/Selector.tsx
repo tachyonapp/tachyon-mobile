@@ -16,7 +16,7 @@ import {
   View,
 } from "react-native";
 
-interface BrainSelectorProps {
+interface SelectorProps {
   brainType: BrainType;
   provider: string;
   modelId: string;
@@ -32,7 +32,7 @@ interface BrainSelectorProps {
 
 type ValidationState = "idle" | "loading" | "success" | "error";
 
-export function BrainSelector({
+export function Selector({
   brainType,
   provider,
   modelId,
@@ -44,7 +44,7 @@ export function BrainSelector({
   onProviderChange,
   onModelChange,
   onValidateKey,
-}: BrainSelectorProps) {
+}: SelectorProps) {
   const theme = Colors[useColorScheme()];
   const router = useRouter();
   const [apiKeyInput, setApiKeyInput] = useState("");

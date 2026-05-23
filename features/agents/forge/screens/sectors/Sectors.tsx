@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/theme";
+import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
 import { SectorFilter } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React from "react";
@@ -21,12 +22,14 @@ interface SectorGridProps {
   selected: SectorFilter[];
   onChange: (sectors: SectorFilter[]) => void;
   showError?: boolean;
+  combatComplete: boolean;
 }
 
 export function SectorGrid({
   selected,
   onChange,
   showError = false,
+  combatComplete,
 }: SectorGridProps) {
   const theme = Colors[useColorScheme()];
   const allSelected = ALL_SECTOR_VALUES.every((v) => selected.includes(v));
@@ -45,73 +48,80 @@ export function SectorGrid({
   }
 
   return (
-    <View style={styles.container}>
-      <Pressable
-        onPress={toggleSelectAll}
-        style={[
-          styles.tile,
-          styles.tileFullWidth,
-          { borderColor: theme.textDisabled, backgroundColor: theme.surface },
-          allSelected && {
-            borderColor: theme.electricBlue,
-            backgroundColor: "rgba(44, 107, 237, 0.1)",
-          },
-        ]}
-      >
-        <Text
+    <ForgeSection
+      title="Sectors"
+      subtitle="Select one or more market sectors your agent can trade in."
+      locked={!combatComplete}
+      lockedMessage="Complete your Trading Profile first."
+    >
+      <View style={styles.container}>
+        <Pressable
+          onPress={toggleSelectAll}
           style={[
-            styles.tileLabel,
-            { color: theme.textSecondary },
-            allSelected && { color: theme.electricBlue, fontWeight: "600" },
+            styles.tile,
+            styles.tileFullWidth,
+            { borderColor: theme.textDisabled, backgroundColor: theme.surface },
+            allSelected && {
+              borderColor: theme.electricBlue,
+              backgroundColor: "rgba(44, 107, 237, 0.1)",
+            },
           ]}
         >
-          {SELECT_ALL_LABEL}
-        </Text>
-      </Pressable>
+          <Text
+            style={[
+              styles.tileLabel,
+              { color: theme.textSecondary },
+              allSelected && { color: theme.electricBlue, fontWeight: "600" },
+            ]}
+          >
+            {SELECT_ALL_LABEL}
+          </Text>
+        </Pressable>
 
-      <View style={styles.grid}>
-        {SECTOR_OPTIONS.map(({ value, label }) => {
-          const isSelected = selected.includes(value);
-          return (
-            <Pressable
-              key={value}
-              onPress={() => toggleSector(value)}
-              style={[
-                styles.tile,
-                styles.tileGridItem,
-                {
-                  borderColor: theme.textDisabled,
-                  backgroundColor: theme.surface,
-                },
-                isSelected && {
-                  borderColor: theme.electricBlue,
-                  backgroundColor: "rgba(44, 107, 237, 0.1)",
-                },
-              ]}
-            >
-              <Text
+        <View style={styles.grid}>
+          {SECTOR_OPTIONS.map(({ value, label }) => {
+            const isSelected = selected.includes(value);
+            return (
+              <Pressable
+                key={value}
+                onPress={() => toggleSector(value)}
                 style={[
-                  styles.tileLabel,
-                  { color: theme.textSecondary },
+                  styles.tile,
+                  styles.tileGridItem,
+                  {
+                    borderColor: theme.textDisabled,
+                    backgroundColor: theme.surface,
+                  },
                   isSelected && {
-                    color: theme.electricBlue,
-                    fontWeight: "300",
+                    borderColor: theme.electricBlue,
+                    backgroundColor: "rgba(44, 107, 237, 0.1)",
                   },
                 ]}
               >
-                {label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+                <Text
+                  style={[
+                    styles.tileLabel,
+                    { color: theme.textSecondary },
+                    isSelected && {
+                      color: theme.electricBlue,
+                      fontWeight: "300",
+                    },
+                  ]}
+                >
+                  {label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
 
-      {hasError && (
-        <Text style={[styles.errorText, { color: theme.danger }]}>
-          Select at least one sector
-        </Text>
-      )}
-    </View>
+        {hasError && (
+          <Text style={[styles.errorText, { color: theme.danger }]}>
+            Select at least one sector
+          </Text>
+        )}
+      </View>
+    </ForgeSection>
   );
 }
 

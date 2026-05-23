@@ -1,9 +1,9 @@
-import { FRAME_CONFIG } from "@/constants/frameConfig";
 import { useWizard } from "@/context/WizardContext";
 import { ForgeNavBar } from "@/features/agents/forge/components/ForgeNavBar";
 import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
 import { BalanceDocument, type BalanceQuery } from "@/generated/graphql";
 import { useQuery } from "@apollo/client/react";
+import { FRAME_CONFIG } from "@tachyonapp/tachyon-queue-types/config";
 import { useRouter } from "expo-router";
 import { Keyboard, Pressable, ScrollView, StyleSheet } from "react-native";
 import { Engagement } from "./Engagement";
@@ -13,7 +13,6 @@ import { SafetySystems } from "./SafetySystems";
 export default function Protections() {
   const { state, updateField, persistDraft } = useWizard();
   const router = useRouter();
-  const sectorsSet = state.sectors.length > 0;
 
   const { data: balanceData } = useQuery<BalanceQuery>(BalanceDocument, {
     fetchPolicy: "cache-first",
@@ -23,24 +22,20 @@ export default function Protections() {
   );
 
   const frameConfig = state.frameName ? FRAME_CONFIG[state.frameName] : null;
-  const dailyMaxLossBounds = frameConfig?.bounds.dailyMaxLoss ?? {
-    minPct: 0,
-    maxPct: 1,
-  };
+  const dailyMaxLossBounds = { minPct: 0.01, maxPct: 0.25 };
 
   const isDailyMaxLossValid =
     state.dailyMaxLoss >= dailyMaxLossBounds.minPct &&
     state.dailyMaxLoss <= dailyMaxLossBounds.maxPct;
 
   const stopLossSet = state.stopLossStyle !== null;
-  const exitSet = state.exitPersonality !== null;
 
   const canAdvance =
     state.exitPersonality !== null && stopLossSet && isDailyMaxLossValid;
 
   async function handleNext() {
     await persistDraft();
-    router.push("/(bot-forge)/step-5-brain");
+    router.push("/(agent-forge)/step-6-timing");
   }
 
   async function handleBack() {
@@ -63,57 +58,35 @@ export default function Protections() {
             <></>
           </ForgeSection>
 
-          <ForgeSection
-            title="Exit Strategy"
-            subtitle="Set how your agent exits positions?"
-            tooltip={{
-              title: "Exit Personality",
-              body: "Exit personality controls when your agent closes a winning position.",
-            }}
-            locked={!sectorsSet}
-            lockedMessage="Select at least one sector first."
-          >
-            <Exit
-              exitPersonality={state.exitPersonality}
-              updateField={updateField}
-            />
-          </ForgeSection>
+          <Exit
+            exitPersonality={state.exitPersonality}
+            updateField={updateField}
+            sectorsSet={state.sectors.length > 0}
+          />
 
-          <ForgeSection
-            title="Daily Loss Limit"
-            subtitle="Configure safety limits to protect your allocated capital."
-            locked={!exitSet}
-            lockedMessage="Choose an exit strategy first."
-          >
-            <SafetySystems
-              frameName={frameConfig?.gamifiedName ?? "your frame"}
-              dailyMaxLossPct={state.dailyMaxLoss}
-              onDailyMaxLossChange={(v) => updateField("dailyMaxLoss", v)}
-              dailyMaxLossBounds={dailyMaxLossBounds}
-              allocationPct={state.allocationPct}
-              userCashBalance={userCashBalance}
-              dailyMaxGain={state.dailyMaxGain}
-              onDailyMaxGainChange={(v) => updateField("dailyMaxGain", v)}
-              stopLossStyle={state.stopLossStyle}
-              onStopLossStyleChange={(v) => updateField("stopLossStyle", v)}
-              emotionalControls={state.emotionalControls}
-              onEmotionalControlsChange={(v) =>
-                updateField("emotionalControls", v)
-              }
-            />
-          </ForgeSection>
+          <SafetySystems
+            frameName={frameConfig?.gamifiedName ?? "your frame"}
+            dailyMaxLossPct={state.dailyMaxLoss}
+            onDailyMaxLossChange={(v) => updateField("dailyMaxLoss", v)}
+            dailyMaxLossBounds={dailyMaxLossBounds}
+            allocationPct={state.allocationPct}
+            userCashBalance={userCashBalance}
+            dailyMaxGain={state.dailyMaxGain}
+            onDailyMaxGainChange={(v) => updateField("dailyMaxGain", v)}
+            stopLossStyle={state.stopLossStyle}
+            onStopLossStyleChange={(v) => updateField("stopLossStyle", v)}
+            emotionalControls={state.emotionalControls}
+            onEmotionalControlsChange={(v) =>
+              updateField("emotionalControls", v)
+            }
+            exitSet={state.exitPersonality !== null}
+          />
 
-          <ForgeSection
-            title="Rules of Engagement"
-            subtitle="Set the operating rules your agent must follow."
-            locked={!stopLossSet}
-            lockedMessage="Configure your stop-loss style first."
-          >
-            <Engagement
-              rulesOfEngagement={state.rulesOfEngagement}
-              updateField={updateField}
-            />
-          </ForgeSection>
+          <Engagement
+            rulesOfEngagement={state.rulesOfEngagement}
+            updateField={updateField}
+            stopLossSet={stopLossSet}
+          />
         </Pressable>
       </ScrollView>
 

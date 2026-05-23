@@ -26,9 +26,8 @@ export const AgentAvatar = ({ seed, backgroundColor }: AgentAvatarProps) => {
 
 const styles = StyleSheet.create({
   previewAvatar: {
-    width: AVATAR_SIZE,
-    height: AVATAR_SIZE,
-    borderRadius: 8,
-    overflow: "hidden",
+    display: "contents",
+    marginTop: 0,
+    padding: 0,
   },
 });

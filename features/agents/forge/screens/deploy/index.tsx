@@ -73,20 +73,44 @@ export default function Deployer() {
               provider: state.brain.provider,
               apiKey: state.brain.apiKey ?? undefined,
             },
+            // Feature 8b — advanced customization fields
+            signalWeights: state.signalWeights
+              ? {
+                  technicals: state.signalWeights.technicals,
+                  news: state.signalWeights.news,
+                  fundamentals: state.signalWeights.fundamentals,
+                }
+              : undefined,
+            confidenceThreshold: state.confidenceThreshold ?? undefined,
+            regimeAwareness: state.regimeAwareness ?? undefined,
+            earningsBehavior: state.earningsBehavior ?? undefined,
+            subSectors:
+              state.subSectors.length > 0 ? state.subSectors : undefined,
+            customWatchlist:
+              state.customWatchlist.length > 0
+                ? state.customWatchlist
+                : undefined,
+            exclusionList:
+              state.exclusionList.length > 0 ? state.exclusionList : undefined,
+            dividendPreference: state.dividendPreference ?? undefined,
+            shortInterestSignal: state.shortInterestSignal ?? undefined,
+            positionSizingMethod: state.positionSizingMethod ?? undefined,
+            minRrRatio: state.minRrRatio ?? undefined,
+            maxDrawdownProtectionPct:
+              state.maxDrawdownProtectionPct ?? undefined,
+            recoveryMode: state.recoveryMode ?? undefined,
+            sessionPreference: state.sessionPreference ?? undefined,
+            dayAvoidance:
+              state.dayAvoidance.length > 0 ? state.dayAvoidance : undefined,
+            volatilityEnvPreference: state.volatilityEnvPreference ?? undefined,
+            agentBackground: state.agentBackground || undefined,
+            proposalCommunicationStyle:
+              state.proposalCommunicationStyle ?? undefined,
+            winReaction: state.winReaction ?? undefined,
+            lossReaction: state.lossReaction ?? undefined,
           },
         },
       });
-
-      const result = data?.createBot;
-      if (result?.__typename === "ValidationError") {
-        setDeployError({
-          kind: "validation",
-          message: result.message ?? "Validation failed.",
-          field: result.field,
-        });
-        setDeploying(false);
-        return;
-      }
 
       await clearDraft();
       router.replace("/(tabs)");

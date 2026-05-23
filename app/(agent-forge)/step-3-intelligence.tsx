@@ -1,5 +1,5 @@
-import MarketIntelligence from "@/features/agents/forge/screens/intelligence";
+import Intelligence from "@/features/agents/forge/screens/intelligence";
 
-export default function Step3Intelligence() {
-  return <MarketIntelligence />;
+export default function AgentThinksRoute() {
+  return <Intelligence />;
 }

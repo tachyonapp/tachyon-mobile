@@ -20,11 +20,13 @@ import {
 
 const STEP_NAMES = [
   "step-1-identity",
-  "step-2-combat",
+  "step-2-trading-profile",
   "step-3-intelligence",
-  "step-4-protection",
-  "step-5-brain",
-  "step-6-review",
+  "step-4-sectors",
+  "step-5-protection",
+  "step-6-timing",
+  "step-7-model",
+  "step-8-review",
 ] as const;
 
 const TOTAL_STEPS = STEP_NAMES.length;
@@ -55,7 +57,7 @@ function ForgeLayoutContent() {
         if (router.canGoBack()) {
           router.back();
         } else {
-          router.replace("/(tabs)");
+          router.replace("/(tabs)/feed");
         }
       }
       prevAppState.current = nextState;
@@ -65,7 +67,7 @@ function ForgeLayoutContent() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
-      <HeaderNav navPath="/(tabs)" iconName="close" />
+      <HeaderNav navPath="/(tabs)/feed" iconName="close" />
 
       {showProgress && (
         <ForgeProgressBar currentStep={currentStep} totalSteps={TOTAL_STEPS} />
@@ -104,7 +106,7 @@ export default function Layout() {
       <Redirect
         href={{
           pathname: "/(subscription)/tier-selection",
-          params: { origin: "bot-forge" },
+          params: { origin: "agent-forge" },
         }}
       />
     );

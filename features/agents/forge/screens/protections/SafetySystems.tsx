@@ -1,7 +1,7 @@
 import { PillSlider } from "@/components/PillSlider";
-import { type FrameConfig } from "@/constants/frameConfig";
 import { Colors } from "@/constants/theme";
 import { ForgeOptionCard } from "@/features/agents/forge/components/ForgeOptionCard";
+import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
 import {
   StopStyleName,
   type EmotionalControlsInput,
@@ -22,7 +22,7 @@ interface SafetySystemsProps {
   frameName: string;
   dailyMaxLossPct: number;
   onDailyMaxLossChange: (v: number) => void;
-  dailyMaxLossBounds: FrameConfig["bounds"]["dailyMaxLoss"];
+  dailyMaxLossBounds: { minPct: number; maxPct: number };
   allocationPct: number;
   userCashBalance: number;
   dailyMaxGain: number | null;
@@ -31,6 +31,7 @@ interface SafetySystemsProps {
   onStopLossStyleChange: (v: StopLossStyleInput) => void;
   emotionalControls: EmotionalControlsInput;
   onEmotionalControlsChange: (v: EmotionalControlsInput) => void;
+  exitSet: boolean;
 }
 
 const STOP_LOSS_OPTIONS: {
@@ -75,6 +76,7 @@ export function SafetySystems({
   onStopLossStyleChange,
   emotionalControls,
   onEmotionalControlsChange,
+  exitSet,
 }: SafetySystemsProps) {
   const theme = Colors[useColorScheme()];
   const [trackWidth, setTrackWidth] = useState(0);
@@ -100,177 +102,186 @@ export function SafetySystems({
   const lossMaxPct = Math.round(dailyMaxLossBounds.maxPct * 100);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.section}>
-        <View style={styles.lossValueRow}>
-          <Text style={[styles.lossValue, { color: theme.textPrimary }]}>
-            {Math.round(dailyMaxLossPct * 100)}%
+    <ForgeSection
+      title="Daily Loss Limit"
+      subtitle="Configure safety limits to protect your allocated capital."
+      locked={!exitSet}
+      lockedMessage="Choose an exit strategy first."
+    >
+      <View style={styles.container}>
+        <View style={styles.section}>
+          <View style={styles.lossValueRow}>
+            <Text style={[styles.lossValue, { color: theme.textPrimary }]}>
+              {Math.round(dailyMaxLossPct * 100)}%
+            </Text>
+            {lossUsd ? (
+              <Text style={[styles.lossUsd, { color: theme.textSecondary }]}>
+                ≈ {lossUsd} based on your allocation
+              </Text>
+            ) : (
+              <Text style={[styles.lossUsd, { color: theme.textSecondary }]}>
+                % of your allocated capital
+              </Text>
+            )}
+          </View>
+          <View onLayout={handleLayout}>
+            <PillSlider
+              value={dailyMaxLossPct}
+              min={dailyMaxLossBounds.minPct}
+              max={dailyMaxLossBounds.maxPct}
+              onChange={onDailyMaxLossChange}
+              fillColor={theme.danger}
+              trackWidth={trackWidth}
+            />
+          </View>
+          <Text style={[styles.boundsHint, { color: theme.textSecondary }]}>
+            {lossMinPct}%–{lossMaxPct}% for {frameName}
           </Text>
-          {lossUsd ? (
-            <Text style={[styles.lossUsd, { color: theme.textSecondary }]}>
-              ≈ {lossUsd} based on your allocation
-            </Text>
-          ) : (
-            <Text style={[styles.lossUsd, { color: theme.textSecondary }]}>
-              % of your allocated capital
-            </Text>
-          )}
         </View>
-        <View onLayout={handleLayout}>
-          <PillSlider
-            value={dailyMaxLossPct}
-            min={dailyMaxLossBounds.minPct}
-            max={dailyMaxLossBounds.maxPct}
-            onChange={onDailyMaxLossChange}
-            fillColor={theme.danger}
-            trackWidth={trackWidth}
+
+        {/* 2. Daily Max Gain */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionLabel, { color: theme.textPrimary }]}>
+            Daily Gain Cap (optional)
+          </Text>
+          <TextInput
+            style={[
+              styles.textInput,
+              {
+                borderColor: theme.inputBorder,
+                color: theme.textPrimary,
+                backgroundColor: theme.inputBackground,
+              },
+            ]}
+            value={gainInput}
+            onChangeText={setGainInput}
+            onEndEditing={handleGainInputEnd}
+            placeholder="e.g. 0.05 for a 5% cap. Leave blank for no cap."
+            placeholderTextColor={theme.textDisabled}
+            keyboardType="decimal-pad"
+            returnKeyType="done"
+            autoCorrect={false}
           />
         </View>
-        <Text style={[styles.boundsHint, { color: theme.textSecondary }]}>
-          {lossMinPct}%–{lossMaxPct}% for {frameName}
-        </Text>
-      </View>
 
-      {/* 2. Daily Max Gain */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionLabel, { color: theme.textPrimary }]}>
-          Daily Gain Cap (optional)
-        </Text>
-        <TextInput
-          style={[
-            styles.textInput,
-            {
-              borderColor: theme.inputBorder,
-              color: theme.textPrimary,
-              backgroundColor: theme.inputBackground,
-            },
-          ]}
-          value={gainInput}
-          onChangeText={setGainInput}
-          onEndEditing={handleGainInputEnd}
-          placeholder="e.g. 0.05 for a 5% cap. Leave blank for no cap."
-          placeholderTextColor={theme.textDisabled}
-          keyboardType="decimal-pad"
-          returnKeyType="done"
-          autoCorrect={false}
-        />
-      </View>
-
-      {/* 3. Stop-loss style */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionLabel, { color: theme.textPrimary }]}>
-          Stop-Loss Style
-        </Text>
-        <View style={styles.optionCards}>
-          {STOP_LOSS_OPTIONS.map((opt) => (
-            <ForgeOptionCard
-              key={opt.name}
-              label={opt.label}
-              description={opt.description}
-              selected={stopLossStyle?.name === opt.name}
-              onSelect={() => onStopLossStyleChange({ name: opt.name })}
-            />
-          ))}
+        {/* 3. Stop-loss style */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionLabel, { color: theme.textPrimary }]}>
+            Stop-Loss Style
+          </Text>
+          <View style={styles.optionCards}>
+            {STOP_LOSS_OPTIONS.map((opt) => (
+              <ForgeOptionCard
+                key={opt.name}
+                label={opt.label}
+                description={opt.description}
+                selected={stopLossStyle?.name === opt.name}
+                onSelect={() => onStopLossStyleChange({ name: opt.name })}
+              />
+            ))}
+          </View>
         </View>
-      </View>
 
-      {/* 4. Emotional Controls */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionLabel, { color: theme.textPrimary }]}>
-          Emotional Controls
-        </Text>
-        <View style={styles.toggleGroup}>
-          {/* Freeze after N losses */}
-          <View style={styles.toggleRow}>
-            <View style={styles.toggleLabelGroup}>
-              <Text style={[styles.toggleLabel, { color: theme.textPrimary }]}>
-                Freeze after losses
-              </Text>
-              {emotionalControls.freezeAfterLosses !== null && (
-                <TextInput
-                  style={[
-                    styles.nInput,
-                    {
-                      borderColor: theme.electricBlue,
-                      color: theme.textPrimary,
-                      backgroundColor: theme.inputBackground,
-                    },
-                  ]}
-                  value={String(emotionalControls.freezeAfterLosses ?? "")}
-                  onChangeText={(t) => {
-                    const n = parseInt(t, 10);
-                    onEmotionalControlsChange({
-                      ...emotionalControls,
-                      freezeAfterLosses: isNaN(n)
-                        ? 1
-                        : Math.min(5, Math.max(1, n)),
-                    });
-                  }}
-                  keyboardType="number-pad"
-                  maxLength={1}
-                  editable={emotionalControls.freezeAfterLosses !== null}
-                />
-              )}
-              {emotionalControls.freezeAfterLosses !== null && (
+        {/* 4. Emotional Controls */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionLabel, { color: theme.textPrimary }]}>
+            Emotional Controls
+          </Text>
+          <View style={styles.toggleGroup}>
+            {/* Freeze after N losses */}
+            <View style={styles.toggleRow}>
+              <View style={styles.toggleLabelGroup}>
                 <Text
                   style={[styles.toggleLabel, { color: theme.textPrimary }]}
                 >
-                  {" "}
-                  losses in a row
+                  Freeze after losses
                 </Text>
-              )}
+                {emotionalControls.freezeAfterLosses !== null && (
+                  <TextInput
+                    style={[
+                      styles.nInput,
+                      {
+                        borderColor: theme.electricBlue,
+                        color: theme.textPrimary,
+                        backgroundColor: theme.inputBackground,
+                      },
+                    ]}
+                    value={String(emotionalControls.freezeAfterLosses ?? "")}
+                    onChangeText={(t) => {
+                      const n = parseInt(t, 10);
+                      onEmotionalControlsChange({
+                        ...emotionalControls,
+                        freezeAfterLosses: isNaN(n)
+                          ? 1
+                          : Math.min(5, Math.max(1, n)),
+                      });
+                    }}
+                    keyboardType="number-pad"
+                    maxLength={1}
+                    editable={emotionalControls.freezeAfterLosses !== null}
+                  />
+                )}
+                {emotionalControls.freezeAfterLosses !== null && (
+                  <Text
+                    style={[styles.toggleLabel, { color: theme.textPrimary }]}
+                  >
+                    {" "}
+                    losses in a row
+                  </Text>
+                )}
+              </View>
+              <Switch
+                value={emotionalControls.freezeAfterLosses !== null}
+                onValueChange={(on) =>
+                  onEmotionalControlsChange({
+                    ...emotionalControls,
+                    freezeAfterLosses: on ? 3 : null,
+                  })
+                }
+                trackColor={{ true: theme.electricBlue, false: theme.surface }}
+                thumbColor={theme.textPrimary}
+              />
             </View>
-            <Switch
-              value={emotionalControls.freezeAfterLosses !== null}
-              onValueChange={(on) =>
-                onEmotionalControlsChange({
-                  ...emotionalControls,
-                  freezeAfterLosses: on ? 3 : null,
-                })
-              }
-              trackColor={{ true: theme.electricBlue, false: theme.surface }}
-              thumbColor={theme.textPrimary}
-            />
-          </View>
 
-          {/* Cooldown after volatility spike */}
-          <View style={styles.toggleRow}>
-            <Text style={[styles.toggleLabel, { color: theme.textPrimary }]}>
-              Cooldown after volatility spike
-            </Text>
-            <Switch
-              value={emotionalControls.cooldownAfterVolatility}
-              onValueChange={(on) =>
-                onEmotionalControlsChange({
-                  ...emotionalControls,
-                  cooldownAfterVolatility: on,
-                })
-              }
-              trackColor={{ true: theme.electricBlue, false: theme.surface }}
-              thumbColor={theme.textPrimary}
-            />
-          </View>
+            {/* Cooldown after volatility spike */}
+            <View style={styles.toggleRow}>
+              <Text style={[styles.toggleLabel, { color: theme.textPrimary }]}>
+                Cooldown after volatility spike
+              </Text>
+              <Switch
+                value={emotionalControls.cooldownAfterVolatility}
+                onValueChange={(on) =>
+                  onEmotionalControlsChange({
+                    ...emotionalControls,
+                    cooldownAfterVolatility: on,
+                  })
+                }
+                trackColor={{ true: theme.electricBlue, false: theme.surface }}
+                thumbColor={theme.textPrimary}
+              />
+            </View>
 
-          {/* Stand down after noon if losing */}
-          <View style={styles.toggleRow}>
-            <Text style={[styles.toggleLabel, { color: theme.textPrimary }]}>
-              Stand down after noon if losing
-            </Text>
-            <Switch
-              value={emotionalControls.standDownAfterNoonIfLosing}
-              onValueChange={(on) =>
-                onEmotionalControlsChange({
-                  ...emotionalControls,
-                  standDownAfterNoonIfLosing: on,
-                })
-              }
-              trackColor={{ true: theme.electricBlue, false: theme.surface }}
-              thumbColor={theme.textPrimary}
-            />
+            {/* Stand down after noon if losing */}
+            <View style={styles.toggleRow}>
+              <Text style={[styles.toggleLabel, { color: theme.textPrimary }]}>
+                Stand down after noon if losing
+              </Text>
+              <Switch
+                value={emotionalControls.standDownAfterNoonIfLosing}
+                onValueChange={(on) =>
+                  onEmotionalControlsChange({
+                    ...emotionalControls,
+                    standDownAfterNoonIfLosing: on,
+                  })
+                }
+                trackColor={{ true: theme.electricBlue, false: theme.surface }}
+                thumbColor={theme.textPrimary}
+              />
+            </View>
           </View>
         </View>
       </View>
-    </View>
+    </ForgeSection>
   );
 }
 

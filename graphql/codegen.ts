@@ -14,6 +14,40 @@ const config: CodegenConfig = {
         fragmentMasking: false,
       },
       plugins: [],
+      config: {
+        // For enums that are authoritative in tachyon-queue-types, import directly
+        // from that package so generated code and WizardState share the exact same type.
+        enumValues: {
+          BotFrame:
+            "@tachyonapp/tachyon-queue-types/config#BotFrameName",
+          RiskAttitude:
+            "@tachyonapp/tachyon-queue-types/config#RiskAttitude",
+          TradeTempo:
+            "@tachyonapp/tachyon-queue-types/config#TradeTempo",
+          CombatPatience:
+            "@tachyonapp/tachyon-queue-types/config#CombatPatience",
+          ConfidenceThreshold:
+            "@tachyonapp/tachyon-queue-types/config#ConfidenceThreshold",
+          RegimeAwareness:
+            "@tachyonapp/tachyon-queue-types/config#RegimeAwareness",
+          EarningsBehavior:
+            "@tachyonapp/tachyon-queue-types/config#EarningsBehavior",
+          DividendPreference:
+            "@tachyonapp/tachyon-queue-types/config#DividendPreference",
+          ShortInterestSignal:
+            "@tachyonapp/tachyon-queue-types/config#ShortInterestSignal",
+          PositionSizingMethod:
+            "@tachyonapp/tachyon-queue-types/config#PositionSizingMethod",
+          RecoveryMode: "@tachyonapp/tachyon-queue-types/config#RecoveryMode",
+          SessionPreference:
+            "@tachyonapp/tachyon-queue-types/config#SessionPreference",
+          DayOfWeek: "@tachyonapp/tachyon-queue-types/config#DayOfWeek",
+          VolatilityEnvPreference:
+            "@tachyonapp/tachyon-queue-types/config#VolatilityEnvPreference",
+          ProposalCommunicationStyle:
+            "@tachyonapp/tachyon-queue-types/config#ProposalCommunicationStyle",
+        },
+      },
     },
   },
   hooks: {

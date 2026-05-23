@@ -1,0 +1,6 @@
+query ParentSectors {
+  parentSectors {
+    parentSector
+    subSectors
+  }
+}

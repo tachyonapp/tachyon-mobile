@@ -16,6 +16,8 @@ jobs:
           node-version: 20
           cache: "npm"
       - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
       - run: npx expo lint
       - run: npm test
 

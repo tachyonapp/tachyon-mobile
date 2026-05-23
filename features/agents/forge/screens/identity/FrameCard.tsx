@@ -1,5 +1,5 @@
 import { IconSymbol } from "@/components/shared/icon-symbol";
-import { type FrameConfig } from "@/constants/frameConfig";
+import { type FrameConfig } from "@tachyonapp/tachyon-queue-types/config";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React, { useRef, useState } from "react";

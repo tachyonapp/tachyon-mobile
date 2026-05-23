@@ -11,7 +11,7 @@ export default function ForgeGate() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/(bot-forge)/step-1-identity");
+    router.replace("/(agent-forge)/step-1-identity");
   }, [router]);
 
   return null;
