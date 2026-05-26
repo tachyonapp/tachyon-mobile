@@ -1,11 +1,20 @@
 import { Colors } from "@/constants/theme";
-import { UpdateBotIdentityDocument, type BotQuery } from "@/generated/graphql";
+import {
+  UpdateAgentIdentityDocument,
+  type BotQuery,
+} from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useApolloClient, useMutation } from "@apollo/client/react";
+import {
+  LOSS_REACTION_PRESETS,
+  WIN_REACTION_PRESETS,
+} from "@tachyonapp/tachyon-queue-types/config";
+import { ProposalCommunicationStyle } from "@tachyonapp/tachyon-queue-types/config";
+import { useMutation } from "@apollo/client/react";
 import React, { useEffect, useState } from "react";
 import {
   Modal,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -38,6 +47,20 @@ const SEED_COLORS = [
   "#9C27B0",
   "#4CAF50",
 ];
+
+const COMM_STYLES: ProposalCommunicationStyle[] = [
+  ProposalCommunicationStyle.TERSE,
+  ProposalCommunicationStyle.DETAILED,
+  ProposalCommunicationStyle.AGGRESSIVE_CONFIDENT,
+  ProposalCommunicationStyle.CAUTIOUS_MEASURED,
+];
+
+const COMM_STYLE_LABELS: Record<ProposalCommunicationStyle, string> = {
+  [ProposalCommunicationStyle.TERSE]: "Terse",
+  [ProposalCommunicationStyle.DETAILED]: "Detailed",
+  [ProposalCommunicationStyle.AGGRESSIVE_CONFIDENT]: "Confident",
+  [ProposalCommunicationStyle.CAUTIOUS_MEASURED]: "Measured",
+};
 
 function AvatarPickerGrid({
   selectedSeed,
@@ -85,55 +108,63 @@ interface Props {
 
 export function EditIdentitySheet({ agent, visible, onDismiss }: Props) {
   const theme = Colors[useColorScheme()];
-  const client = useApolloClient();
 
   const [name, setName] = useState(agent.name ?? "");
-  const [selectedSeed, setSelectedSeed] = useState(agent.name ?? "");
+  const [selectedSeed, setSelectedSeed] = useState(agent.avatarSeed ?? "");
+  const [backstory, setBackstory] = useState(agent.agentBackground ?? "");
+  const [communicationStyle, setCommunicationStyle] =
+    useState<ProposalCommunicationStyle | "">(
+      agent.proposalCommunicationStyle ?? "",
+    );
+  const [winReaction, setWinReaction] = useState(agent.winReaction ?? "");
+  const [lossReaction, setLossReaction] = useState(agent.lossReaction ?? "");
   const [isSaving, setIsSaving] = useState(false);
 
-  // Reset state each time the sheet opens
   useEffect(() => {
     if (visible) {
       setName(agent.name ?? "");
-      setSelectedSeed(agent.name ?? "");
+      setSelectedSeed(agent.avatarSeed ?? "");
+      setBackstory(agent.agentBackground ?? "");
+      setCommunicationStyle(agent.proposalCommunicationStyle ?? "");
+      setWinReaction(agent.winReaction ?? "");
+      setLossReaction(agent.lossReaction ?? "");
     }
-  }, [visible, agent.name]);
+  }, [visible, agent]);
 
-  const [updateBotIdentity] = useMutation(UpdateBotIdentityDocument);
+  const [updateAgentIdentity] = useMutation(UpdateAgentIdentityDocument);
 
-  const canSave = name.trim().length > 0 && name.length <= 24 && !isSaving;
+  const backstoryOverLimit = backstory.length > 300;
+  const canSave =
+    name.trim().length > 0 &&
+    name.length <= 24 &&
+    !backstoryOverLimit &&
+    !isSaving;
 
   const handleSave = async () => {
     if (!canSave) return;
     setIsSaving(true);
 
-    const previousName = agent.name ?? "";
-    const cacheId = client.cache.identify({ __typename: "Bot", id: agent.id });
-
-    // Optimistic name update
-    if (cacheId) {
-      client.cache.modify({
-        id: cacheId,
-        fields: { name: () => name },
-      });
-    }
-
     try {
-      await updateBotIdentity({
+      await updateAgentIdentity({
         variables: {
           id: agent.id!,
-          input: { name, avatarSeed: `${name + Date.now().toString()}` },
+          input: {
+            name,
+            avatarSeed: selectedSeed,
+            backstory: backstory || null,
+            communicationStyle:
+              (communicationStyle as ProposalCommunicationStyle) || null,
+            winReaction: winReaction || null,
+            lossReaction: lossReaction || null,
+          },
+        },
+        update: (cache) => {
+          cache.evict({
+            id: cache.identify({ __typename: "Bot", id: agent.id }),
+          });
         },
       });
       onDismiss();
-    } catch {
-      // Rollback on error
-      if (cacheId) {
-        client.cache.modify({
-          id: cacheId,
-          fields: { name: () => previousName },
-        });
-      }
     } finally {
       setIsSaving(false);
     }
@@ -152,44 +183,204 @@ export function EditIdentitySheet({ agent, visible, onDismiss }: Props) {
             Edit Agent Identity
           </Text>
 
-          <View style={styles.fieldGroup}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
+          >
+            {/* Name */}
+            <View style={styles.fieldGroup}>
+              <TextInput
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: theme.background,
+                    color: theme.textPrimary,
+                    borderColor: theme.inputBorder,
+                  },
+                ]}
+                value={name}
+                onChangeText={setName}
+                maxLength={24}
+                placeholder="Bot name"
+                placeholderTextColor={theme.textDisabled}
+                returnKeyType="done"
+                autoCorrect={false}
+                spellCheck={false}
+              />
+              <Text style={[styles.charCount, { color: theme.textSecondary }]}>
+                {name.length}/24
+              </Text>
+            </View>
+
+            {/* Avatar */}
+            <Text
+              style={[styles.sectionLabel, { color: theme.textSecondary }]}
+            >
+              AVATAR
+            </Text>
+            <AvatarPickerGrid
+              selectedSeed={selectedSeed}
+              onSelect={setSelectedSeed}
+            />
+
+            {/* Backstory */}
+            <Text style={[styles.fieldLabel, { color: theme.textPrimary }]}>
+              Backstory
+            </Text>
             <TextInput
+              multiline
+              value={backstory}
+              onChangeText={setBackstory}
+              placeholder="Describe your agent's trading personality..."
+              placeholderTextColor={theme.textDisabled}
               style={[
-                styles.input,
+                styles.textArea,
                 {
                   backgroundColor: theme.background,
                   color: theme.textPrimary,
-                  borderColor: theme.inputBorder,
+                  borderColor: backstoryOverLimit
+                    ? "#D64545"
+                    : theme.inputBorder,
                 },
               ]}
-              value={name}
-              onChangeText={setName}
-              maxLength={24}
-              placeholder="Bot name"
-              placeholderTextColor={theme.textDisabled}
-              returnKeyType="done"
-              autoCorrect={false}
-              spellCheck={false}
             />
-            <Text style={[styles.charCount, { color: theme.textSecondary }]}>
-              {name.length}/24
+            <Text
+              style={[
+                styles.charCount,
+                backstoryOverLimit && styles.charCountError,
+                { color: backstoryOverLimit ? "#D64545" : theme.textSecondary },
+              ]}
+            >
+              {backstory.length}/300
             </Text>
-          </View>
 
-          <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>
-            AVATAR
-          </Text>
-          <AvatarPickerGrid
-            selectedSeed={selectedSeed}
-            onSelect={setSelectedSeed}
-          />
+            {/* Communication Style */}
+            <Text style={[styles.fieldLabel, { color: theme.textPrimary }]}>
+              Communication Style
+            </Text>
+            <View style={styles.segmentedControl}>
+              {COMM_STYLES.map((style) => (
+                <TouchableOpacity
+                  key={style}
+                  style={[
+                    styles.segment,
+                    {
+                      borderColor: theme.inputBorder,
+                      backgroundColor:
+                        communicationStyle === style
+                          ? theme.electricBlue
+                          : theme.background,
+                    },
+                  ]}
+                  onPress={() => setCommunicationStyle(style)}
+                >
+                  <Text
+                    style={[
+                      styles.segmentText,
+                      {
+                        color:
+                          communicationStyle === style
+                            ? "#FFFFFF"
+                            : theme.textSecondary,
+                      },
+                    ]}
+                  >
+                    {COMM_STYLE_LABELS[style]}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
 
+            {/* Win Reaction */}
+            <Text style={[styles.fieldLabel, { color: theme.textPrimary }]}>
+              Win Reaction
+            </Text>
+            {WIN_REACTION_PRESETS.map((phrase) => (
+              <TouchableOpacity
+                key={phrase}
+                style={[
+                  styles.reactionOption,
+                  {
+                    borderColor:
+                      winReaction === phrase
+                        ? theme.electricBlue
+                        : theme.inputBorder,
+                    backgroundColor:
+                      winReaction === phrase
+                        ? theme.electricBlue + "22"
+                        : theme.background,
+                  },
+                ]}
+                onPress={() =>
+                  setWinReaction(winReaction === phrase ? "" : phrase)
+                }
+              >
+                <Text
+                  style={[
+                    styles.reactionText,
+                    {
+                      color:
+                        winReaction === phrase
+                          ? theme.electricBlue
+                          : theme.textPrimary,
+                    },
+                  ]}
+                >
+                  {phrase}
+                </Text>
+              </TouchableOpacity>
+            ))}
+
+            {/* Loss Reaction */}
+            <Text style={[styles.fieldLabel, { color: theme.textPrimary }]}>
+              Loss Reaction
+            </Text>
+            {LOSS_REACTION_PRESETS.map((phrase) => (
+              <TouchableOpacity
+                key={phrase}
+                style={[
+                  styles.reactionOption,
+                  {
+                    borderColor:
+                      lossReaction === phrase
+                        ? theme.electricBlue
+                        : theme.inputBorder,
+                    backgroundColor:
+                      lossReaction === phrase
+                        ? theme.electricBlue + "22"
+                        : theme.background,
+                  },
+                ]}
+                onPress={() =>
+                  setLossReaction(lossReaction === phrase ? "" : phrase)
+                }
+              >
+                <Text
+                  style={[
+                    styles.reactionText,
+                    {
+                      color:
+                        lossReaction === phrase
+                          ? theme.electricBlue
+                          : theme.textPrimary,
+                    },
+                  ]}
+                >
+                  {phrase}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          {/* Actions */}
           <View style={styles.actions}>
             <TouchableOpacity
               style={[styles.cancelBtn, { borderColor: theme.inputBorder }]}
               onPress={onDismiss}
             >
-              <Text style={[styles.cancelText, { color: theme.textSecondary }]}>
+              <Text
+                style={[styles.cancelText, { color: theme.textSecondary }]}
+              >
                 Cancel
               </Text>
             </TouchableOpacity>
@@ -227,10 +418,15 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 16,
     padding: 24,
     gap: 16,
+    maxHeight: "90%",
   },
   title: {
     fontSize: 18,
     fontWeight: "600",
+  },
+  scrollContent: {
+    gap: 16,
+    paddingBottom: 8,
   },
   fieldGroup: {
     gap: 4,
@@ -246,10 +442,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     alignSelf: "flex-end",
   },
+  charCountError: {
+    color: "#D64545",
+  },
   sectionLabel: {
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 0.8,
+    marginBottom: -4,
+  },
+  fieldLabel: {
+    fontSize: 13,
+    fontWeight: "600",
     marginBottom: -4,
   },
   pickerGrid: {
@@ -268,6 +472,39 @@ const styles = StyleSheet.create({
   avatarInitials: {
     fontSize: 16,
     fontWeight: "700",
+  },
+  textArea: {
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 14,
+    minHeight: 80,
+    textAlignVertical: "top",
+  },
+  segmentedControl: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  segment: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  segmentText: {
+    fontSize: 13,
+    fontWeight: "500",
+  },
+  reactionOption: {
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 4,
+  },
+  reactionText: {
+    fontSize: 13,
   },
   actions: {
     flexDirection: "row",

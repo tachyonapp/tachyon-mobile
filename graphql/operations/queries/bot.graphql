@@ -40,6 +40,10 @@ query Bot($id: ID!) {
       expiresAt
       createdAt
     }
+    agentBackground
+    proposalCommunicationStyle
+    winReaction
+    lossReaction
     scanCapUsed
     scanCapRemaining
     botBrainConfig {

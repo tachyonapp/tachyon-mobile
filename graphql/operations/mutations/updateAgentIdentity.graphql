@@ -1,0 +1,13 @@
+mutation UpdateAgentIdentity($id: ID!, $input: UpdateAgentIdentityInput!) {
+  updateAgentIdentity(id: $id, input: $input) {
+    bot {
+      id
+      name
+      avatarSeed
+      agentBackground
+      proposalCommunicationStyle
+      winReaction
+      lossReaction
+    }
+  }
+}
