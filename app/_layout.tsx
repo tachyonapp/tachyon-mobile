@@ -9,6 +9,7 @@ import { tokenCache } from "@/auth/token-cache";
 import { AuthLoadingState } from "@/components/auth/auth-loading-state";
 import { BiometricLockScreen } from "@/components/auth/BiometricLockScreen";
 import { AppInitProvider, useAppInit } from "@/context/AppInitContext";
+import { WizardProvider } from "@/context/WizardContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { OnboardingStateProvider } from "@/context/OnboardingStateContext";
 import { ApolloProvider } from "@apollo/client/react";
@@ -120,9 +121,11 @@ export default function RootLayout() {
                 <ThemeProvider
                   value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
                 >
-                  <AppInitProvider>
-                    <RootNavigator />
-                  </AppInitProvider>
+                  <WizardProvider>
+                    <AppInitProvider>
+                      <RootNavigator />
+                    </AppInitProvider>
+                  </WizardProvider>
                 </ThemeProvider>
               </OnboardingStateProvider>
             </ApolloProvider>

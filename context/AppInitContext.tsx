@@ -1,5 +1,6 @@
 import { useAuth } from "@/auth/AuthProvider";
 import { useOnboardingState } from "@/hooks/use-onboarding-state";
+import { useWizard } from "@/context/WizardContext";
 import { useRouter, useRootNavigationState } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, {
@@ -45,6 +46,7 @@ let appInitCompleted = false;
 export function AppInitProvider({ children }: { children: React.ReactNode }) {
   const { isLoading, isAuthenticated, pendingVerification } = useAuth();
   const { isComplete } = useOnboardingState();
+  const { isLoading: wizardIsLoading } = useWizard();
   const router = useRouter();
   // useRootNavigationState resolves once the navigation container has finished
   // initializing, including any navigation state restoration from persistence.
@@ -62,7 +64,7 @@ export function AppInitProvider({ children }: { children: React.ReactNode }) {
   // Startup routing — fires once per JS context, after the nav container and
   // all async state (Clerk, SecureStore) have resolved.
   useEffect(() => {
-    if (!isNavReady || isLoading || isComplete === null) return;
+    if (!isNavReady || isLoading || isComplete === null || wizardIsLoading) return;
     if (initRef.current) return;
     initRef.current = true;
 
@@ -90,7 +92,7 @@ export function AppInitProvider({ children }: { children: React.ReactNode }) {
     SplashScreen.hideAsync().catch(() => {
       // Non-fatal in dev/hot-reload flows where splash may already be hidden.
     });
-  }, [isNavReady, isLoading, isComplete, isAuthenticated, pendingVerification, router]);
+  }, [isNavReady, isLoading, isComplete, isAuthenticated, pendingVerification, router, wizardIsLoading]);
 
   // Foreground routing — re-runs the decision tree whenever the app becomes
   // active. The Stack is always mounted (biometric lock renders as an overlay,
