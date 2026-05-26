@@ -1,6 +1,7 @@
 import { Colors } from "@/constants/theme";
 import { type BotQuery } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { ModelVariantPicker } from "@/features/agents/forge/components/ModelVariantPicker";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { ModelVariantBadge } from "../../components/ModelVariantBadge";
@@ -77,16 +78,22 @@ export function Subscription({ agent }: SubscriptionProps) {
         )}
       </View>
 
-      {/* TODO Task 12: ModelVariantPicker sheet
+      {variant === "BYOK" && config?.provider && (
         <ModelVariantPicker
           isVisible={isVariantPickerVisible}
           onClose={() => setIsVariantPickerVisible(false)}
-          provider={config?.provider as any}
-          currentVariant={...}
+          provider={config.provider as "openai" | "anthropic" | "groq" | "gemini"}
+          currentVariant={
+            config.provider === "openai"    ? (config.openaiModelVariant    ?? null) :
+            config.provider === "anthropic" ? (config.anthropicModelVariant ?? null) :
+            config.provider === "groq"      ? (config.groqModelVariant      ?? null) :
+            config.provider === "gemini"    ? (config.geminiModelVariant    ?? null) :
+            null
+          }
           mode="management"
           botId={agent.id ?? ""}
         />
-      */}
+      )}
     </ScrollView>
   );
 }

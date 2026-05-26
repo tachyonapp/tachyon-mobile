@@ -25,6 +25,7 @@ type Documents = {
   "mutation SelectTier($tier: SubscriptionTier!, $stripePaymentMethodId: String) {\n  selectTier(tier: $tier, stripePaymentMethodId: $stripePaymentMethodId) {\n    subscriptionTier\n    subscriptionStatus\n    trialExpiresAt\n  }\n}": typeof types.SelectTierDocument;
   "mutation SkipProposal($id: ID!) {\n  skipProposal(id: $id) {\n    ... on Proposal {\n      id\n      status\n    }\n    ... on NotFoundError {\n      message\n    }\n    ... on AuthError {\n      message\n    }\n  }\n}": typeof types.SkipProposalDocument;
   "mutation UpdateAgentIdentity($id: ID!, $input: UpdateAgentIdentityInput!) {\n  updateAgentIdentity(id: $id, input: $input) {\n    bot {\n      id\n      name\n      avatarSeed\n      agentBackground\n      proposalCommunicationStyle\n      winReaction\n      lossReaction\n    }\n  }\n}": typeof types.UpdateAgentIdentityDocument;
+  "mutation UpdateBotBrain($id: ID!, $input: UpdateBotBrainInput!) {\n  updateBotBrain(id: $id, input: $input) {\n    bot {\n      id\n    }\n  }\n}": typeof types.UpdateBotBrainDocument;
   "mutation ValidateBrainKey($provider: String!, $apiKey: String!) {\n  validateBrainKey(provider: $provider, apiKey: $apiKey) {\n    valid\n    error\n  }\n}": typeof types.ValidateBrainKeyDocument;
   "query Account {\n  account {\n    id\n    status\n    providerName\n  }\n}": typeof types.AccountDocument;
   "query Balance {\n  balance {\n    totalValue\n    cashBalance\n    investedValue\n    dayPnl\n    dayPnlPercent\n  }\n}": typeof types.BalanceDocument;
@@ -60,6 +61,8 @@ const documents: Documents = {
     types.SkipProposalDocument,
   "mutation UpdateAgentIdentity($id: ID!, $input: UpdateAgentIdentityInput!) {\n  updateAgentIdentity(id: $id, input: $input) {\n    bot {\n      id\n      name\n      avatarSeed\n      agentBackground\n      proposalCommunicationStyle\n      winReaction\n      lossReaction\n    }\n  }\n}":
     types.UpdateAgentIdentityDocument,
+  "mutation UpdateBotBrain($id: ID!, $input: UpdateBotBrainInput!) {\n  updateBotBrain(id: $id, input: $input) {\n    bot {\n      id\n    }\n  }\n}":
+    types.UpdateBotBrainDocument,
   "mutation ValidateBrainKey($provider: String!, $apiKey: String!) {\n  validateBrainKey(provider: $provider, apiKey: $apiKey) {\n    valid\n    error\n  }\n}":
     types.ValidateBrainKeyDocument,
   "query Account {\n  account {\n    id\n    status\n    providerName\n  }\n}":
@@ -164,6 +167,12 @@ export function gql(
 export function gql(
   source: "mutation UpdateAgentIdentity($id: ID!, $input: UpdateAgentIdentityInput!) {\n  updateAgentIdentity(id: $id, input: $input) {\n    bot {\n      id\n      name\n      avatarSeed\n      agentBackground\n      proposalCommunicationStyle\n      winReaction\n      lossReaction\n    }\n  }\n}",
 ): (typeof documents)["mutation UpdateAgentIdentity($id: ID!, $input: UpdateAgentIdentityInput!) {\n  updateAgentIdentity(id: $id, input: $input) {\n    bot {\n      id\n      name\n      avatarSeed\n      agentBackground\n      proposalCommunicationStyle\n      winReaction\n      lossReaction\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(
+  source: "mutation UpdateBotBrain($id: ID!, $input: UpdateBotBrainInput!) {\n  updateBotBrain(id: $id, input: $input) {\n    bot {\n      id\n    }\n  }\n}",
+): (typeof documents)["mutation UpdateBotBrain($id: ID!, $input: UpdateBotBrainInput!) {\n  updateBotBrain(id: $id, input: $input) {\n    bot {\n      id\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

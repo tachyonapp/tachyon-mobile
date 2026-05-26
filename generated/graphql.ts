@@ -829,6 +829,19 @@ export type UpdateAgentIdentityMutation = {
   } | null;
 };
 
+export type UpdateBotBrainMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: UpdateBotBrainInput;
+}>;
+
+export type UpdateBotBrainMutation = {
+  __typename?: "Mutation";
+  updateBotBrain?: {
+    __typename?: "UpdateBotBrainResult";
+    bot?: { __typename?: "Bot"; id?: string | null } | null;
+  } | null;
+};
+
 export type ValidateBrainKeyMutationVariables = Exact<{
   provider: Scalars["String"]["input"];
   apiKey: Scalars["String"]["input"];
@@ -1917,6 +1930,85 @@ export const UpdateAgentIdentityDocument = {
 } as unknown as DocumentNode<
   UpdateAgentIdentityMutation,
   UpdateAgentIdentityMutationVariables
+>;
+export const UpdateBotBrainDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "UpdateBotBrain" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "UpdateBotBrainInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "updateBotBrain" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "id" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "bot" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateBotBrainMutation,
+  UpdateBotBrainMutationVariables
 >;
 export const ValidateBrainKeyDocument = {
   kind: "Document",
