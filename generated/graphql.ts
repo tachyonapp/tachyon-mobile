@@ -194,9 +194,13 @@ export type BrainCatalog = {
 };
 
 export type BrainConfigInput = {
+  anthropicModelVariant?: InputMaybe<Scalars["String"]["input"]>;
   apiKey?: InputMaybe<Scalars["String"]["input"]>;
   brainType: BrainType;
+  geminiModelVariant?: InputMaybe<Scalars["String"]["input"]>;
+  groqModelVariant?: InputMaybe<Scalars["String"]["input"]>;
   modelId: Scalars["String"]["input"];
+  openaiModelVariant?: InputMaybe<Scalars["String"]["input"]>;
   provider?: InputMaybe<Scalars["String"]["input"]>;
 };
 
