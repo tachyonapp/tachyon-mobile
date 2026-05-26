@@ -74,7 +74,9 @@ export default function AgentProfile() {
       <View style={styles.tabContent}>
         {activeTab === "Overview" && <Overview agent={agent} />}
         {activeTab === "Performance" && <Performance agentId={id} />}
-        {activeTab === "Configuration" && <Configuration agent={agent} />}
+        {activeTab === "Configuration" && (
+          <Configuration agent={agent} onRebuild={handleRebuild} />
+        )}
         {activeTab === "Brain" && <Subscription agent={agent} />}
       </View>
       <ActionBar

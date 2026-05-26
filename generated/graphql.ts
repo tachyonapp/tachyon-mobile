@@ -891,6 +891,21 @@ export type BotQuery = {
     sectors?: Array<SectorFilter> | null;
     exitStyle?: string | null;
     stopStyle?: string | null;
+    subSectors?: Array<string> | null;
+    customWatchlist?: Array<string> | null;
+    exclusionList?: Array<string> | null;
+    dividendPreference?: DividendPreference | null;
+    shortInterestSignal?: ShortInterestSignal | null;
+    confidenceThreshold?: ConfidenceThreshold | null;
+    regimeAwareness?: RegimeAwareness | null;
+    earningsBehavior?: EarningsBehavior | null;
+    positionSizingMethod?: PositionSizingMethod | null;
+    minRrRatio?: number | null;
+    maxDrawdownProtectionPct?: number | null;
+    recoveryMode?: RecoveryMode | null;
+    sessionPreference?: SessionPreference | null;
+    dayAvoidance?: Array<DayOfWeek> | null;
+    volatilityEnvPreference?: VolatilityEnvPreference | null;
     agentBackground?: string | null;
     proposalCommunicationStyle?: ProposalCommunicationStyle | null;
     winReaction?: string | null;
@@ -905,6 +920,12 @@ export type BotQuery = {
       meanReversion?: number | null;
       volatility?: number | null;
       trendFollowing?: number | null;
+    } | null;
+    signalWeights?: {
+      __typename?: "SignalWeightsOutput";
+      technicals?: number | null;
+      news?: number | null;
+      fundamentals?: number | null;
     } | null;
     activePosition?: {
       __typename?: "Position";
@@ -2125,6 +2146,78 @@ export const BotDocument = {
                 { kind: "Field", name: { kind: "Name", value: "sectors" } },
                 { kind: "Field", name: { kind: "Name", value: "exitStyle" } },
                 { kind: "Field", name: { kind: "Name", value: "stopStyle" } },
+                { kind: "Field", name: { kind: "Name", value: "subSectors" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "customWatchlist" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "exclusionList" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "dividendPreference" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "shortInterestSignal" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "signalWeights" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "technicals" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "news" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "fundamentals" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "confidenceThreshold" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "regimeAwareness" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "earningsBehavior" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "positionSizingMethod" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "minRrRatio" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "maxDrawdownProtectionPct" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "recoveryMode" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "sessionPreference" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "dayAvoidance" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "volatilityEnvPreference" },
+                },
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "activePosition" },

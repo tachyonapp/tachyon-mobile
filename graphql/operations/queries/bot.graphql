@@ -21,6 +21,26 @@ query Bot($id: ID!) {
     sectors
     exitStyle
     stopStyle
+    subSectors
+    customWatchlist
+    exclusionList
+    dividendPreference
+    shortInterestSignal
+    signalWeights {
+      technicals
+      news
+      fundamentals
+    }
+    confidenceThreshold
+    regimeAwareness
+    earningsBehavior
+    positionSizingMethod
+    minRrRatio
+    maxDrawdownProtectionPct
+    recoveryMode
+    sessionPreference
+    dayAvoidance
+    volatilityEnvPreference
     activePosition {
       id
       symbol
