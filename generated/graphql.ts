@@ -954,6 +954,10 @@ export type BotQuery = {
       modelId?: string | null;
       provider?: string | null;
       keyPreview?: string | null;
+      openaiModelVariant?: string | null;
+      anthropicModelVariant?: string | null;
+      groqModelVariant?: string | null;
+      geminiModelVariant?: string | null;
     } | null;
   } | null;
 };
@@ -2320,6 +2324,22 @@ export const BotDocument = {
                       {
                         kind: "Field",
                         name: { kind: "Name", value: "keyPreview" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "openaiModelVariant" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "anthropicModelVariant" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "groqModelVariant" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "geminiModelVariant" },
                       },
                     ],
                   },

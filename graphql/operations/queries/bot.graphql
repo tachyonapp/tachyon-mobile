@@ -71,6 +71,10 @@ query Bot($id: ID!) {
       modelId
       provider
       keyPreview
+      openaiModelVariant
+      anthropicModelVariant
+      groqModelVariant
+      geminiModelVariant
     }
     createdAt
     updatedAt
