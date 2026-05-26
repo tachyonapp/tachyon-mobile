@@ -10,6 +10,7 @@ interface Props {
   onPause?: () => void;
   onDelete?: () => void;
   onEditIdentity?: () => void;
+  onRebuild?: () => void;
 }
 
 export function ActionBar({
@@ -18,6 +19,7 @@ export function ActionBar({
   onPause,
   onDelete,
   onEditIdentity,
+  onRebuild,
 }: Props) {
   const theme = Colors[useColorScheme()];
   const isActive = agent.status === BotStatus.Active;
@@ -49,6 +51,23 @@ export function ActionBar({
       >
         <Text style={[styles.buttonText, { color: theme.textSecondary }]}>
           Edit
+        </Text>
+      </Pressable>
+
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          {
+            backgroundColor: theme.surface,
+            borderWidth: 1,
+            borderColor: theme.electricBlue,
+          },
+          pressed && styles.pressed,
+        ]}
+        onPress={onRebuild}
+      >
+        <Text style={[styles.buttonText, { color: theme.electricBlue }]}>
+          Rebuild
         </Text>
       </Pressable>
 

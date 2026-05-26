@@ -65,6 +65,7 @@ import {
   ExitPersonalityName,
   SectorFilter,
   StopStyleName,
+  type BotQuery,
   type BrainCatalog,
   type CombatPatience,
   type EmotionalControlsInput,
@@ -79,7 +80,7 @@ import { gql } from "@apollo/client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   FRAME_CONFIG,
-  type BotFrameName,
+  BotFrameName,
   type ConfidenceThreshold,
   type DayOfWeek,
   type DividendPreference,
@@ -155,6 +156,11 @@ export interface WizardState {
   proposalCommunicationStyle: ProposalCommunicationStyle | null;
   winReaction: string | null;
   lossReaction: string | null;
+  // Model variant selections per provider — persisted to AsyncStorage (unlike apiKey)
+  openaiModelVariant: string | null;
+  anthropicModelVariant: string | null;
+  groqModelVariant: string | null;
+  geminiModelVariant: string | null;
   activeAdvisories: FrameAdvisory[]; // derived — NOT persisted to AsyncStorage
 }
 
@@ -227,6 +233,10 @@ const EMPTY_STATE: WizardState = {
   proposalCommunicationStyle: null,
   winReaction: null,
   lossReaction: null,
+  openaiModelVariant: null,
+  anthropicModelVariant: null,
+  groqModelVariant: null,
+  geminiModelVariant: null,
   activeAdvisories: [],
 };
 
@@ -382,6 +392,8 @@ interface WizardContextValue {
   setExclusionList: (tickers: string[]) => void;
   setWinReaction: (phrase: string | null) => void;
   setLossReaction: (phrase: string | null) => void;
+  /** Replaces the full wizard state — used by the Rebuild flow to pre-fill from an existing agent */
+  initWithState: (state: WizardState) => void;
   persistDraft: () => Promise<void>;
   clearDraft: () => Promise<void>;
   resumeDraft: () => void;
@@ -612,6 +624,10 @@ export function WizardProvider({ children }: { children: ReactNode }) {
     setState((prev) => ({ ...prev, lossReaction: phrase }));
   }, []);
 
+  const initWithState = useCallback((newState: WizardState) => {
+    setState(newState);
+  }, []);
+
   const persistDraft = useCallback(async () => {
     const start = Date.now();
 
@@ -678,6 +694,7 @@ export function WizardProvider({ children }: { children: ReactNode }) {
         setExclusionList,
         setWinReaction,
         setLossReaction,
+        initWithState,
         persistDraft,
         clearDraft,
         resumeDraft,
@@ -687,6 +704,170 @@ export function WizardProvider({ children }: { children: ReactNode }) {
       {children}
     </WizardContext.Provider>
   );
+}
+
+// ── Rebuild flow ──────────────────────────────────────────────────────────────
+
+type AgentData = NonNullable<BotQuery["bot"]>;
+
+// Extended type to bridge the gap until bot.graphql is updated (Task 14) to include
+// Feature 8b fields (agentBackground, winReaction, signalWeights, etc.) and
+// variant fields (added to BotBrainConfig in Task 6).
+type AgentDataExtended = AgentData & {
+  colorway?: string | null;
+  subSectors?: string[] | null;
+  customWatchlist?: string[] | null;
+  exclusionList?: string[] | null;
+  signalWeights?: { technicals: number; news: number; fundamentals: number } | null;
+  confidenceThreshold?: string | null;
+  regimeAwareness?: string | null;
+  earningsBehavior?: string | null;
+  dividendPreference?: string | null;
+  shortInterestSignal?: string | null;
+  positionSizingMethod?: string | null;
+  minRrRatio?: number | null;
+  maxDrawdownProtectionPct?: number | null;
+  recoveryMode?: string | null;
+  sessionPreference?: string | null;
+  dayAvoidance?: string[] | null;
+  volatilityEnvPreference?: string | null;
+  agentBackground?: string | null;
+  proposalCommunicationStyle?: string | null;
+  winReaction?: string | null;
+  lossReaction?: string | null;
+  emotionalControls?: {
+    freezeAfterLosses?: number | null;
+    cooldownAfterVolatility?: boolean;
+    standDownAfterNoonIfLosing?: boolean;
+  } | null;
+  rulesOfEngagement?: {
+    overnightHoldAllowed?: boolean;
+    noSameDayExitUnlessStopLoss?: boolean;
+  } | null;
+  botBrainConfig?: (AgentData["botBrainConfig"] & {
+    openaiModelVariant?: string | null;
+    anthropicModelVariant?: string | null;
+    groqModelVariant?: string | null;
+    geminiModelVariant?: string | null;
+  }) | null;
+};
+
+/**
+ * Builds a complete WizardState for the Rebuild flow.
+ * Uses agent data values when available; falls back to FRAME_CONFIG defaults.
+ * Falls back to SCOUT defaults if frameName is unrecognized and logs a warning.
+ * Fields not yet in the bot query (pre-Task 14 codegen) fall back to frame defaults.
+ */
+export function buildRebuildInitialState(agentData: AgentData): WizardState {
+  const agent = agentData as AgentDataExtended;
+  const frameName = agent.frame as BotFrameName | null;
+
+  let frameDefaults = frameName ? FRAME_CONFIG[frameName]?.defaults : null;
+  if (!frameDefaults) {
+    // Data integrity issue — fall back to SCOUT defaults
+    console.warn(
+      `buildRebuildInitialState: unrecognized frameName "${frameName}" for bot ${agent.id}. Falling back to SCOUT defaults.`,
+    );
+    frameDefaults = FRAME_CONFIG[BotFrameName.SCOUT].defaults;
+  }
+
+  const frameColorway = frameName ? FRAME_CONFIG[frameName]?.colorway ?? "" : "";
+
+  return {
+    // Identity
+    name: agent.name ?? "",
+    frameName: agent.frame ?? null,
+    avatarSeed: agent.avatarSeed ?? "",
+    colorway: agent.colorway ?? frameColorway,
+
+    // Core trading
+    allocationPct: agent.allocationPct != null ? Number(agent.allocationPct) : frameDefaults.allocationPct,
+    riskAttitude: (agent.riskAttitude as RiskAttitude | null) ?? frameDefaults.riskAttitude,
+    tradeTempo: (agent.tradeTempo as TradeTempo | null) ?? frameDefaults.tradeTempo,
+    combatPatience: (agent.combatPatience as CombatPatience | null) ?? frameDefaults.combatPatience,
+
+    // Market awareness
+    marketAwareness: agent.marketAwareness
+      ? {
+          momentum: agent.marketAwareness.momentum ?? 0.5,
+          meanReversion: agent.marketAwareness.meanReversion ?? 0.5,
+          volatility: agent.marketAwareness.volatility ?? 0.5,
+          trendFollowing: agent.marketAwareness.trendFollowing ?? 0.5,
+        }
+      : frameDefaults.marketAwareness,
+
+    // Sectors
+    sectors: (agent.sectors ?? []) as SectorFilter[],
+    subSectors: agent.subSectors ?? [],
+    customWatchlist: agent.customWatchlist ?? [],
+    exclusionList: agent.exclusionList ?? [],
+    dividendPreference: (agent.dividendPreference as DividendPreference | null) ?? frameDefaults.dividendPreference,
+    shortInterestSignal: (agent.shortInterestSignal as ShortInterestSignal | null) ?? frameDefaults.shortInterestSignal,
+
+    // Safety
+    dailyMaxLoss: agent.dailyMaxLoss != null ? Number(agent.dailyMaxLoss) : frameDefaults.dailyMaxLossPct,
+    dailyMaxGain: agent.dailyMaxGain != null ? Number(agent.dailyMaxGain) : null,
+    emotionalControls: agent.emotionalControls
+      ? {
+          freezeAfterLosses: agent.emotionalControls.freezeAfterLosses ?? null,
+          cooldownAfterVolatility: agent.emotionalControls.cooldownAfterVolatility ?? false,
+          standDownAfterNoonIfLosing: agent.emotionalControls.standDownAfterNoonIfLosing ?? false,
+        }
+      : { freezeAfterLosses: null, cooldownAfterVolatility: false, standDownAfterNoonIfLosing: false },
+    rulesOfEngagement: agent.rulesOfEngagement
+      ? {
+          overnightHoldAllowed: agent.rulesOfEngagement.overnightHoldAllowed ?? false,
+          noSameDayExitUnlessStopLoss: agent.rulesOfEngagement.noSameDayExitUnlessStopLoss ?? false,
+        }
+      : { overnightHoldAllowed: false, noSameDayExitUnlessStopLoss: false },
+    exitPersonality: agent.exitStyle
+      ? { name: agent.exitStyle as ExitPersonalityName }
+      : { name: frameDefaults.exitPersonality as ExitPersonalityName },
+    stopLossStyle: agent.stopStyle
+      ? { name: agent.stopStyle as StopStyleName }
+      : { name: frameDefaults.stopLossStyle as StopStyleName },
+
+    // Intelligence
+    signalWeights: agent.signalWeights ?? frameDefaults.signalWeights,
+    confidenceThreshold: (agent.confidenceThreshold as ConfidenceThreshold | null) ?? frameDefaults.confidenceThreshold,
+    regimeAwareness: (agent.regimeAwareness as RegimeAwareness | null) ?? frameDefaults.regimeAwareness,
+    earningsBehavior: (agent.earningsBehavior as EarningsBehavior | null) ?? frameDefaults.earningsBehavior,
+
+    // Sizing
+    positionSizingMethod: (agent.positionSizingMethod as PositionSizingMethod | null) ?? frameDefaults.positionSizingMethod,
+    minRrRatio: agent.minRrRatio ?? frameDefaults.minRrRatio,
+    maxDrawdownProtectionPct: agent.maxDrawdownProtectionPct ?? frameDefaults.maxDrawdownProtectionPct,
+    recoveryMode: (agent.recoveryMode as RecoveryMode | null) ?? frameDefaults.recoveryMode,
+
+    // Timing
+    sessionPreference: (agent.sessionPreference as SessionPreference | null) ?? frameDefaults.sessionPreference,
+    dayAvoidance: (agent.dayAvoidance as DayOfWeek[] | null) ?? frameDefaults.dayAvoidance,
+    volatilityEnvPreference: (agent.volatilityEnvPreference as VolatilityEnvPreference | null) ?? frameDefaults.volatilityEnvPreference,
+
+    // Personality
+    agentBackground: agent.agentBackground ?? "",
+    proposalCommunicationStyle: (agent.proposalCommunicationStyle as ProposalCommunicationStyle | null) ?? frameDefaults.proposalCommunicationStyle,
+    winReaction: agent.winReaction ?? null,
+    lossReaction: agent.lossReaction ?? null,
+
+    // Brain variant (apiKey is NEVER pre-filled — user must re-enter)
+    openaiModelVariant: agent.botBrainConfig?.openaiModelVariant ?? null,
+    anthropicModelVariant: agent.botBrainConfig?.anthropicModelVariant ?? null,
+    groqModelVariant: agent.botBrainConfig?.groqModelVariant ?? null,
+    geminiModelVariant: agent.botBrainConfig?.geminiModelVariant ?? null,
+
+    // Brain state (non-persisted runtime — apiKey cleared)
+    brain: {
+      brainType: (agent.botBrainConfig?.brainType as BrainType) ?? BrainType.TachyonHosted,
+      modelId: agent.botBrainConfig?.modelId ?? "",
+      provider: agent.botBrainConfig?.provider ?? "anthropic",
+      apiKey: null, // NEVER pre-fill
+    },
+
+    // Runtime-only state
+    activeAdvisories: [],
+    existingAllocationTotal: 0,
+  };
 }
 
 export function useWizard(): WizardContextValue {

@@ -8,6 +8,7 @@ import {
   MeSubscriptionDocument,
   SubscriptionStatus,
 } from "@/generated/graphql";
+import { buildRebuildInitialState, useWizard } from "@/context/WizardContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useQuery } from "@apollo/client/react";
 import { router, useLocalSearchParams } from "expo-router";
@@ -34,12 +35,19 @@ export default function AgentProfile() {
   });
 
   const { data: meData } = useQuery(MeSubscriptionDocument);
+  const { initWithState } = useWizard();
 
   const agent = data?.bot;
   const subscriptionStatus = meData?.me?.subscriptionStatus;
   const isBlocked =
     subscriptionStatus === SubscriptionStatus.Suspended ||
     subscriptionStatus === SubscriptionStatus.Cancelled;
+
+  const handleRebuild = () => {
+    if (!agent) return;
+    initWithState(buildRebuildInitialState(agent));
+    router.push("/(agent-forge)" as any);
+  };
 
   const handleActivate = () => {
     if (isBlocked) {
@@ -75,6 +83,7 @@ export default function AgentProfile() {
         onPause={() => router.push(`/(bot-detail)/${id}/pause` as any)}
         onDelete={() => setDeleteDialogVisible(true)}
         onEditIdentity={() => setEditSheetVisible(true)}
+        onRebuild={handleRebuild}
       />
       <EditIdentitySheet
         agent={agent}
