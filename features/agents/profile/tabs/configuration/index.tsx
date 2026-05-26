@@ -3,6 +3,7 @@ import { type BotQuery } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React from "react";
 import { ScrollView, StyleSheet } from "react-native";
+import AdvancedConfigSection from "../../components/AdvancedConfigSection";
 import { Brain } from "./Brain";
 import { ExitPersonality } from "./ExitPersonality";
 import { Identity } from "./Identity";
@@ -14,9 +15,10 @@ type Agent = NonNullable<BotQuery["bot"]>;
 
 interface Props {
   agent: Agent;
+  onRebuild: () => void;
 }
 
-export function Configuration({ agent }: Props) {
+export function Configuration({ agent, onRebuild }: Props) {
   const theme = Colors[useColorScheme()];
 
   return (
@@ -53,6 +55,9 @@ export function Configuration({ agent }: Props) {
 
       {/* 6. Brain */}
       <Brain agentBrainConfig={agent.botBrainConfig} />
+
+      {/* 7. Advanced Configuration */}
+      <AdvancedConfigSection agent={agent} onRebuild={onRebuild} />
     </ScrollView>
   );
 }

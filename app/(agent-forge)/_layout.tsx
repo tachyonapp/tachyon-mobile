@@ -1,6 +1,6 @@
 import { HeaderNav } from "@/components/layout/header-nav";
 import { Colors } from "@/constants/theme";
-import { WizardProvider, useWizard } from "@/context/WizardContext";
+import { useWizard } from "@/context/WizardContext";
 import { ForgeProgressBar } from "@/features/agents/forge/components/ForgeProgressBar";
 import { MeSubscriptionDocument } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -112,11 +112,7 @@ export default function Layout() {
     );
   }
 
-  return (
-    <WizardProvider>
-      <ForgeLayoutContent />
-    </WizardProvider>
-  );
+  return <ForgeLayoutContent />;
 }
 
 const styles = StyleSheet.create({

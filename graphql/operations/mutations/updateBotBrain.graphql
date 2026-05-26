@@ -1,0 +1,7 @@
+mutation UpdateBotBrain($id: ID!, $input: UpdateBotBrainInput!) {
+  updateBotBrain(id: $id, input: $input) {
+    bot {
+      id
+    }
+  }
+}

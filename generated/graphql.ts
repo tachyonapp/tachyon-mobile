@@ -133,9 +133,13 @@ export type BotProposalsArgs = {
 
 export type BotBrainConfig = {
   __typename?: "BotBrainConfig";
+  anthropicModelVariant?: Maybe<Scalars["String"]["output"]>;
   brainType?: Maybe<Scalars["String"]["output"]>;
+  geminiModelVariant?: Maybe<Scalars["String"]["output"]>;
+  groqModelVariant?: Maybe<Scalars["String"]["output"]>;
   keyPreview?: Maybe<Scalars["String"]["output"]>;
   modelId?: Maybe<Scalars["String"]["output"]>;
+  openaiModelVariant?: Maybe<Scalars["String"]["output"]>;
   provider?: Maybe<Scalars["String"]["output"]>;
 };
 
@@ -190,9 +194,13 @@ export type BrainCatalog = {
 };
 
 export type BrainConfigInput = {
+  anthropicModelVariant?: InputMaybe<Scalars["String"]["input"]>;
   apiKey?: InputMaybe<Scalars["String"]["input"]>;
   brainType: BrainType;
+  geminiModelVariant?: InputMaybe<Scalars["String"]["input"]>;
+  groqModelVariant?: InputMaybe<Scalars["String"]["input"]>;
   modelId: Scalars["String"]["input"];
+  openaiModelVariant?: InputMaybe<Scalars["String"]["input"]>;
   provider?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -335,7 +343,9 @@ export type Mutation = {
   pauseBot?: Maybe<BotResult>;
   selectTier?: Maybe<SelectTierResult>;
   skipProposal?: Maybe<SkipProposalResult>;
-  updateBotIdentity?: Maybe<UpdateBotIdentityResult>;
+  updateAgentIdentity?: Maybe<UpdateAgentIdentityResult>;
+  updateBotBrain?: Maybe<UpdateBotBrainResult>;
+  updateBotIdentity?: Maybe<UpdateAgentIdentityResult>;
   validateBrainKey?: Maybe<ValidateBrainKeyResult>;
 };
 
@@ -373,9 +383,19 @@ export type MutationSkipProposalArgs = {
   id: Scalars["ID"]["input"];
 };
 
+export type MutationUpdateAgentIdentityArgs = {
+  id: Scalars["ID"]["input"];
+  input: UpdateAgentIdentityInput;
+};
+
+export type MutationUpdateBotBrainArgs = {
+  id: Scalars["ID"]["input"];
+  input: UpdateBotBrainInput;
+};
+
 export type MutationUpdateBotIdentityArgs = {
   id: Scalars["ID"]["input"];
-  input: UpdateBotIdentityInput;
+  input: UpdateAgentIdentityInput;
 };
 
 export type MutationValidateBrainKeyArgs = {
@@ -582,13 +602,26 @@ export enum SubscriptionTier {
 
 export { TradeTempo };
 
-export type UpdateBotIdentityInput = {
+export type UpdateAgentIdentityInput = {
   avatarSeed: Scalars["String"]["input"];
+  backstory?: InputMaybe<Scalars["String"]["input"]>;
+  communicationStyle?: InputMaybe<ProposalCommunicationStyle>;
+  lossReaction?: InputMaybe<Scalars["String"]["input"]>;
   name: Scalars["String"]["input"];
+  winReaction?: InputMaybe<Scalars["String"]["input"]>;
 };
 
-export type UpdateBotIdentityResult = {
-  __typename?: "UpdateBotIdentityResult";
+export type UpdateAgentIdentityResult = {
+  __typename?: "UpdateAgentIdentityResult";
+  bot?: Maybe<Bot>;
+};
+
+export type UpdateBotBrainInput = {
+  modelVariant: Scalars["String"]["input"];
+};
+
+export type UpdateBotBrainResult = {
+  __typename?: "UpdateBotBrainResult";
   bot?: Maybe<Bot>;
 };
 
@@ -778,20 +811,38 @@ export type SkipProposalMutation = {
     | null;
 };
 
-export type UpdateBotIdentityMutationVariables = Exact<{
+export type UpdateAgentIdentityMutationVariables = Exact<{
   id: Scalars["ID"]["input"];
-  input: UpdateBotIdentityInput;
+  input: UpdateAgentIdentityInput;
 }>;
 
-export type UpdateBotIdentityMutation = {
+export type UpdateAgentIdentityMutation = {
   __typename?: "Mutation";
-  updateBotIdentity?: {
-    __typename?: "UpdateBotIdentityResult";
+  updateAgentIdentity?: {
+    __typename?: "UpdateAgentIdentityResult";
     bot?: {
       __typename?: "Bot";
       id?: string | null;
       name?: string | null;
+      avatarSeed?: string | null;
+      agentBackground?: string | null;
+      proposalCommunicationStyle?: ProposalCommunicationStyle | null;
+      winReaction?: string | null;
+      lossReaction?: string | null;
     } | null;
+  } | null;
+};
+
+export type UpdateBotBrainMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: UpdateBotBrainInput;
+}>;
+
+export type UpdateBotBrainMutation = {
+  __typename?: "Mutation";
+  updateBotBrain?: {
+    __typename?: "UpdateBotBrainResult";
+    bot?: { __typename?: "Bot"; id?: string | null } | null;
   } | null;
 };
 
@@ -857,6 +908,25 @@ export type BotQuery = {
     sectors?: Array<SectorFilter> | null;
     exitStyle?: string | null;
     stopStyle?: string | null;
+    subSectors?: Array<string> | null;
+    customWatchlist?: Array<string> | null;
+    exclusionList?: Array<string> | null;
+    dividendPreference?: DividendPreference | null;
+    shortInterestSignal?: ShortInterestSignal | null;
+    confidenceThreshold?: ConfidenceThreshold | null;
+    regimeAwareness?: RegimeAwareness | null;
+    earningsBehavior?: EarningsBehavior | null;
+    positionSizingMethod?: PositionSizingMethod | null;
+    minRrRatio?: number | null;
+    maxDrawdownProtectionPct?: number | null;
+    recoveryMode?: RecoveryMode | null;
+    sessionPreference?: SessionPreference | null;
+    dayAvoidance?: Array<DayOfWeek> | null;
+    volatilityEnvPreference?: VolatilityEnvPreference | null;
+    agentBackground?: string | null;
+    proposalCommunicationStyle?: ProposalCommunicationStyle | null;
+    winReaction?: string | null;
+    lossReaction?: string | null;
     scanCapUsed?: number | null;
     scanCapRemaining?: number | null;
     createdAt?: any | null;
@@ -867,6 +937,12 @@ export type BotQuery = {
       meanReversion?: number | null;
       volatility?: number | null;
       trendFollowing?: number | null;
+    } | null;
+    signalWeights?: {
+      __typename?: "SignalWeightsOutput";
+      technicals?: number | null;
+      news?: number | null;
+      fundamentals?: number | null;
     } | null;
     activePosition?: {
       __typename?: "Position";
@@ -895,6 +971,10 @@ export type BotQuery = {
       modelId?: string | null;
       provider?: string | null;
       keyPreview?: string | null;
+      openaiModelVariant?: string | null;
+      anthropicModelVariant?: string | null;
+      groqModelVariant?: string | null;
+      geminiModelVariant?: string | null;
     } | null;
   } | null;
 };
@@ -1752,13 +1832,13 @@ export const SkipProposalDocument = {
   SkipProposalMutation,
   SkipProposalMutationVariables
 >;
-export const UpdateBotIdentityDocument = {
+export const UpdateAgentIdentityDocument = {
   kind: "Document",
   definitions: [
     {
       kind: "OperationDefinition",
       operation: "mutation",
-      name: { kind: "Name", value: "UpdateBotIdentity" },
+      name: { kind: "Name", value: "UpdateAgentIdentity" },
       variableDefinitions: [
         {
           kind: "VariableDefinition",
@@ -1778,7 +1858,7 @@ export const UpdateBotIdentityDocument = {
             kind: "NonNullType",
             type: {
               kind: "NamedType",
-              name: { kind: "Name", value: "UpdateBotIdentityInput" },
+              name: { kind: "Name", value: "UpdateAgentIdentityInput" },
             },
           },
         },
@@ -1788,7 +1868,7 @@ export const UpdateBotIdentityDocument = {
         selections: [
           {
             kind: "Field",
-            name: { kind: "Name", value: "updateBotIdentity" },
+            name: { kind: "Name", value: "updateAgentIdentity" },
             arguments: [
               {
                 kind: "Argument",
@@ -1818,6 +1898,29 @@ export const UpdateBotIdentityDocument = {
                     selections: [
                       { kind: "Field", name: { kind: "Name", value: "id" } },
                       { kind: "Field", name: { kind: "Name", value: "name" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "avatarSeed" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "agentBackground" },
+                      },
+                      {
+                        kind: "Field",
+                        name: {
+                          kind: "Name",
+                          value: "proposalCommunicationStyle",
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "winReaction" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "lossReaction" },
+                      },
                     ],
                   },
                 },
@@ -1829,8 +1932,87 @@ export const UpdateBotIdentityDocument = {
     },
   ],
 } as unknown as DocumentNode<
-  UpdateBotIdentityMutation,
-  UpdateBotIdentityMutationVariables
+  UpdateAgentIdentityMutation,
+  UpdateAgentIdentityMutationVariables
+>;
+export const UpdateBotBrainDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "UpdateBotBrain" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "UpdateBotBrainInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "updateBotBrain" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "id" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "bot" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateBotBrainMutation,
+  UpdateBotBrainMutationVariables
 >;
 export const ValidateBrainKeyDocument = {
   kind: "Document",
@@ -2064,6 +2246,78 @@ export const BotDocument = {
                 { kind: "Field", name: { kind: "Name", value: "sectors" } },
                 { kind: "Field", name: { kind: "Name", value: "exitStyle" } },
                 { kind: "Field", name: { kind: "Name", value: "stopStyle" } },
+                { kind: "Field", name: { kind: "Name", value: "subSectors" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "customWatchlist" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "exclusionList" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "dividendPreference" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "shortInterestSignal" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "signalWeights" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "technicals" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "news" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "fundamentals" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "confidenceThreshold" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "regimeAwareness" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "earningsBehavior" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "positionSizingMethod" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "minRrRatio" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "maxDrawdownProtectionPct" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "recoveryMode" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "sessionPreference" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "dayAvoidance" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "volatilityEnvPreference" },
+                },
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "activePosition" },
@@ -2127,6 +2381,19 @@ export const BotDocument = {
                     ],
                   },
                 },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "agentBackground" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "proposalCommunicationStyle" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "winReaction" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "lossReaction" },
+                },
                 { kind: "Field", name: { kind: "Name", value: "scanCapUsed" } },
                 {
                   kind: "Field",
@@ -2153,6 +2420,22 @@ export const BotDocument = {
                       {
                         kind: "Field",
                         name: { kind: "Name", value: "keyPreview" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "openaiModelVariant" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "anthropicModelVariant" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "groqModelVariant" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "geminiModelVariant" },
                       },
                     ],
                   },

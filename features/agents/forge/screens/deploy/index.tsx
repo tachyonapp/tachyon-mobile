@@ -72,6 +72,11 @@ export default function Deployer() {
               modelId: state.brain.modelId,
               provider: state.brain.provider,
               apiKey: state.brain.apiKey ?? undefined,
+              // Feature 8c — only the active provider's variant field is non-null
+              openaiModelVariant: state.openaiModelVariant ?? undefined,
+              anthropicModelVariant: state.anthropicModelVariant ?? undefined,
+              groqModelVariant: state.groqModelVariant ?? undefined,
+              geminiModelVariant: state.geminiModelVariant ?? undefined,
             },
             // Feature 8b — advanced customization fields
             signalWeights: state.signalWeights
