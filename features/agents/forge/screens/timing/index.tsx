@@ -1,5 +1,6 @@
 import { useWizard } from "@/context/WizardContext";
 import { ForgeNavBar } from "@/features/agents/forge/components/ForgeNavBar";
+import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet } from "react-native";
@@ -38,6 +39,10 @@ export default function Timing() {
         keyboardDismissMode="on-drag"
         contentContainerStyle={styles.scrollContent}
       >
+        <ForgeSection title="Timing" subtitle="Timing settings for your agent">
+          <></>
+        </ForgeSection>
+
         {/* Session Preference */}
         <Session
           sessionPreference={state.sessionPreference}

@@ -128,6 +128,7 @@ export function SectorGrid({
 const styles = StyleSheet.create({
   container: {
     gap: 10,
+    marginTop: 20,
   },
   grid: {
     flexDirection: "row",

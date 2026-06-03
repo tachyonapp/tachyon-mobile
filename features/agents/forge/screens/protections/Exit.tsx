@@ -51,7 +51,7 @@ export const Exit = ({
       locked={!sectorsSet}
       lockedMessage="Select at least one sector first."
     >
-      <View>
+      <View style={styles.container}>
         <View style={styles.optionList}>
           {EXIT_OPTIONS.map((opt) => (
             <ForgeOptionCard
@@ -71,5 +71,9 @@ export const Exit = ({
 };
 
 const styles = StyleSheet.create({
+  container: {
+    gap: 10,
+    marginTop: 20,
+  },
   optionList: { gap: 10 },
 });

@@ -1,7 +1,7 @@
 import { HeaderNav } from "@/components/layout/header-nav";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Stack } from "expo-router";
+import { Slot } from "expo-router";
 import { SafeAreaView, StyleSheet, View } from "react-native";
 
 export default function Layout() {
@@ -11,13 +11,8 @@ export default function Layout() {
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
       <HeaderNav navPath="/(tabs)/feed" iconName="close" />
 
-      <View style={styles.stackContainer}>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: theme.background },
-          }}
-        />
+      <View style={styles.content}>
+        <Slot />
       </View>
     </SafeAreaView>
   );
@@ -25,5 +20,5 @@ export default function Layout() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  stackContainer: { flex: 1 },
+  content: { flex: 1 },
 });

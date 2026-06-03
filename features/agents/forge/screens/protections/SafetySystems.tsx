@@ -105,6 +105,10 @@ export function SafetySystems({
     <ForgeSection
       title="Daily Loss Limit"
       subtitle="Configure safety limits to protect your allocated capital."
+      tooltip={{
+        title: "Safety Systems",
+        body: "Safety systems are hard limits that cap your downside and override your agent's signals when risk thresholds are hit. The daily loss limit halts all activity once losses reach the set percentage of your allocated capital. Stop-loss style controls how individual trades are exited. Emotional controls add circuit-breakers that pause your agent during losing streaks or volatile market conditions.",
+      }}
       locked={!exitSet}
       lockedMessage="Choose an exit strategy first."
     >
@@ -288,10 +292,10 @@ export function SafetySystems({
 const styles = StyleSheet.create({
   container: {
     gap: 28,
+    marginTop: 20,
   },
   section: {
     gap: 10,
-    marginTop: 15,
   },
   sectionLabel: {
     fontSize: 15,

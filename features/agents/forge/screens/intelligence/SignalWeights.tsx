@@ -34,7 +34,11 @@ export const SignalWeights = ({
   return (
     <ForgeSection
       title="Signal Weights"
-      subtitle="Balance how your agent weighs different types of market signals."
+      subtitle="How your agent weighs different types of market signals."
+      tooltip={{
+        title: "Signal Weights",
+        body: "Signal weights control how much your agent prioritizes each category of market signal when scoring trade candidates. Technicals cover chart patterns and momentum. News & Sentiment tracks headlines and market mood. Fundamentals look at earnings, valuations, and financials. Weights must add up to 100.",
+      }}
     >
       <SignalWeightSliders
         value={signalWeights}

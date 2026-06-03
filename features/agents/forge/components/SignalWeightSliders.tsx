@@ -79,6 +79,7 @@ export function SignalWeightSliders({
 const styles = StyleSheet.create({
   container: {
     gap: 16,
+    marginTop: 20,
   },
   sliderRow: {
     gap: 8,

@@ -54,27 +54,33 @@ export const Volatility = ({
       title="Volatility Environment"
       subtitle="How should your agent respond to broad market volatility conditions?"
     >
-      {VOLATILITY_OPTIONS.map((opt) => (
-        <ForgeOptionCard
-          key={opt.value}
-          label={opt.label}
-          description={opt.description}
-          selected={volatilityEnvPreference === opt.value}
-          onSelect={() => updateField("volatilityEnvPreference", opt.value)}
-        />
-      ))}
-      {visibleAdvisories
-        .filter((a) => a.field === "volatilityEnvPreference")
-        .map((a) => (
-          <View key={a.code} style={styles.advisorySpacing}>
-            <FrameAdvisoryBanner advisory={a} onDismiss={handleDismiss} />
-          </View>
+      <View style={styles.container}>
+        {VOLATILITY_OPTIONS.map((opt) => (
+          <ForgeOptionCard
+            key={opt.value}
+            label={opt.label}
+            description={opt.description}
+            selected={volatilityEnvPreference === opt.value}
+            onSelect={() => updateField("volatilityEnvPreference", opt.value)}
+          />
         ))}
+        {visibleAdvisories
+          .filter((a) => a.field === "volatilityEnvPreference")
+          .map((a) => (
+            <View key={a.code} style={styles.advisorySpacing}>
+              <FrameAdvisoryBanner advisory={a} onDismiss={handleDismiss} />
+            </View>
+          ))}
+      </View>
     </ForgeSection>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    gap: 16,
+    marginTop: 20,
+  },
   advisorySpacing: {
     marginTop: 8,
   },
