@@ -1,64 +1,15 @@
 import { useWizard } from "@/context/WizardContext";
 import { ForgeNavBar } from "@/features/agents/forge/components/ForgeNavBar";
-import { ForgeOptionCard } from "@/features/agents/forge/components/ForgeOptionCard";
 import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
 import { TickerTagInput } from "@/features/agents/forge/components/TickerTagInput";
-import {
-  DividendPreference,
-  ShortInterestSignal,
-} from "@tachyonapp/tachyon-queue-types/config";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Keyboard, Pressable, ScrollView, StyleSheet } from "react-native";
+import { Dividend } from "./Dividend";
 import { MarketAwareness } from "./MarketAwareness";
 import { SectorGrid } from "./Sectors";
+import { ShortInterest } from "./ShortInterest";
 import { SubSectorExpansionPanel } from "./SubSectorExpansionPanel";
-
-const DIVIDEND_OPTIONS: {
-  value: DividendPreference;
-  label: string;
-  description: string;
-}[] = [
-  {
-    value: DividendPreference.PREFER_DIVIDEND,
-    label: "Prefer Dividend Stocks",
-    description: "Favors stocks that pay regular dividends.",
-  },
-  {
-    value: DividendPreference.NO_PREFERENCE,
-    label: "No Preference",
-    description: "Dividend status has no bearing on stock selection.",
-  },
-  {
-    value: DividendPreference.EXCLUDE_DIVIDEND,
-    label: "Exclude Dividend Stocks",
-    description: "Avoids dividend-paying stocks entirely.",
-  },
-];
-
-const SHORT_INTEREST_OPTIONS: {
-  value: ShortInterestSignal;
-  label: string;
-  description: string;
-}[] = [
-  {
-    value: ShortInterestSignal.TARGET_SHORT_SQUEEZE,
-    label: "Target Short Squeeze Candidates",
-    description:
-      "Actively seeks stocks with high short interest as potential squeeze setups.",
-  },
-  {
-    value: ShortInterestSignal.AVOID_HIGH_SHORT_INTEREST,
-    label: "Avoid High Short Interest",
-    description:
-      "Steers clear of heavily shorted stocks to reduce volatility risk.",
-  },
-  {
-    value: ShortInterestSignal.IGNORE,
-    label: "Ignore",
-    description: "Short interest data is not factored into stock selection.",
-  },
-];
 
 export default function Sectors() {
   const {
@@ -172,40 +123,18 @@ export default function Sectors() {
           </ForgeSection>
 
           {/* Dividend preference */}
-          <ForgeSection
-            title="Dividend Preference"
-            subtitle="How should your agent treat dividend-paying stocks?"
-            locked={!combatComplete}
-            lockedMessage="Complete your Trading Profile first."
-          >
-            {DIVIDEND_OPTIONS.map((opt) => (
-              <ForgeOptionCard
-                key={opt.value}
-                label={opt.label}
-                description={opt.description}
-                selected={state.dividendPreference === opt.value}
-                onSelect={() => updateField("dividendPreference", opt.value)}
-              />
-            ))}
-          </ForgeSection>
+          <Dividend
+            updateField={updateField}
+            combatComplete={combatComplete}
+            dividendPreference={state.dividendPreference}
+          />
 
           {/* Short interest signal */}
-          <ForgeSection
-            title="Short Interest Signal"
-            subtitle="How should your agent use short interest data in its analysis?"
-            locked={!combatComplete}
-            lockedMessage="Complete your Trading Profile first."
-          >
-            {SHORT_INTEREST_OPTIONS.map((opt) => (
-              <ForgeOptionCard
-                key={opt.value}
-                label={opt.label}
-                description={opt.description}
-                selected={state.shortInterestSignal === opt.value}
-                onSelect={() => updateField("shortInterestSignal", opt.value)}
-              />
-            ))}
-          </ForgeSection>
+          <ShortInterest
+            updateField={updateField}
+            combatComplete={combatComplete}
+            shortInterestSignal={state.shortInterestSignal}
+          />
         </Pressable>
       </ScrollView>
 

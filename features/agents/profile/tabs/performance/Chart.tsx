@@ -39,33 +39,6 @@ export const PLChart = ({ data }: PLChartProps) => {
 
   return (
     <View>
-      <View style={[styles.rangeSelector, { backgroundColor: theme.surface }]}>
-        {RANGES.map(({ key, label }) => {
-          const isActive = selectedRange === key;
-          return (
-            <Pressable
-              key={key}
-              style={[
-                styles.rangeBtn,
-                isActive && { backgroundColor: theme.electricBlue },
-              ]}
-              onPress={() => setSelectedRange(key)}
-            >
-              <Text
-                style={[
-                  styles.rangeBtnText,
-                  {
-                    color: isActive ? theme.textPrimary : theme.textSecondary,
-                  },
-                ]}
-              >
-                {label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-
       {filteredSeries.length > 0 ? (
         <View
           style={[styles.chartContainer, { backgroundColor: theme.surface }]}
@@ -96,6 +69,33 @@ export const PLChart = ({ data }: PLChartProps) => {
           </Text>
         </View>
       )}
+
+      <View style={[styles.rangeSelector, { backgroundColor: theme.surface }]}>
+        {RANGES.map(({ key, label }) => {
+          const isActive = selectedRange === key;
+          return (
+            <Pressable
+              key={key}
+              style={[
+                styles.rangeBtn,
+                isActive && { backgroundColor: theme.electricBlue },
+              ]}
+              onPress={() => setSelectedRange(key)}
+            >
+              <Text
+                style={[
+                  styles.rangeBtnText,
+                  {
+                    color: isActive ? theme.textPrimary : theme.textSecondary,
+                  },
+                ]}
+              >
+                {label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 };
@@ -109,6 +109,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 4,
     gap: 4,
+    marginTop: 10,
   },
   rangeBtn: {
     flex: 1,

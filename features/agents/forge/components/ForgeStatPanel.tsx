@@ -1,8 +1,5 @@
-import { AgentAvatar } from "@/components/shared/AgentAvatar";
-import { Colors } from "@/constants/theme";
 import { type WizardState } from "@/context/WizardContext";
 import { BrainType } from "@/generated/graphql";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { FRAME_CONFIG } from "@tachyonapp/tachyon-queue-types/config";
 import LottieView from "lottie-react-native";
 import React from "react";
@@ -26,7 +23,6 @@ function formatEnumLabel(s: string): string {
 }
 
 export function ForgeStatPanel({ state }: ForgeStatPanelProps) {
-  const theme = Colors[useColorScheme()];
   const frameConfig = state.frameName ? FRAME_CONFIG[state.frameName] : null;
 
   const brainLabel =
@@ -72,12 +68,6 @@ export function ForgeStatPanel({ state }: ForgeStatPanelProps) {
 
       {/* Stat chip rows */}
       <View style={styles.chipsGrid}>
-        <View style={styles.chipsRow}>
-          <AgentAvatar
-            seed={state.avatarSeed}
-            backgroundColor={theme.background}
-          />
-        </View>
         <View style={styles.chipsRow}>
           <ForgeStatChip label="NAME" value={state.name.trim() || null} />
           <ForgeStatChip
@@ -162,6 +152,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 10,
   },
   chipsGrid: {
     gap: 6,

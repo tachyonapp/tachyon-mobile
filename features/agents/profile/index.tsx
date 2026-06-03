@@ -12,8 +12,17 @@ import { buildRebuildInitialState, useWizard } from "@/context/WizardContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useQuery } from "@apollo/client/react";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import React, { useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { Hero } from "./components/Hero";
 import { Tabs, type TabName } from "./tabs";
 import { Configuration } from "./tabs/configuration";
@@ -21,16 +30,21 @@ import { Overview } from "./tabs/overview";
 import { Performance } from "./tabs/performance";
 import { Subscription } from "./tabs/subscription";
 
+const TAB_ORDER: TabName[] = ["Overview", "Performance", "Configuration", "Brain"];
+
 export default function AgentProfile() {
   const theme = Colors[useColorScheme()];
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { width } = useWindowDimensions();
+  const pagerRef = useRef<ScrollView>(null);
   const [activeTab, setActiveTab] = useState<TabName>("Overview");
   const [editSheetVisible, setEditSheetVisible] = useState(false);
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [reactivationVisible, setReactivationVisible] = useState(false);
 
-  const { data, loading } = useQuery(BotDocument, {
-    variables: { id },
+  const { data, loading, error } = useQuery(BotDocument, {
+    variables: { id: id! },
+    skip: !id,
     fetchPolicy: "cache-and-network",
   });
 
@@ -42,6 +56,18 @@ export default function AgentProfile() {
   const isBlocked =
     subscriptionStatus === SubscriptionStatus.Suspended ||
     subscriptionStatus === SubscriptionStatus.Cancelled;
+
+  const handleTabChange = (tab: TabName) => {
+    const index = TAB_ORDER.indexOf(tab);
+    pagerRef.current?.scrollTo({ x: index * width, animated: true });
+    setActiveTab(tab);
+  };
+
+  const handlePagerScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const index = Math.round(e.nativeEvent.contentOffset.x / width);
+    const tab = TAB_ORDER[index];
+    if (tab && tab !== activeTab) setActiveTab(tab);
+  };
 
   const handleRebuild = () => {
     if (!agent) return;
@@ -57,7 +83,7 @@ export default function AgentProfile() {
     router.push(`/(bot-detail)/${id}/activate` as any);
   };
 
-  if (loading && !agent) {
+  if (!id || (loading && !agent)) {
     return (
       <View style={[styles.loading, { backgroundColor: theme.background }]}>
         <ActivityIndicator color={theme.electricBlue} />
@@ -65,20 +91,42 @@ export default function AgentProfile() {
     );
   }
 
-  if (!agent) return null;
+  if (!agent) {
+    return (
+      <View style={[styles.loading, { backgroundColor: theme.background }]}>
+        <Text style={{ color: theme.textSecondary }}>
+          {error ? "Unable to load agent." : "Agent not found."}
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Hero agent={agent} />
-      <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
-      <View style={styles.tabContent}>
-        {activeTab === "Overview" && <Overview agent={agent} />}
-        {activeTab === "Performance" && <Performance agentId={id} />}
-        {activeTab === "Configuration" && (
+      <Tabs activeTab={activeTab} onTabChange={handleTabChange} />
+      <ScrollView
+        ref={pagerRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        scrollEventThrottle={16}
+        onMomentumScrollEnd={handlePagerScroll}
+        style={styles.pager}
+      >
+        <View style={[styles.page, { width }]}>
+          <Overview agent={agent} />
+        </View>
+        <View style={[styles.page, { width }]}>
+          <Performance agentId={id} />
+        </View>
+        <View style={[styles.page, { width }]}>
           <Configuration agent={agent} onRebuild={handleRebuild} />
-        )}
-        {activeTab === "Brain" && <Subscription agent={agent} />}
-      </View>
+        </View>
+        <View style={[styles.page, { width }]}>
+          <Subscription agent={agent} />
+        </View>
+      </ScrollView>
       <ActionBar
         agent={agent}
         onActivate={handleActivate}
@@ -111,5 +159,6 @@ export default function AgentProfile() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   loading: { flex: 1, alignItems: "center", justifyContent: "center" },
-  tabContent: { flex: 1 },
+  pager: { flex: 1 },
+  page: { flex: 1 },
 });

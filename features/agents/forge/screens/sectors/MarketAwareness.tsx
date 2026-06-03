@@ -127,6 +127,7 @@ export function MarketAwareness({
 const styles = StyleSheet.create({
   container: {
     gap: 20,
+    marginTop: 20,
   },
   row: {
     gap: 8,

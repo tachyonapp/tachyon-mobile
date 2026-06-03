@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
   dayRow: {
     flexDirection: "row",
     gap: 8,
+    marginTop: 15,
   },
   dayChip: {
     flex: 1,

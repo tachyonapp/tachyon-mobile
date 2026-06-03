@@ -2,6 +2,7 @@ import { useWizard } from "@/context/WizardContext";
 import { ForgeNavBar } from "@/features/agents/forge/components/ForgeNavBar";
 import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
 import { ForgeStatPanel } from "@/features/agents/forge/components/ForgeStatPanel";
+
 import {
   BrainType,
   CreateBotDocument,
@@ -118,7 +119,7 @@ export default function Deployer() {
       });
 
       await clearDraft();
-      router.replace("/(tabs)");
+      router.replace("/(tabs)/feed");
     } catch (err) {
       const gqlErrors: { extensions?: { code?: string } }[] =
         (err as any)?.graphQLErrors ?? [];

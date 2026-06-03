@@ -60,27 +60,33 @@ export const Session = ({
       title="Session Preference"
       subtitle="Which part of the trading day should your agent focus on?"
     >
-      {SESSION_OPTIONS.map((opt) => (
-        <ForgeOptionCard
-          key={opt.value}
-          label={opt.label}
-          description={opt.description}
-          selected={sessionPreference === opt.value}
-          onSelect={() => updateField("sessionPreference", opt.value)}
-        />
-      ))}
-      {visibleAdvisories
-        .filter((a) => a.field === "sessionPreference")
-        .map((a) => (
-          <View key={a.code} style={styles.advisorySpacing}>
-            <FrameAdvisoryBanner advisory={a} onDismiss={handleDismiss} />
-          </View>
+      <View style={styles.container}>
+        {SESSION_OPTIONS.map((opt) => (
+          <ForgeOptionCard
+            key={opt.value}
+            label={opt.label}
+            description={opt.description}
+            selected={sessionPreference === opt.value}
+            onSelect={() => updateField("sessionPreference", opt.value)}
+          />
         ))}
+        {visibleAdvisories
+          .filter((a) => a.field === "sessionPreference")
+          .map((a) => (
+            <View key={a.code} style={styles.advisorySpacing}>
+              <FrameAdvisoryBanner advisory={a} onDismiss={handleDismiss} />
+            </View>
+          ))}
+      </View>
     </ForgeSection>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    gap: 16,
+    marginTop: 20,
+  },
   advisorySpacing: {
     marginTop: 8,
   },

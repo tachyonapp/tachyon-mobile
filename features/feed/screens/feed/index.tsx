@@ -81,7 +81,10 @@ export default function FeedScreen() {
         renderItem={({ item }) => (
           <AgentCard
             bot={item}
-            onPress={() => router.push(`/(bot-detail)/${item.id}` as any)}
+            onPress={() => {
+              if (!item.id) return;
+              router.push(`/(agent-detail)/${item.id}`);
+            }}
           />
         )}
         ListEmptyComponent={

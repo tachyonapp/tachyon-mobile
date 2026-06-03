@@ -53,28 +53,38 @@ export const Earnings = ({
     <ForgeSection
       title="Earnings Behavior"
       subtitle="How should your agent behave around company earnings announcements?"
+      tooltip={{
+        title: "Earnings Behavior",
+        body: "The earnings behavior settings control how your agent behaves around company earnings announcements. More aggressive behavior means it opens more positions around earnings announcements. Neutral behavior means it trades as normal regardless of earnings announcements. Stand down behavior means it avoids opening new positions around earnings announcements.",
+      }}
     >
-      {EARNINGS_OPTIONS.map((opt) => (
-        <ForgeOptionCard
-          key={opt.value}
-          label={opt.label}
-          description={opt.description}
-          selected={earningsBehavior === opt.value}
-          onSelect={() => updateField("earningsBehavior", opt.value)}
-        />
-      ))}
-      {visibleAdvisories
-        .filter((a) => a.field === "earningsBehavior")
-        .map((a) => (
-          <View key={a.code} style={styles.advisorySpacing}>
-            <FrameAdvisoryBanner advisory={a} onDismiss={handleDismiss} />
-          </View>
+      <View style={styles.container}>
+        {EARNINGS_OPTIONS.map((opt) => (
+          <ForgeOptionCard
+            key={opt.value}
+            label={opt.label}
+            description={opt.description}
+            selected={earningsBehavior === opt.value}
+            onSelect={() => updateField("earningsBehavior", opt.value)}
+          />
         ))}
+        {visibleAdvisories
+          .filter((a) => a.field === "earningsBehavior")
+          .map((a) => (
+            <View key={a.code} style={styles.advisorySpacing}>
+              <FrameAdvisoryBanner advisory={a} onDismiss={handleDismiss} />
+            </View>
+          ))}
+      </View>
     </ForgeSection>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    gap: 16,
+    marginTop: 20,
+  },
   advisorySpacing: {
     marginTop: 8,
   },

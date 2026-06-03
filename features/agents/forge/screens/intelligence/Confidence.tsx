@@ -58,29 +58,39 @@ export const Confidence = ({
   return (
     <ForgeSection
       title="Confidence Threshold"
-      subtitle="How strong must a signal be before your agent proposes a trade?"
+      subtitle="How strong must a signal be before agent proposes a trade?"
+      tooltip={{
+        title: "Confidence Threshold",
+        body: "The confidence threshold sets how strong your agent's combined signal score must be before it surfaces a trade proposal. A lower threshold means more frequent proposals on weaker signals — more opportunities, more noise. A higher threshold filters aggressively for conviction — fewer proposals, but each one carries more weight.",
+      }}
     >
-      {CONFIDENCE_OPTIONS.map((opt) => (
-        <ForgeOptionCard
-          key={opt.value}
-          label={opt.label}
-          description={opt.description}
-          selected={confidenceThreshold === opt.value}
-          onSelect={() => updateField("confidenceThreshold", opt.value)}
-        />
-      ))}
-      {visibleAdvisories
-        .filter((a) => a.field === "confidenceThreshold")
-        .map((a) => (
-          <View key={a.code} style={styles.advisorySpacing}>
-            <FrameAdvisoryBanner advisory={a} onDismiss={handleDismiss} />
-          </View>
+      <View style={styles.container}>
+        {CONFIDENCE_OPTIONS.map((opt) => (
+          <ForgeOptionCard
+            key={opt.value}
+            label={opt.label}
+            description={opt.description}
+            selected={confidenceThreshold === opt.value}
+            onSelect={() => updateField("confidenceThreshold", opt.value)}
+          />
         ))}
+        {visibleAdvisories
+          .filter((a) => a.field === "confidenceThreshold")
+          .map((a) => (
+            <View key={a.code} style={styles.advisorySpacing}>
+              <FrameAdvisoryBanner advisory={a} onDismiss={handleDismiss} />
+            </View>
+          ))}
+      </View>
     </ForgeSection>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    gap: 16,
+    marginTop: 20,
+  },
   advisorySpacing: {
     marginTop: 8,
   },
