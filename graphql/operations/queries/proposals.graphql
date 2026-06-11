@@ -8,6 +8,7 @@ query Proposals($status: ProposalStatus) {
     limitPrice
     rationaleText
     status
+    rejectionReason
     expiresAt
     createdAt
     bot {
