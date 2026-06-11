@@ -6,7 +6,9 @@ query Bot($id: ID!) {
     avatarSeed
     frame
     status
-    allocationPct
+    capitalAllocatedUsd
+    recoveryModeActiveUntil
+    recoveryModeApplied
     dailyMaxLoss
     dailyMaxGain
     riskAttitude

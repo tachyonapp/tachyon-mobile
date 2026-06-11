@@ -82,10 +82,11 @@ export type Bot = {
   __typename?: "Bot";
   activePosition?: Maybe<Position>;
   agentBackground?: Maybe<Scalars["String"]["output"]>;
-  allocationPct?: Maybe<Scalars["Decimal"]["output"]>;
   avatarSeed?: Maybe<Scalars["String"]["output"]>;
   botBrainConfig?: Maybe<BotBrainConfig>;
   brain?: Maybe<BotBrainConfig>;
+  /** Fixed dollar amount the agent may deploy in a single position. */
+  capitalAllocatedUsd: Scalars["Float"]["output"];
   combatPatience?: Maybe<CombatPatience>;
   confidenceThreshold?: Maybe<ConfidenceThreshold>;
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
@@ -109,6 +110,10 @@ export type Bot = {
   proposalCommunicationStyle?: Maybe<ProposalCommunicationStyle>;
   proposals?: Maybe<Array<Proposal>>;
   recoveryMode?: Maybe<RecoveryMode>;
+  /** Date through which recovery mode constraints are active. Null if not in recovery. */
+  recoveryModeActiveUntil?: Maybe<Scalars["DateTime"]["output"]>;
+  /** Recovery mode variant being enforced. Null if not in recovery. */
+  recoveryModeApplied?: Maybe<Scalars["String"]["output"]>;
   regimeAwareness?: Maybe<RegimeAwareness>;
   riskAttitude?: Maybe<RiskAttitude>;
   scanCapRemaining?: Maybe<Scalars["Int"]["output"]>;
@@ -241,9 +246,9 @@ export type ConnectBrokerResult = Account | ValidationError;
 
 export type CreateBotInput = {
   agentBackground?: InputMaybe<Scalars["String"]["input"]>;
-  allocationPct: Scalars["Decimal"]["input"];
   avatarSeed: Scalars["String"]["input"];
   brain: BrainConfigInput;
+  capitalAllocatedUsd: Scalars["Float"]["input"];
   colorway: Scalars["String"]["input"];
   combatPatience: CombatPatience;
   confidenceThreshold?: InputMaybe<ConfidenceThreshold>;
@@ -278,6 +283,8 @@ export type CreateBotInput = {
   volatilityEnvPreference?: InputMaybe<VolatilityEnvPreference>;
   winReaction?: InputMaybe<Scalars["String"]["input"]>;
 };
+
+export type CreateBotResult = Bot | ValidationError;
 
 export { DayOfWeek };
 
@@ -338,14 +345,13 @@ export type Mutation = {
   /** Mark the authenticated user's FTUE as complete. Idempotent. */
   completeOnboarding?: Maybe<Scalars["Boolean"]["output"]>;
   connectBroker?: Maybe<ConnectBrokerResult>;
-  createBot?: Maybe<BotMutationResult>;
+  createBot?: Maybe<CreateBotResult>;
   deleteBot?: Maybe<DeleteBotResult>;
   pauseBot?: Maybe<BotResult>;
   selectTier?: Maybe<SelectTierResult>;
   skipProposal?: Maybe<SkipProposalResult>;
   updateAgentIdentity?: Maybe<UpdateAgentIdentityResult>;
   updateBotBrain?: Maybe<UpdateBotBrainResult>;
-  updateBotIdentity?: Maybe<UpdateAgentIdentityResult>;
   validateBrainKey?: Maybe<ValidateBrainKeyResult>;
 };
 
@@ -391,11 +397,6 @@ export type MutationUpdateAgentIdentityArgs = {
 export type MutationUpdateBotBrainArgs = {
   id: Scalars["ID"]["input"];
   input: UpdateBotBrainInput;
-};
-
-export type MutationUpdateBotIdentityArgs = {
-  id: Scalars["ID"]["input"];
-  input: UpdateAgentIdentityInput;
 };
 
 export type MutationValidateBrainKeyArgs = {
@@ -460,6 +461,7 @@ export type Proposal = {
   minHoldUntil?: Maybe<Scalars["DateTime"]["output"]>;
   qty?: Maybe<Scalars["Decimal"]["output"]>;
   rationaleText?: Maybe<Scalars["String"]["output"]>;
+  rejectionReason?: Maybe<Scalars["String"]["output"]>;
   side?: Maybe<ProposalSide>;
   status?: Maybe<ProposalStatus>;
   stopPrice?: Maybe<Scalars["Decimal"]["output"]>;
@@ -735,23 +737,22 @@ export type CreateBotMutationVariables = Exact<{
 
 export type CreateBotMutation = {
   __typename?: "Mutation";
-  createBot?: {
-    __typename?: "BotMutationResult";
-    bot?: {
-      __typename?: "Bot";
-      id?: string | null;
-      name?: string | null;
-      frame?: BotFrame | null;
-      status?: BotStatus | null;
-      allocationPct?: any | null;
-    } | null;
-    advisories?: Array<{
-      __typename?: "MutationAdvisory";
-      code?: string | null;
-      field?: string | null;
-      message?: string | null;
-    }> | null;
-  } | null;
+  createBot?:
+    | {
+        __typename?: "Bot";
+        id?: string | null;
+        name?: string | null;
+        frame?: BotFrame | null;
+        status?: BotStatus | null;
+        capitalAllocatedUsd: number;
+      }
+    | {
+        __typename?: "ValidationError";
+        code?: string | null;
+        field?: string | null;
+        message?: string | null;
+      }
+    | null;
 };
 
 export type DeleteBotMutationVariables = Exact<{
@@ -899,7 +900,9 @@ export type BotQuery = {
     avatarSeed?: string | null;
     frame?: BotFrame | null;
     status?: BotStatus | null;
-    allocationPct?: any | null;
+    capitalAllocatedUsd: number;
+    recoveryModeActiveUntil?: any | null;
+    recoveryModeApplied?: string | null;
     dailyMaxLoss?: any | null;
     dailyMaxGain?: any | null;
     riskAttitude?: RiskAttitude | null;
@@ -1021,7 +1024,9 @@ export type BotsQuery = {
     name?: string | null;
     frame?: BotFrame | null;
     status?: BotStatus | null;
-    allocationPct?: any | null;
+    capitalAllocatedUsd: number;
+    recoveryModeActiveUntil?: any | null;
+    recoveryModeApplied?: string | null;
     dailyMaxLoss?: any | null;
     dailyMaxGain?: any | null;
     riskAttitude?: RiskAttitude | null;
@@ -1107,6 +1112,7 @@ export type ProposalsQuery = {
     limitPrice?: any | null;
     rationaleText?: string | null;
     status?: ProposalStatus | null;
+    rejectionReason?: string | null;
     expiresAt?: any | null;
     createdAt?: any | null;
     bot?: {
@@ -1497,8 +1503,11 @@ export const CreateBotDocument = {
               kind: "SelectionSet",
               selections: [
                 {
-                  kind: "Field",
-                  name: { kind: "Name", value: "bot" },
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "Bot" },
+                  },
                   selectionSet: {
                     kind: "SelectionSet",
                     selections: [
@@ -1511,14 +1520,17 @@ export const CreateBotDocument = {
                       },
                       {
                         kind: "Field",
-                        name: { kind: "Name", value: "allocationPct" },
+                        name: { kind: "Name", value: "capitalAllocatedUsd" },
                       },
                     ],
                   },
                 },
                 {
-                  kind: "Field",
-                  name: { kind: "Name", value: "advisories" },
+                  kind: "InlineFragment",
+                  typeCondition: {
+                    kind: "NamedType",
+                    name: { kind: "Name", value: "ValidationError" },
+                  },
                   selectionSet: {
                     kind: "SelectionSet",
                     selections: [
@@ -2199,7 +2211,15 @@ export const BotDocument = {
                 { kind: "Field", name: { kind: "Name", value: "status" } },
                 {
                   kind: "Field",
-                  name: { kind: "Name", value: "allocationPct" },
+                  name: { kind: "Name", value: "capitalAllocatedUsd" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "recoveryModeActiveUntil" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "recoveryModeApplied" },
                 },
                 {
                   kind: "Field",
@@ -2579,7 +2599,15 @@ export const BotsDocument = {
                 { kind: "Field", name: { kind: "Name", value: "status" } },
                 {
                   kind: "Field",
-                  name: { kind: "Name", value: "allocationPct" },
+                  name: { kind: "Name", value: "capitalAllocatedUsd" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "recoveryModeActiveUntil" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "recoveryModeApplied" },
                 },
                 {
                   kind: "Field",
@@ -2804,6 +2832,10 @@ export const ProposalsDocument = {
                   name: { kind: "Name", value: "rationaleText" },
                 },
                 { kind: "Field", name: { kind: "Name", value: "status" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "rejectionReason" },
+                },
                 { kind: "Field", name: { kind: "Name", value: "expiresAt" } },
                 { kind: "Field", name: { kind: "Name", value: "createdAt" } },
                 {

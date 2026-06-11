@@ -5,7 +5,9 @@ query Bots {
     name
     frame
     status
-    allocationPct
+    capitalAllocatedUsd
+    recoveryModeActiveUntil
+    recoveryModeApplied
     dailyMaxLoss
     dailyMaxGain
     riskAttitude
