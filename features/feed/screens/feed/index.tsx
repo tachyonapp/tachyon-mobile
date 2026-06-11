@@ -1,7 +1,7 @@
+import { AgentTile } from "@/components/shared/AgentTile";
 import { ReactivationBottomSheet } from "@/components/subscriptions/ReactivationBottomSheet";
 import { SubscriptionStatusBanner } from "@/components/subscriptions/SubscriptionStatusBanner";
 import { Colors } from "@/constants/theme";
-import { AgentCard } from "@/features/feed/components/AgentCard";
 import { CreateAgentFab } from "@/features/feed/components/CreateAgentFab";
 import { EmptyAgentList } from "@/features/feed/components/EmptyAgentList";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useQuery } from "@apollo/client/react";
+import { FRAME_CONFIG } from "@tachyonapp/tachyon-queue-types/config";
 import { router } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
@@ -77,10 +78,22 @@ export default function FeedScreen() {
       )}
       <FlatList
         data={bots}
+        numColumns={2}
         keyExtractor={(item) => item.id ?? ""}
+        columnWrapperStyle={styles.row}
         renderItem={({ item }) => (
-          <AgentCard
-            bot={item}
+          <AgentTile
+            id={item.id ?? ""}
+            name={item.name ?? "Unnamed"}
+            avatarSeed={item.avatarSeed}
+            frameColorway={
+              item.frame
+                ? (FRAME_CONFIG[item.frame]?.colorway ?? theme.electricBlue)
+                : theme.electricBlue
+            }
+            status={item.status}
+            recoveryModeApplied={item.recoveryModeApplied}
+            recoveryModeActiveUntil={item.recoveryModeActiveUntil}
             onPress={() => {
               if (!item.id) return;
               router.push(`/(agent-detail)/${item.id}`);
@@ -134,6 +147,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 100,
+    gap: 12,
+  },
+  row: {
     gap: 12,
   },
   emptyContainer: { flex: 1 },

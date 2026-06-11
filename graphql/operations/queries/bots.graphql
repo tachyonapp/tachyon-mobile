@@ -3,6 +3,7 @@ query Bots {
   bots {
     id
     name
+    avatarSeed
     frame
     status
     capitalAllocatedUsd

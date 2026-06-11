@@ -1022,6 +1022,7 @@ export type BotsQuery = {
     __typename?: "Bot";
     id?: string | null;
     name?: string | null;
+    avatarSeed?: string | null;
     frame?: BotFrame | null;
     status?: BotStatus | null;
     capitalAllocatedUsd: number;
@@ -2595,6 +2596,7 @@ export const BotsDocument = {
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "avatarSeed" } },
                 { kind: "Field", name: { kind: "Name", value: "frame" } },
                 { kind: "Field", name: { kind: "Name", value: "status" } },
                 {
