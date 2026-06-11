@@ -23,7 +23,7 @@ interface SafetySystemsProps {
   dailyMaxLossPct: number;
   onDailyMaxLossChange: (v: number) => void;
   dailyMaxLossBounds: { minPct: number; maxPct: number };
-  allocationPct: number;
+  capitalAllocatedUsd: number;
   userCashBalance: number;
   dailyMaxGain: number | null;
   onDailyMaxGainChange: (v: number | null) => void;
@@ -68,7 +68,7 @@ export function SafetySystems({
   dailyMaxLossPct,
   onDailyMaxLossChange,
   dailyMaxLossBounds,
-  allocationPct,
+  capitalAllocatedUsd,
   userCashBalance,
   dailyMaxGain,
   onDailyMaxGainChange,
@@ -94,8 +94,8 @@ export function SafetySystems({
   }
 
   const lossUsd =
-    userCashBalance > 0
-      ? formatUsd(dailyMaxLossPct * (allocationPct * userCashBalance))
+    capitalAllocatedUsd > 0
+      ? formatUsd(dailyMaxLossPct * capitalAllocatedUsd)
       : null;
 
   const lossMinPct = Math.round(dailyMaxLossBounds.minPct * 100);

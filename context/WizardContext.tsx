@@ -12,7 +12,17 @@
  *
  * Frame selection:
  *
- * - When user selects a frame, populate all fields with `FRAME_CONFIG[frameName].defaults` (pre-fill).
+ * - When user selects a frame, most fields are pre-filled from `FRAME_CONFIG[frameName].defaults`.
+ * - `capitalAllocatedUsd` is NOT pre-filled from frame config — it defaults to $500 and is
+ *   always set explicitly by the user in Step 2.
+ *
+ * Capital allocation:
+ *
+ * - `capitalAllocatedUsd` is a fixed dollar amount (not a percentage) representing the maximum
+ *   capital this agent may deploy in a single position. Default: $500.
+ * - `existingAllocationTotal` is the sum of `capitalAllocatedUsd` across all existing bots for
+ *   this user. Fetched at wizard entry via `WizardExistingAllocation` query; never persisted to
+ *   AsyncStorage.
  *
  * Step persistence:
  *
@@ -79,8 +89,8 @@ import {
 import { gql } from "@apollo/client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
-  FRAME_CONFIG,
   BotFrameName,
+  FRAME_CONFIG,
   type ConfidenceThreshold,
   type DayOfWeek,
   type DividendPreference,
@@ -122,7 +132,7 @@ export interface WizardState {
   name: string;
   avatarSeed: string;
   colorway: string;
-  allocationPct: number;
+  capitalAllocatedUsd: number;
   riskAttitude: RiskAttitude | null;
   tradeTempo: TradeTempo | null;
   combatPatience: CombatPatience | null;
@@ -186,7 +196,7 @@ const EMPTY_STATE: WizardState = {
   name: "",
   avatarSeed: "",
   colorway: "",
-  allocationPct: 0.1,
+  capitalAllocatedUsd: 500,
   riskAttitude: null,
   tradeTempo: null,
   combatPatience: null,
@@ -267,7 +277,7 @@ const BRAIN_PROVIDERS_QUERY = gql`
 const EXISTING_ALLOCATION_QUERY = gql`
   query WizardExistingAllocation {
     bots {
-      allocationPct
+      capitalAllocatedUsd
     }
   }
 `;
@@ -490,12 +500,12 @@ export function WizardProvider({ children }: { children: ReactNode }) {
         setParentSectorsData([]);
       }
 
-      const bots: { allocationPct?: string | null }[] =
+      const bots: { capitalAllocatedUsd?: number | null }[] =
         allocationResult.status === "fulfilled"
           ? ((allocationResult.value.data as any)?.bots ?? [])
           : [];
       const existingAllocationTotal = bots.reduce(
-        (sum, bot) => sum + parseFloat(bot.allocationPct ?? "0"),
+        (sum, bot) => sum + (bot.capitalAllocatedUsd ?? 0),
         0,
       );
 
@@ -565,7 +575,7 @@ export function WizardProvider({ children }: { children: ReactNode }) {
         frameName,
         colorway,
         // Existing frame-determined fields (bounds-clamping removed)
-        allocationPct: defaults.allocationPct,
+        capitalAllocatedUsd: 500,
         dailyMaxLoss: defaults.dailyMaxLossPct,
         riskAttitude: defaults.riskAttitude,
         tradeTempo: defaults.tradeTempo,
@@ -718,7 +728,11 @@ type AgentDataExtended = AgentData & {
   subSectors?: string[] | null;
   customWatchlist?: string[] | null;
   exclusionList?: string[] | null;
-  signalWeights?: { technicals: number; news: number; fundamentals: number } | null;
+  signalWeights?: {
+    technicals: number;
+    news: number;
+    fundamentals: number;
+  } | null;
   confidenceThreshold?: string | null;
   regimeAwareness?: string | null;
   earningsBehavior?: string | null;
@@ -744,12 +758,14 @@ type AgentDataExtended = AgentData & {
     overnightHoldAllowed?: boolean;
     noSameDayExitUnlessStopLoss?: boolean;
   } | null;
-  botBrainConfig?: (AgentData["botBrainConfig"] & {
-    openaiModelVariant?: string | null;
-    anthropicModelVariant?: string | null;
-    groqModelVariant?: string | null;
-    geminiModelVariant?: string | null;
-  }) | null;
+  botBrainConfig?:
+    | (AgentData["botBrainConfig"] & {
+        openaiModelVariant?: string | null;
+        anthropicModelVariant?: string | null;
+        groqModelVariant?: string | null;
+        geminiModelVariant?: string | null;
+      })
+    | null;
 };
 
 /**
@@ -771,7 +787,9 @@ export function buildRebuildInitialState(agentData: AgentData): WizardState {
     frameDefaults = FRAME_CONFIG[BotFrameName.SCOUT].defaults;
   }
 
-  const frameColorway = frameName ? FRAME_CONFIG[frameName]?.colorway ?? "" : "";
+  const frameColorway = frameName
+    ? (FRAME_CONFIG[frameName]?.colorway ?? "")
+    : "";
 
   return {
     // Identity
@@ -781,10 +799,17 @@ export function buildRebuildInitialState(agentData: AgentData): WizardState {
     colorway: agent.colorway ?? frameColorway,
 
     // Core trading
-    allocationPct: agent.allocationPct != null ? Number(agent.allocationPct) : frameDefaults.allocationPct,
-    riskAttitude: (agent.riskAttitude as RiskAttitude | null) ?? frameDefaults.riskAttitude,
-    tradeTempo: (agent.tradeTempo as TradeTempo | null) ?? frameDefaults.tradeTempo,
-    combatPatience: (agent.combatPatience as CombatPatience | null) ?? frameDefaults.combatPatience,
+    capitalAllocatedUsd:
+      agent.capitalAllocatedUsd != null
+        ? Number(agent.capitalAllocatedUsd)
+        : 500,
+    riskAttitude:
+      (agent.riskAttitude as RiskAttitude | null) ?? frameDefaults.riskAttitude,
+    tradeTempo:
+      (agent.tradeTempo as TradeTempo | null) ?? frameDefaults.tradeTempo,
+    combatPatience:
+      (agent.combatPatience as CombatPatience | null) ??
+      frameDefaults.combatPatience,
 
     // Market awareness
     marketAwareness: agent.marketAwareness
@@ -801,23 +826,39 @@ export function buildRebuildInitialState(agentData: AgentData): WizardState {
     subSectors: agent.subSectors ?? [],
     customWatchlist: agent.customWatchlist ?? [],
     exclusionList: agent.exclusionList ?? [],
-    dividendPreference: (agent.dividendPreference as DividendPreference | null) ?? frameDefaults.dividendPreference,
-    shortInterestSignal: (agent.shortInterestSignal as ShortInterestSignal | null) ?? frameDefaults.shortInterestSignal,
+    dividendPreference:
+      (agent.dividendPreference as DividendPreference | null) ??
+      frameDefaults.dividendPreference,
+    shortInterestSignal:
+      (agent.shortInterestSignal as ShortInterestSignal | null) ??
+      frameDefaults.shortInterestSignal,
 
     // Safety
-    dailyMaxLoss: agent.dailyMaxLoss != null ? Number(agent.dailyMaxLoss) : frameDefaults.dailyMaxLossPct,
-    dailyMaxGain: agent.dailyMaxGain != null ? Number(agent.dailyMaxGain) : null,
+    dailyMaxLoss:
+      agent.dailyMaxLoss != null
+        ? Number(agent.dailyMaxLoss)
+        : frameDefaults.dailyMaxLossPct,
+    dailyMaxGain:
+      agent.dailyMaxGain != null ? Number(agent.dailyMaxGain) : null,
     emotionalControls: agent.emotionalControls
       ? {
           freezeAfterLosses: agent.emotionalControls.freezeAfterLosses ?? null,
-          cooldownAfterVolatility: agent.emotionalControls.cooldownAfterVolatility ?? false,
-          standDownAfterNoonIfLosing: agent.emotionalControls.standDownAfterNoonIfLosing ?? false,
+          cooldownAfterVolatility:
+            agent.emotionalControls.cooldownAfterVolatility ?? false,
+          standDownAfterNoonIfLosing:
+            agent.emotionalControls.standDownAfterNoonIfLosing ?? false,
         }
-      : { freezeAfterLosses: null, cooldownAfterVolatility: false, standDownAfterNoonIfLosing: false },
+      : {
+          freezeAfterLosses: null,
+          cooldownAfterVolatility: false,
+          standDownAfterNoonIfLosing: false,
+        },
     rulesOfEngagement: agent.rulesOfEngagement
       ? {
-          overnightHoldAllowed: agent.rulesOfEngagement.overnightHoldAllowed ?? false,
-          noSameDayExitUnlessStopLoss: agent.rulesOfEngagement.noSameDayExitUnlessStopLoss ?? false,
+          overnightHoldAllowed:
+            agent.rulesOfEngagement.overnightHoldAllowed ?? false,
+          noSameDayExitUnlessStopLoss:
+            agent.rulesOfEngagement.noSameDayExitUnlessStopLoss ?? false,
         }
       : { overnightHoldAllowed: false, noSameDayExitUnlessStopLoss: false },
     exitPersonality: agent.exitStyle
@@ -829,24 +870,41 @@ export function buildRebuildInitialState(agentData: AgentData): WizardState {
 
     // Intelligence
     signalWeights: agent.signalWeights ?? frameDefaults.signalWeights,
-    confidenceThreshold: (agent.confidenceThreshold as ConfidenceThreshold | null) ?? frameDefaults.confidenceThreshold,
-    regimeAwareness: (agent.regimeAwareness as RegimeAwareness | null) ?? frameDefaults.regimeAwareness,
-    earningsBehavior: (agent.earningsBehavior as EarningsBehavior | null) ?? frameDefaults.earningsBehavior,
+    confidenceThreshold:
+      (agent.confidenceThreshold as ConfidenceThreshold | null) ??
+      frameDefaults.confidenceThreshold,
+    regimeAwareness:
+      (agent.regimeAwareness as RegimeAwareness | null) ??
+      frameDefaults.regimeAwareness,
+    earningsBehavior:
+      (agent.earningsBehavior as EarningsBehavior | null) ??
+      frameDefaults.earningsBehavior,
 
     // Sizing
-    positionSizingMethod: (agent.positionSizingMethod as PositionSizingMethod | null) ?? frameDefaults.positionSizingMethod,
+    positionSizingMethod:
+      (agent.positionSizingMethod as PositionSizingMethod | null) ??
+      frameDefaults.positionSizingMethod,
     minRrRatio: agent.minRrRatio ?? frameDefaults.minRrRatio,
-    maxDrawdownProtectionPct: agent.maxDrawdownProtectionPct ?? frameDefaults.maxDrawdownProtectionPct,
-    recoveryMode: (agent.recoveryMode as RecoveryMode | null) ?? frameDefaults.recoveryMode,
+    maxDrawdownProtectionPct:
+      agent.maxDrawdownProtectionPct ?? frameDefaults.maxDrawdownProtectionPct,
+    recoveryMode:
+      (agent.recoveryMode as RecoveryMode | null) ?? frameDefaults.recoveryMode,
 
     // Timing
-    sessionPreference: (agent.sessionPreference as SessionPreference | null) ?? frameDefaults.sessionPreference,
-    dayAvoidance: (agent.dayAvoidance as DayOfWeek[] | null) ?? frameDefaults.dayAvoidance,
-    volatilityEnvPreference: (agent.volatilityEnvPreference as VolatilityEnvPreference | null) ?? frameDefaults.volatilityEnvPreference,
+    sessionPreference:
+      (agent.sessionPreference as SessionPreference | null) ??
+      frameDefaults.sessionPreference,
+    dayAvoidance:
+      (agent.dayAvoidance as DayOfWeek[] | null) ?? frameDefaults.dayAvoidance,
+    volatilityEnvPreference:
+      (agent.volatilityEnvPreference as VolatilityEnvPreference | null) ??
+      frameDefaults.volatilityEnvPreference,
 
     // Personality
     agentBackground: agent.agentBackground ?? "",
-    proposalCommunicationStyle: (agent.proposalCommunicationStyle as ProposalCommunicationStyle | null) ?? frameDefaults.proposalCommunicationStyle,
+    proposalCommunicationStyle:
+      (agent.proposalCommunicationStyle as ProposalCommunicationStyle | null) ??
+      frameDefaults.proposalCommunicationStyle,
     winReaction: agent.winReaction ?? null,
     lossReaction: agent.lossReaction ?? null,
 
@@ -858,7 +916,9 @@ export function buildRebuildInitialState(agentData: AgentData): WizardState {
 
     // Brain state (non-persisted runtime — apiKey cleared)
     brain: {
-      brainType: (agent.botBrainConfig?.brainType as BrainType) ?? BrainType.TachyonHosted,
+      brainType:
+        (agent.botBrainConfig?.brainType as BrainType) ??
+        BrainType.TachyonHosted,
       modelId: agent.botBrainConfig?.modelId ?? "",
       provider: agent.botBrainConfig?.provider ?? "anthropic",
       apiKey: null, // NEVER pre-fill

@@ -1,73 +1,77 @@
-import { IconSymbol } from "@/components/shared/icon-symbol";
-import { PillSlider } from "@/components/ui/PillSlider";
 import { Colors } from "@/constants/theme";
+import { ForgeOptionCard } from "@/features/agents/forge/components/ForgeOptionCard";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React, { useState } from "react";
-import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
 interface AllocationControlProps {
   value: number;
   onChange: (v: number) => void;
-  min: number;
-  max: number;
   existingTotal: number;
   userCashBalance: number;
 }
 
+const PRESETS = [500, 1000, 2500, 5000, 10000];
+
 function formatUsd(amount: number): string {
-  return amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
+  return amount.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
 }
 
 export function AllocationControl({
   value,
   onChange,
-  min,
-  max,
   existingTotal,
   userCashBalance,
 }: AllocationControlProps) {
   const theme = Colors[useColorScheme()];
-  const [trackWidth, setTrackWidth] = useState(0);
+  const [customMode, setCustomMode] = useState(!PRESETS.includes(value));
+  const [customInput, setCustomInput] = useState(String(value));
 
-  const existingPct = Math.round(existingTotal * 100);
-  const currentPct = Math.round(value * 100);
-  const availablePct = Math.max(0, 100 - existingPct - currentPct);
+  const availableBalance = Math.max(0, userCashBalance - existingTotal);
 
-  function handleLayout(e: LayoutChangeEvent) {
-    setTrackWidth(e.nativeEvent.layout.width);
+  const existingFrac =
+    userCashBalance > 0 ? Math.min(existingTotal / userCashBalance, 1) : 0;
+  const currentFrac =
+    userCashBalance > 0
+      ? Math.min(value / userCashBalance, Math.max(0, 1 - existingFrac))
+      : 0;
+  const availableFrac = Math.max(0, 1 - existingFrac - currentFrac);
+
+  function handleCustomEnd() {
+    const parsed = parseFloat(customInput.replace(/[^0-9.]/g, ""));
+    if (!isNaN(parsed) && parsed > 0) {
+      onChange(parsed);
+    }
   }
-
-  const usdEquivalent =
-    userCashBalance > 0 ? formatUsd(value * userCashBalance) : null;
 
   return (
     <View style={styles.container}>
-      <View style={styles.labelRow}>
-        <Text style={[styles.label, { color: theme.textPrimary }]}>
-          {currentPct}%{usdEquivalent ? ` — ${usdEquivalent}` : ""}
-        </Text>
-      </View>
-
       <View style={styles.energyBar}>
-        {existingTotal > 0 && (
+        {existingFrac > 0 && (
           <View
             style={[
               styles.segment,
-              { flex: existingPct, backgroundColor: theme.warning },
+              { flex: existingFrac, backgroundColor: theme.warning },
             ]}
           />
         )}
-        <View
-          style={[
-            styles.segment,
-            { flex: currentPct, backgroundColor: theme.electricBlue },
-          ]}
-        />
-        {availablePct > 0 && (
+        {currentFrac > 0 && (
           <View
             style={[
               styles.segment,
-              { flex: availablePct, backgroundColor: theme.surface },
+              { flex: currentFrac, backgroundColor: theme.electricBlue },
+            ]}
+          />
+        )}
+        {availableFrac > 0 && (
+          <View
+            style={[
+              styles.segment,
+              { flex: availableFrac, backgroundColor: theme.surface },
             ]}
           />
         )}
@@ -80,7 +84,7 @@ export function AllocationControl({
               style={[styles.legendDot, { backgroundColor: theme.warning }]}
             />
             <Text style={[styles.legendText, { color: theme.textSecondary }]}>
-              Other agents {existingPct}%
+              Other agents {formatUsd(existingTotal)}
             </Text>
           </View>
         )}
@@ -89,7 +93,7 @@ export function AllocationControl({
             style={[styles.legendDot, { backgroundColor: theme.electricBlue }]}
           />
           <Text style={[styles.legendText, { color: theme.textSecondary }]}>
-            This agent {currentPct}%
+            This agent {formatUsd(value)}
           </Text>
         </View>
         <View style={styles.legendItem}>
@@ -97,36 +101,72 @@ export function AllocationControl({
             style={[styles.legendDot, { backgroundColor: theme.inputBorder }]}
           />
           <Text style={[styles.legendText, { color: theme.textSecondary }]}>
-            Available {availablePct}%
+            Available {formatUsd(availableBalance)}
           </Text>
         </View>
       </View>
 
-      <View onLayout={handleLayout} style={styles.sliderContainer}>
-        <PillSlider
-          value={value}
-          min={min}
-          max={max}
-          onChange={onChange}
-          trackWidth={trackWidth}
+      <View style={styles.presets}>
+        {PRESETS.map((preset) => (
+          <ForgeOptionCard
+            key={preset}
+            label={formatUsd(preset)}
+            description={
+              userCashBalance > 0
+                ? `${Math.round((preset / userCashBalance) * 100)}% of your balance`
+                : ""
+            }
+            selected={!customMode && value === preset}
+            onSelect={() => {
+              setCustomMode(false);
+              onChange(preset);
+            }}
+            disabled={userCashBalance > 0 && preset > availableBalance}
+            disabledReason={`Exceeds available balance of ${formatUsd(availableBalance)}`}
+          />
+        ))}
+        <ForgeOptionCard
+          label="Custom"
+          description="Enter a specific dollar amount"
+          selected={customMode}
+          onSelect={() => {
+            setCustomMode(true);
+            setCustomInput(String(value));
+          }}
         />
-        <View style={styles.rangeLabelsRow}>
-          <Text style={[styles.rangeLabel, { color: theme.textSecondary }]}>
-            Min {Math.round(min * 100)}%
-          </Text>
-          <Text style={[styles.rangeLabel, { color: theme.textSecondary }]}>
-            Max {Math.round(max * 100)}%
-          </Text>
-        </View>
       </View>
+
+      {customMode && (
+        <View style={styles.customInputRow}>
+          <Text style={[styles.currencySymbol, { color: theme.textPrimary }]}>
+            $
+          </Text>
+          <TextInput
+            style={[
+              styles.customInput,
+              {
+                borderColor: theme.electricBlue,
+                color: theme.textPrimary,
+                backgroundColor: theme.inputBackground,
+              },
+            ]}
+            value={customInput}
+            onChangeText={setCustomInput}
+            onEndEditing={handleCustomEnd}
+            onBlur={handleCustomEnd}
+            placeholder="e.g. 3000"
+            placeholderTextColor={theme.textDisabled}
+            keyboardType="decimal-pad"
+            returnKeyType="done"
+            autoFocus
+          />
+        </View>
+      )}
 
       {userCashBalance === 0 && (
-        <View style={styles.fundingPromptContainer}>
-          <IconSymbol size={22} name="warning" color={theme.warning} />
-          <Text style={[styles.fundingPrompt, { color: theme.warning }]}>
-            Fund your account to activate this agent!
-          </Text>
-        </View>
+        <Text style={[styles.fundingPrompt, { color: theme.warning }]}>
+          Fund your account to activate this agent!
+        </Text>
       )}
     </View>
   );
@@ -134,8 +174,6 @@ export function AllocationControl({
 
 const styles = StyleSheet.create({
   container: { gap: 12, marginTop: 15 },
-  labelRow: { flexDirection: "row", alignItems: "center" },
-  label: { fontSize: 16, fontWeight: "600" },
   energyBar: {
     flexDirection: "row",
     height: 8,
@@ -147,23 +185,17 @@ const styles = StyleSheet.create({
   legendItem: { flexDirection: "row", alignItems: "center", gap: 6 },
   legendDot: { width: 8, height: 8, borderRadius: 4 },
   legendText: { fontSize: 12 },
-  sliderContainer: { width: "100%" },
-  rangeLabelsRow: {
-    marginTop: 6,
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  rangeLabel: {
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  fundingPromptContainer: {
+  presets: { gap: 8 },
+  customInputRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  currencySymbol: { fontSize: 20, fontWeight: "600" },
+  customInput: {
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 10,
-    marginTop: 15,
+    height: 48,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    fontSize: 20,
+    fontWeight: "600",
   },
-  fundingPrompt: { fontSize: 15 },
+  fundingPrompt: { fontSize: 14, textAlign: "center" },
 });

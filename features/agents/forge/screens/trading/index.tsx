@@ -1,9 +1,9 @@
-import { FRAME_CONFIG } from "@tachyonapp/tachyon-queue-types/config";
 import { useWizard } from "@/context/WizardContext";
 import { ForgeNavBar } from "@/features/agents/forge/components/ForgeNavBar";
 import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
 import { BalanceDocument, type BalanceQuery } from "@/generated/graphql";
 import { useQuery } from "@apollo/client/react";
+import { FRAME_CONFIG } from "@tachyonapp/tachyon-queue-types/config";
 import { useRouter } from "expo-router";
 import { Keyboard, Pressable, ScrollView, StyleSheet } from "react-native";
 import { Allocation } from "./Allocation";
@@ -74,10 +74,7 @@ export default function TradingProfile() {
               body: "Controls how often your agent looks for new opportunities.",
             }}
           >
-            <Tempo
-              tradeTempo={state.tradeTempo}
-              updateField={updateField}
-            />
+            <Tempo tradeTempo={state.tradeTempo} updateField={updateField} />
           </ForgeSection>
 
           <ForgeSection
@@ -96,19 +93,17 @@ export default function TradingProfile() {
 
           <ForgeSection
             title="Capital Allocation"
-            subtitle="How much of your total account funds will this agent use?"
+            subtitle="How much capital should this agent deploy per position?"
             tooltip={{
               title: "Capital Allocation",
-              body: "This is the percentage of your total account balance that this agent can use. Multiple agents share your capital — allocated total cannot exceed 100%.",
+              body: "This is the fixed dollar amount this agent can deploy in a single position. Your total allocated capital across all agents cannot exceed your account balance.",
             }}
             locked={!combatComplete}
             lockedMessage="Set Trade Tempo first."
           >
             <Allocation
-              allocationPct={state.allocationPct}
+              capitalAllocatedUsd={state.capitalAllocatedUsd}
               updateField={updateField}
-              allocationBounds={{ min: 0.01, max: 1.0 }}
-              combatComplete={combatComplete}
               existingAllocationTotal={state.existingAllocationTotal}
               userCashBalance={userCashBalance}
               frameName={frameConfig?.gamifiedName ?? null}
