@@ -1,5 +1,5 @@
-import { PillSlider } from "@/components/PillSlider";
 import { IconSymbol } from "@/components/shared/icon-symbol";
+import { PillSlider } from "@/components/ui/PillSlider";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React, { useState } from "react";

@@ -1,4 +1,4 @@
-import { PillSlider } from "@/components/PillSlider";
+import { PillSlider } from "@/components/ui/PillSlider";
 import { Colors } from "@/constants/theme";
 import { ForgeOptionCard } from "@/features/agents/forge/components/ForgeOptionCard";
 import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
