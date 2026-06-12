@@ -1,5 +1,5 @@
-import { EducationalTooltip } from "@/components/EducationalTooltip";
-import { PillSlider } from "@/components/PillSlider";
+import { EducationalTooltip } from "@/components/ui/EducationalTooltip";
+import { PillSlider } from "@/components/ui/PillSlider";
 import { Colors } from "@/constants/theme";
 import { ForgeSection } from "@/features/agents/forge/components/ForgeSection";
 import { type MarketAwarenessInput } from "@/generated/graphql";

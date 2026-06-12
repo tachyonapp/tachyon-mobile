@@ -1,8 +1,9 @@
+import { RecoveryModeEducationSheet } from "@/components/shared/RecoveryModeEducationSheet";
 import { Colors } from "@/constants/theme";
+import { Avatar } from "@/features/agents/profile/components/Avatar";
 import { BotStatus } from "@/generated/graphql";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Avatar } from "@/features/agents/profile/components/Avatar";
-import React from "react";
+import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const STOOD_DOWN_RED = "#D64545";
@@ -26,7 +27,10 @@ function daysUntil(dateValue: string | null | undefined): number {
   today.setHours(0, 0, 0, 0);
   const until = new Date(dateValue);
   until.setHours(0, 0, 0, 0);
-  return Math.max(0, Math.ceil((until.getTime() - today.getTime()) / 86_400_000));
+  return Math.max(
+    0,
+    Math.ceil((until.getTime() - today.getTime()) / 86_400_000),
+  );
 }
 
 interface Badge {
@@ -44,7 +48,11 @@ function resolveBadge(
 
   if (isStoodDown && recoveryModeApplied === "MORE_CONSERVATIVE_2D") {
     const days = daysUntil(recoveryModeActiveUntil);
-    return { bg: RECOVERY_AMBER, text: `Rec. Mode · ${days}d`, textColor: "#0B0F1A" };
+    return {
+      bg: RECOVERY_AMBER,
+      text: `Rec. Mode · ${days}d`,
+      textColor: "#0B0F1A",
+    };
   }
   if (isStoodDown) {
     return { bg: STOOD_DOWN_RED, text: "Stood Down", textColor: "#FFFFFF" };
@@ -65,37 +73,73 @@ export function AgentTile({
   onPress,
 }: AgentTileProps) {
   const theme = Colors[useColorScheme()];
+  const [sheetVisible, setSheetVisible] = useState(false);
   const initials = (name ?? "?").slice(0, 2).toUpperCase();
-  const badge = resolveBadge(status, recoveryModeApplied, recoveryModeActiveUntil);
+  const badge = resolveBadge(
+    status,
+    recoveryModeApplied,
+    recoveryModeActiveUntil,
+  );
+  const isRecoveryBadge = badge?.bg === RECOVERY_AMBER;
 
   return (
-    <Pressable
-      style={({ pressed }) => [
-        styles.tile,
-        { backgroundColor: theme.surface, borderColor: frameColorway },
-        pressed && styles.tilePressed,
-      ]}
-      onPress={onPress}
-    >
-      <View style={styles.content}>
-        {avatarSeed ? (
-          <Avatar seed={avatarSeed} backgroundColor={theme.background} />
-        ) : (
-          <View style={[styles.initialsWrap, { backgroundColor: theme.background }]}>
-            <Text style={[styles.initials, { color: theme.textPrimary }]}>{initials}</Text>
-          </View>
-        )}
-        <Text style={[styles.name, { color: theme.textPrimary }]} numberOfLines={2}>
-          {name ?? "Unnamed"}
-        </Text>
-      </View>
-
-      {badge && (
-        <View style={[styles.badge, { backgroundColor: badge.bg }]}>
-          <Text style={[styles.badgeText, { color: badge.textColor }]}>{badge.text}</Text>
+    <>
+      <Pressable
+        style={({ pressed }) => [
+          styles.tile,
+          { backgroundColor: theme.surface, borderColor: frameColorway },
+          pressed && styles.tilePressed,
+        ]}
+        onPress={onPress}
+      >
+        <View style={styles.content}>
+          {avatarSeed ? (
+            <Avatar seed={avatarSeed} backgroundColor={theme.background} />
+          ) : (
+            <View
+              style={[
+                styles.initialsWrap,
+                { backgroundColor: theme.background },
+              ]}
+            >
+              <Text style={[styles.initials, { color: theme.textPrimary }]}>
+                {initials}
+              </Text>
+            </View>
+          )}
+          <Text
+            style={[styles.name, { color: theme.textPrimary }]}
+            numberOfLines={2}
+          >
+            {name ?? "Unnamed"}
+          </Text>
         </View>
-      )}
-    </Pressable>
+
+        {badge && (
+          <Pressable
+            style={[styles.badge, { backgroundColor: badge.bg }]}
+            onPress={
+              isRecoveryBadge
+                ? (e) => {
+                    e.stopPropagation();
+                    setSheetVisible(true);
+                  }
+                : undefined
+            }
+          >
+            <Text style={[styles.badgeText, { color: badge.textColor }]}>
+              {badge.text}
+            </Text>
+          </Pressable>
+        )}
+      </Pressable>
+
+      <RecoveryModeEducationSheet
+        visible={sheetVisible}
+        onDismiss={() => setSheetVisible(false)}
+        recoveryModeApplied={recoveryModeApplied}
+      />
+    </>
   );
 }
 

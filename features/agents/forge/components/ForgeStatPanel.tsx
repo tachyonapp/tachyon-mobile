@@ -109,7 +109,7 @@ export function ForgeStatPanel({ state }: ForgeStatPanelProps) {
           />
           <ForgeStatChip
             label="ALLOC"
-            value={`${Math.round(state.allocationPct * 100)}%`}
+            value={`$${state.capitalAllocatedUsd.toLocaleString("en-US", { maximumFractionDigits: 0 })}`}
           />
         </View>
         <View style={styles.chipsRow}>

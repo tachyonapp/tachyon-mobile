@@ -34,7 +34,7 @@ export function Configuration({ agent, onRebuild }: Props) {
         riskAttitude={agent.riskAttitude}
         tradeTempo={agent.tradeTempo}
         combatPatience={agent.combatPatience}
-        allocationPct={agent.allocationPct}
+        capitalAllocatedUsd={agent.capitalAllocatedUsd}
       />
 
       {/* 3. Safety Systems */}

@@ -1,4 +1,4 @@
-import { EducationalTooltip } from "@/components/EducationalTooltip";
+import { EducationalTooltip } from "@/components/ui/EducationalTooltip";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import React from "react";

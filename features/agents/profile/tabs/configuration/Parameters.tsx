@@ -1,6 +1,5 @@
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { formatPct } from "@/utils/format-pct";
 import React from "react";
 import { Section } from "../../components/Section";
 import { StatRow } from "../../components/StatRow";
@@ -9,7 +8,7 @@ interface ParametersProps {
   riskAttitude: any;
   tradeTempo: any;
   combatPatience: any;
-  allocationPct: any;
+  capitalAllocatedUsd: any;
 }
 
 const RISK_ATTITUDE_LABELS: Record<string, string> = {
@@ -35,7 +34,7 @@ export const Parameters = ({
   riskAttitude,
   tradeTempo,
   combatPatience,
-  allocationPct,
+  capitalAllocatedUsd,
 }: ParametersProps) => {
   const theme = Colors[useColorScheme()];
 
@@ -68,7 +67,15 @@ export const Parameters = ({
       />
       <StatRow
         label="Capital Allocated"
-        value={formatPct(allocationPct)}
+        value={
+          capitalAllocatedUsd != null
+            ? Number(capitalAllocatedUsd).toLocaleString("en-US", {
+                style: "currency",
+                currency: "USD",
+                maximumFractionDigits: 0,
+              })
+            : "—"
+        }
         theme={theme}
       />
     </Section>

@@ -1,4 +1,4 @@
-import { PillSlider } from "@/components/PillSlider";
+import { PillSlider } from "@/components/ui/PillSlider";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { type SignalWeights } from "@tachyonapp/tachyon-queue-types/config";

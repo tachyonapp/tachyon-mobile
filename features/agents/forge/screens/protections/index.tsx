@@ -69,7 +69,7 @@ export default function Protections() {
             dailyMaxLossPct={state.dailyMaxLoss}
             onDailyMaxLossChange={(v) => updateField("dailyMaxLoss", v)}
             dailyMaxLossBounds={dailyMaxLossBounds}
-            allocationPct={state.allocationPct}
+            capitalAllocatedUsd={state.capitalAllocatedUsd}
             userCashBalance={userCashBalance}
             dailyMaxGain={state.dailyMaxGain}
             onDailyMaxGainChange={(v) => updateField("dailyMaxGain", v)}

@@ -5,7 +5,7 @@ import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { OpenPositionSummary } from "./OpenPositionSummary";
 import { RecentProposalsFeed } from "./RecentProposalsFeed";
-import { StoodDownPanel } from "./StoodDownPanel";
+import { StoodDownBanner } from "./StoodDownBanner";
 
 type Agent = NonNullable<BotQuery["bot"]>;
 
@@ -39,13 +39,18 @@ export function Overview({ agent }: OverviewProps) {
       style={[styles.container, { backgroundColor: theme.background }]}
       contentContainerStyle={[styles.content, isEmpty && styles.emptyContent]}
     >
+      <StoodDownBanner
+        status={agent.status}
+        standdownReason={null}
+        recoveryModeApplied={agent.recoveryModeApplied}
+        recoveryModeActiveUntil={agent.recoveryModeActiveUntil}
+      />
       {hasPosition && (
         <OpenPositionSummary position={agent.activePosition!} theme={theme} />
       )}
       {hasProposals && (
         <RecentProposalsFeed proposals={proposals} theme={theme} />
       )}
-      {isStoodDown && <StoodDownPanel theme={theme} />}
       {isEmpty && (
         <View style={styles.emptyState}>
           <Text style={[styles.emptyText, { color: theme.textSecondary }]}>

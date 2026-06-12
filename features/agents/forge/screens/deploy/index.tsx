@@ -53,7 +53,7 @@ export default function Deployer() {
             frameName: state.frameName!,
             avatarSeed: state.avatarSeed,
             colorway: state.colorway,
-            allocationPct: String(state.allocationPct),
+            capitalAllocatedUsd: state.capitalAllocatedUsd,
             riskAttitude: state.riskAttitude!,
             tradeTempo: state.tradeTempo!,
             combatPatience: state.combatPatience!,

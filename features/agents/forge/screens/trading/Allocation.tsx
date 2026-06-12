@@ -4,51 +4,45 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Text, View } from "react-native";
 import { AllocationControl } from "./AllocationControl";
 
+const MIN_ALLOCATION_USD = 500;
+
 interface AllocationProps {
-  allocationPct: number;
-  allocationBounds: { min: number; max: number };
+  capitalAllocatedUsd: number;
   updateField: <K extends keyof WizardState>(
     field: K,
     value: WizardState[K],
   ) => void;
-  combatComplete: boolean;
   existingAllocationTotal: number;
   userCashBalance: number;
   frameName: string | null;
 }
 
 export const Allocation = ({
-  allocationPct,
+  capitalAllocatedUsd,
   updateField,
-  allocationBounds,
-  combatComplete,
   existingAllocationTotal,
   userCashBalance,
-  frameName: _frameName,
 }: AllocationProps) => {
   const theme = Colors[useColorScheme()];
-  const allocationMax = Math.min(
-    allocationBounds.max,
-    Math.max(0, 1.0 - existingAllocationTotal),
+  const availableBalance = Math.max(
+    0,
+    userCashBalance - existingAllocationTotal,
   );
-  const fullyAllocated = allocationMax < allocationBounds.min;
+  const fullyAllocated =
+    userCashBalance > 0 && availableBalance < MIN_ALLOCATION_USD;
 
   return (
     <View>
       {fullyAllocated ? (
         <Text style={{ color: theme.warning, fontSize: 13 }}>
-          Your other agents are using 100% of your capital. Free up allocation
-          by editing or removing an existing bot before adding a new one or
-          adding more funds to your account.
+          Your other agents have committed all available capital. Free up
+          allocation by editing or removing an existing agent, or deposit
+          additional funds.
         </Text>
       ) : (
         <AllocationControl
-          value={allocationPct}
-          onChange={(v) => {
-            updateField("allocationPct", v);
-          }}
-          min={allocationBounds.min}
-          max={allocationMax}
+          value={capitalAllocatedUsd}
+          onChange={(v) => updateField("capitalAllocatedUsd", v)}
           existingTotal={existingAllocationTotal}
           userCashBalance={userCashBalance}
         />
